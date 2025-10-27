@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="fragments/headers :: headers"></head>
+  <body>
+    <nav th:replace="fragments/navdar :: nav"></nav>
+
+    <main class="page-wrap max-w-3xl mx-auto p-6">
+      <div class="card-3d p-6">
+        <h1 class="text-2xl font-bold mb-4" style="color:var(--tf-blue);">Editar Usuario</h1>
+        <form th:action="@{/user/update}" method="post" class="space-y-4" id="updateUserForm">
+          <input type="hidden" name="idx" th:value="${idx}" />
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nombre</label>
+            <input name="nombre" type="text" required class="mt-1 block w-full rounded-md input-3d" th:value="${usuario['nombre']}" placeholder="Nombre" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Apellido</label>
+            <input name="apellido" type="text" required class="mt-1 block w-full rounded-md input-3d" th:value="${usuario['apellido']}" placeholder="Apellido" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <input name="email" type="email" required class="mt-1 block w-full rounded-md input-3d" th:value="${usuario['email']}" placeholder="email@example.com" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+            <input name="password" id="password" type="password" required class="mt-1 block w-full rounded-md input-3d" th:value="${usuario['password']}" placeholder="Contraseña" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">RUT</label>
+            <input name="rut" id="rut" type="text" required class="mt-1 block w-full rounded-md input-3d" th:value="${usuario['rut']}" placeholder="Ej: 12.345.678-9" />
+          </div>
+
+          <!-- Ubicación: tag input allowing multiple entries -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Ubicación (puedes añadir una o varias)</label>
+            <div id="tags" class="mt-1 min-h-[44px] w-full rounded-md border border-gray-300 bg-white p-2 flex flex-wrap items-center gap-2">
+              <input id="tag-input" type="text" class="flex-1 min-w-[160px] outline-none" placeholder="Escribe y presiona Enter" />
+            </div>
+
+            <div class="mt-2 text-sm text-gray-500">Sugerencias:
+              <div class="mt-1 flex flex-wrap gap-2">
+                <button type="button" class="suggestion-btn" data-value="DC APOQUINDO">DC APOQUINDO</button>
+                <button type="button" class="suggestion-btn" data-value="DC SAN MARTIN">DC SAN MARTIN</button>
+                <button type="button" class="suggestion-btn" data-value="MC LA FLORIDA">MC LA FLORIDA</button>
+                <button type="button" class="suggestion-btn" data-value="MC INDEPENDENCIA">MC INDEPENDENCIA</button>
+                <button type="button" class="suggestion-btn" data-value="MC CHILOÉ">MC CHILOÉ</button>
+                <button type="button" class="suggestion-btn" data-value="MC PROVIDENCIA">MC PROVIDENCIA</button>
+                <button type="button" class="suggestion-btn" data-value="MC PEDRO DE VALDIVIA">MC PEDRO DE VALDIVIA</button>
+                <button type="button" class="suggestion-btn" data-value="MC MANUEL MONTT">MC MANUEL MONTT</button>
+              </div>
+            </div>
+
+            <!-- hidden input to submit the selected locations as comma-separated values -->
+            <input type="hidden" name="ubicacion" id="ubicacion-hidden" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Rol</label>
+            <select name="rol" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+              <option th:selected="${usuario['rol']=='USER'}" value="USER">USER</option>
+              <option th:selected="${usuario['rol']=='ADMIN'}" value="ADMIN">ADMIN</option>
+            </select>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <button type="submit" class="btn-3d">Guardar cambios</button>
+            <a th:href="@{/user/list}" class="text-sm text-gray-600 hover:underline">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <script>
+      (function(){
+        const tagInput = document.getElementById('tag-input');
+        const tagsContainer = document.getElementById('tags');
+        const hiddenInput = document.getElementById('ubicacion-hidden');
+        const form = document.getElementById('updateUserForm');
+
+        // prepopulate tags from server-side value
+        const initial = /*[[${usuario['ubicacion']}]]*/ '';
+        let tags = [];
+        if(initial && initial.length>0){
+          tags = initial.split(',').map(s=>s.trim()).filter(Boolean);
+        }
+
+        function renderTags(){
+          Array.from(tagsContainer.querySelectorAll('.tag-item')).forEach(el => el.remove());
+          tags.forEach((t, idx) =>{
+            const span = document.createElement('span');
+            span.className = 'tag-item inline-flex items-center gap-2 px-2 py-1 rounded';
+            span.textContent = t;
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'ml-2 text-xs text-red-600';
+            btn.textContent = '✕';
+            btn.addEventListener('click', () => { tags.splice(idx,1); renderTags(); });
+            span.appendChild(btn);
+            tagsContainer.insertBefore(span, tagInput);
+          });
+          hiddenInput.value = tags.join(',');
+        }
+
+        function addTag(value){
+          const v = value.trim();
+          if(!v) return;
+          if(tags.includes(v)) return;
+          tags.push(v);
+          renderTags();
+        }
+
+        tagInput.addEventListener('keydown', function(e){
+          if(e.key === 'Enter'){
+            e.preventDefault();
+            addTag(tagInput.value);
+            tagInput.value = '';
+          } else if(e.key === 'Backspace' && tagInput.value === ''){
+            tags.pop(); renderTags();
+          }
+        });
+
+        document.querySelectorAll('[data-value]').forEach(btn =>{
+          btn.addEventListener('click', () => { addTag(btn.getAttribute('data-value')); });
+        });
+
+        form.addEventListener('submit', function(){ hiddenInput.value = tags.join(','); });
+
+        // initial render
+        renderTags();
+      })();
+    </script>
+  </body>
+</html>

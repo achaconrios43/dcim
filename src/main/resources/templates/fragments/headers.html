@@ -1,0 +1,81 @@
+<head th:fragment="headers">  
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Iniciar sesión</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'tf-blue': '#003DA5',
+                            'tf-cyan': '#00A1E6',
+                            'tf-dark': '#002B5C',
+                            'accent': '#003DA5'
+                        },
+                        fontFamily: {
+                            sans: ['Inter', 'ui-sans-serif', 'system-ui']
+                        }
+                    },
+                },
+            }
+        </script>
+        <style>
+            :root{
+                --tf-blue: #003DA5;
+                --tf-cyan: #00A1E6;
+            }
+            html,body{ height:100%; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+            body{ background: linear-gradient(180deg, rgba(234,246,255,1) 0%, rgba(230,242,255,1) 50%, rgba(247,251,255,1) 100%); }
+            /* Static 3D card style used by pages */
+            .card-3d{
+                transform: translateZ(8px) rotateX(2deg) rotateY(-3deg);
+                border-radius: 14px;
+                box-shadow: 0 28px 60px rgba(0,29,77,0.14), inset 0 1px 0 rgba(255,255,255,0.8);
+                background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(240,248,255,0.96));
+                border: 1px solid rgba(0,61,165,0.06);
+                backdrop-filter: blur(8px) saturate(120%);
+            }
+            /* Utility: input/select defaults matching 3D look */
+            .input-3d, .select-3d{ background: rgba(255,255,255,0.95); border:1px solid rgba(0,61,165,0.06); border-radius:10px; padding:.6rem .8rem; }
+
+            /* Topbar 3D address style */
+            .topbar-3d{
+                display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:12px 18px; 
+                background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(240,248,255,0.5));
+                border-bottom: 1px solid rgba(0,61,165,0.06);
+                box-shadow: 0 8px 30px rgba(0,29,77,0.06);
+                transform: translateZ(6px);
+            }
+            .topbar-logo{
+                display:flex; align-items:center; gap:.75rem;
+            }
+            .topbar-logo .mark{ width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,#e6f7ff,#f0fbff); border:1px solid rgba(0,61,165,0.06); box-shadow:0 10px 30px rgba(0,61,165,0.06); }
+            .topbar-address{ text-align:right; transform: translateZ(6px); }
+            .topbar-address h4{ margin:0; color:var(--tf-dark); font-weight:700; text-shadow:0 6px 14px rgba(0,29,77,0.06); }
+            .topbar-address p{ margin:0; color:var(--tf-blue); font-size:0.9rem; }
+        </style>
+    </head>
+
+    <!-- Visible header fragment: include in body with th:replace="fragments/headers :: topbar" -->
+    <div th:fragment="topbar">
+      <div class="topbar-3d">
+        <div class="topbar-logo">
+          <div class="mark">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" rx="5" fill="#003DA5" />
+              <text x="12" y="15" text-anchor="middle" font-family="Inter, Arial" font-size="9" fill="#ffffff" font-weight="700">IPSS</text>
+            </svg>
+          </div>
+          <div>
+            <div style="font-weight:700; color:var(--tf-dark);">IPSS - SERVICIO COMMODITIES</div>
+            <div style="font-size:0.85rem; color:var(--tf-blue);">DATA CENTER & MEGACENTRALES</div>
+          </div>
+        </div>
+        <div class="topbar-address">
+          <h4>Av. Ejemplo 1234</h4>
+          <p>Providencia, Santiago · Tel +56 2 1234 5678</p>
+        </div>
+      </div>
+    </div>

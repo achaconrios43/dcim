@@ -1,0 +1,38 @@
+<nav th:fragment="nav" class="w-full bg-transparent">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="flex items-center justify-between h-20">
+      <div class="flex items-center gap-4">
+        <!-- IPSS logo: simple SVG mark + name -->
+        <a th:href="@{/}" class="flex items-center gap-3 no-underline">
+          <div style="width:56px; height:56px; border-radius:10px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,#e6f7ff,#f0fbff); border:1px solid rgba(0,61,165,0.08); box-shadow:0 10px 30px rgba(0,61,165,0.08);">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" rx="5" fill="#003DA5" />
+              <text x="12" y="16" text-anchor="middle" font-family="Inter, Arial" font-size="10" fill="#ffffff" font-weight="700">IPSS</text>
+            </svg>
+          </div>
+          <div class="leading-tight">
+            <div style="font-weight:700; color:#003DA5; font-size:1rem;">SERVICIO COMMODITIES</div>
+            <div style="font-size:0.85rem; color:#004a99;">DATA CENTER & MEGA CENTRALES</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-6">
+          <a th:href="@{/}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Servicio</a>
+          <a th:href="@{/login}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Login</a>
+          <a th:href="@{/user/create}" class="text-[#003DA5] hover:underline px-3 py-2 rounded" th:unless="${#authentication?.name}">Register</a>
+          <span th:if="${#authentication?.name}" class="text-[#004a99] font-semibold px-3">Usuario: <span th:text="${#authentication.name}"></span></span>
+          <a th:href="@{/logout}" th:if="${#authentication?.name}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Logout</a>
+        </div>
+
+        
+
+        <!-- mobile menu toggle placeholder -->
+        <div class="md:hidden">
+          <button type="button" style="background:transparent; border:1px solid rgba(0,61,165,0.06); padding:8px 10px; border-radius:8px; color:#003DA5;">☰</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

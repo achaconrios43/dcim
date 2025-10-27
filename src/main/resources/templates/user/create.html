@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="fragments/headers :: headers"></head>
+  <body>
+    <nav th:replace="fragments/navdar :: nav"></nav>
+
+    <!-- 3D/modern styles injected here to avoid editing global header fragment -->
+    <style>
+      :root{
+        /* Telefónica-like palette: deep blue + cyan accents */
+        --card-bg: linear-gradient(135deg, rgba(240,246,252,0.95), rgba(230,242,255,0.85));
+        --accent: #003DA5; /* deep Telefónica blue */
+        --accent-2: #063a50ff; /* cyan accent */
+        --glass-border: rgba(255,255,255,0.6);
+      }
+      .page-wrap{ perspective: 1200px; }
+      .card-3d{
+        transform-style: preserve-3d;
+        /* static relief instead of interactive tilt */
+        transform: translateZ(8px) rotateX(2deg) rotateY(-4deg);
+        transition: box-shadow 300ms, transform 300ms cubic-bezier(.2,.8,.2,1);
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0,29,77,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+        background: var(--card-bg);
+        border: 1px solid rgba(0,61,165,0.06);
+        backdrop-filter: blur(8px) saturate(120%);
+      }
+      .card-3d:hover{ box-shadow: 0 30px 60px rgba(0,29,77,0.22); }
+
+      /* Input styles */
+      .input-3d{
+        background: rgba(255,255,255,0.9);
+        border: 1px solid rgba(0,61,165,0.06);
+        padding: .6rem .75rem;
+        border-radius: 8px;
+        transition: box-shadow .18s, transform .18s;
+      }
+      .input-3d:focus{ outline: none; box-shadow: 0 6px 20px rgba(0,161,230,0.14); transform: translateY(-2px); }
+
+      .btn-3d{
+        display:inline-flex; align-items:center; gap:.5rem; justify-content:center;
+        padding:.6rem 1rem; border-radius:10px; color:white; font-weight:600;
+        background: linear-gradient(90deg,var(--accent), var(--accent-2));
+        box-shadow: 0 8px 20px rgba(0,61,165,0.18);
+        border: 0; cursor:pointer; transition: transform .18s, box-shadow .18s;
+      }
+      .btn-3d:active{ transform: translateY(1px) scale(.998); }
+
+      /* tags styling adjustments */
+      .tag-item{ background: linear-gradient(90deg,#e6f7ff,#f0fbff); color: #003865; padding:4px 8px; border-radius:999px; display:inline-flex; align-items:center; }
+
+      /* layout tweaks */
+      main { padding: 3.5rem 1rem; }
+      .form-title { letter-spacing: .2px; color: var(--accent); }
+
+      @media (min-width: 768px){
+        main { padding:4.5rem 1rem; }
+      }
+
+      /* Suggestion buttons subtle blue outline */
+      .suggestion-btn{ border: 1px solid rgba(0,61,165,0.06); background: #f5fbff; color: #003865; padding: .25rem .5rem; border-radius: 8px; }
+      .suggestion-btn:hover{ background: #e9f7ff; }
+
+      /* Modal styles */
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(4, 10, 25, 0.4);
+        z-index: 50;
+      }
+      .modal-content {
+        width: 90%;
+        max-width: 420px;
+        padding: 1.25rem;
+        border-radius: 14px;
+        background: linear-gradient(180deg,#fff,#f4fbff);
+        box-shadow: 0 30px 80px rgba(0,29,77,0.18);
+        border: 1px solid rgba(0,61,165,0.08);
+        transform: translateZ(8px);
+      }
+      .modal-header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .modal-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: linear-gradient(90deg,#ffefef,#fff2f2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-title {
+        font-weight: 700;
+        color: #002B5C;
+      }
+      .modal-message {
+        color: #003DA5;
+      }
+      .modal-close {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 12px;
+      }
+    </style>
+
+    <main class="page-wrap max-w-3xl mx-auto p-6">
+      <div class="card-3d p-6">
+        <h1 class="text-2xl font-bold mb-4 form-title">Registrar Usuario</h1>
+        <form action="/user/create" method="post" class="space-y-4" id="createUserForm">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nombre</label>
+            <input name="nombre" type="text" required class="mt-1 block w-full rounded-md input-3d" placeholder="Nombre" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Apellido</label>
+            <input name="apellido" type="text" required class="mt-1 block w-full rounded-md input-3d" placeholder="Apellido" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <input name="email" type="email" required class="mt-1 block w-full rounded-md input-3d" placeholder="email@example.com" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+            <input name="password" id="password" type="password" required class="mt-1 block w-full rounded-md input-3d" placeholder="Contraseña" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">RUT</label>
+            <input name="rut" id="rut" type="text" required class="mt-1 block w-full rounded-md input-3d" placeholder="Ej: 12.345.678-9" />
+          </div>
+
+          <!-- Ubicación: tag input allowing multiple entries -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Ubicación (puedes añadir una o varias)</label>
+            <div id="tags" class="mt-1 min-h-[44px] w-full rounded-md border border-gray-300 bg-white p-2 flex flex-wrap items-center gap-2">
+              <!-- tags will be inserted here -->
+              <input id="tag-input" type="text" class="flex-1 min-w-[160px] outline-none" placeholder="Escribe y presiona Enter" />
+            </div>
+
+            <div class="mt-2 text-sm text-gray-500">Sugerencias:
+              <div class="mt-1 flex flex-wrap gap-2">
+                <button type="button" class="suggestion-btn" data-value="DC APOQUINDO">DC APOQUINDO</button>
+                <button type="button" class="suggestion-btn" data-value="DC SAN MARTIN">DC SAN MARTIN</button>
+                <button type="button" class="suggestion-btn" data-value="MC LA FLORIDA">MC LA FLORIDA</button>
+                <button type="button" class="suggestion-btn" data-value="MC INDEPENDENCIA">MC INDEPENDENCIA</button>
+                <button type="button" class="suggestion-btn" data-value="MC CHILOÉ">MC CHILOÉ</button>
+                <button type="button" class="suggestion-btn" data-value="MC PROVIDENCIA">MC PROVIDENCIA</button>
+                <button type="button" class="suggestion-btn" data-value="MC PEDRO DE VALDIVIA">MC PEDRO DE VALDIVIA</button>
+                <button type="button" class="suggestion-btn" data-value="MC MANUEL MONTT">MC MANUEL MONTT</button>
+              </div>
+            </div>
+
+            <!-- hidden input to submit the selected locations as comma-separated values -->
+            <input type="hidden" name="ubicacion" id="ubicacion-hidden" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Rol</label>
+            <select name="rol" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+              <option value="USER">USER</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <button type="submit" class="btn-3d">Crear usuario</button>
+            <a th:href="@{/user/list}" class="text-sm text-gray-600 hover:underline">Ver listado</a>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- 3D modal for validation error -->
+    <div th:if="${errorMessage}" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 7h2v6h-2zM11 15h2v2h-2z" fill="#D14343"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" fill="#fff2f2" opacity="0.9"/></svg>
+          </div>
+          <div>
+            <div class="modal-title">Falta campo</div>
+            <div class="modal-message"><span th:text="${errorMessage}"></span></div>
+          </div>
+        </div>
+        <div class="modal-close">
+          <button onclick="this.closest('[th\:if]').style.display='none'" class="btn-3d" style="background:linear-gradient(90deg,#003DA5,#00A1E6);">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // removed interactive tilt; kept static relief via CSS transform
+
+      // tags logic (preserve previous behavior)
+      (function(){
+        const tagInput = document.getElementById('tag-input');
+        const tagsContainer = document.getElementById('tags');
+        const hiddenInput = document.getElementById('ubicacion-hidden');
+        const form = document.getElementById('createUserForm');
+
+        let tags = [];
+
+        function renderTags(){
+          Array.from(tagsContainer.querySelectorAll('.tag-item')).forEach(el => el.remove());
+          tags.forEach((t, idx) =>{
+            const span = document.createElement('span');
+            span.className = 'tag-item inline-flex items-center gap-2 px-2 py-1 rounded';
+            span.textContent = t;
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'ml-2 text-xs text-red-600';
+            btn.textContent = '✕';
+            btn.addEventListener('click', () => { tags.splice(idx,1); renderTags(); });
+            span.appendChild(btn);
+            tagsContainer.insertBefore(span, tagInput);
+          });
+          hiddenInput.value = tags.join(',');
+        }
+
+        function addTag(value){
+          const v = value.trim();
+          if(!v) return;
+          if(tags.includes(v)) return;
+          tags.push(v);
+          renderTags();
+        }
+
+        tagInput.addEventListener('keydown', function(e){
+          if(e.key === 'Enter'){
+            e.preventDefault();
+            addTag(tagInput.value);
+            tagInput.value = '';
+          } else if(e.key === 'Backspace' && tagInput.value === ''){
+            tags.pop(); renderTags();
+          }
+        });
+
+        document.querySelectorAll('[data-value]').forEach(btn =>{
+          btn.addEventListener('click', () => { addTag(btn.getAttribute('data-value')); });
+        });
+
+        form.addEventListener('submit', function(){ hiddenInput.value = tags.join(','); });
+      })();
+    </script>
+  </body>
+</html>

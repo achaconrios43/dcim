@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head th:replace="fragments/headers :: headers"></head>
+  <body>
+    <nav th:replace="fragments/navdar :: nav"></nav>
+    <main class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-accent py-8">
+      <div class="w-full max-w-lg bg-white bg-opacity-80 rounded-xl shadow-xl p-8 backdrop-blur">
+        <div class="flex items-center mb-6">
+          <div class="mr-3">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#6c5ce7" opacity="0.12"/><path d="M6 12h12M6 8h12M6 16h8" stroke="#6c5ce7" stroke-opacity="0.9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-accent">Registro de Ingreso</div>
+            <div class="text-sm text-gray-500">Complete los datos de la visita</div>
+          </div>
+        </div>
+
+        <form th:action="@{/ingreso}" action="/ingreso" method="post" class="space-y-5" id="ingresoForm">
+          <div th:if="${_csrf != null}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          </div>
+
+          <div>
+            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+            <input type="text" id="nombre" name="nombre" th:value="${nombre}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Nombre completo" />
+          </div>
+
+          <div>
+            <label for="rut" class="block text-sm font-medium text-gray-700">RUT</label>
+            <input type="text" id="rut" name="rut" th:value="${rut}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Ej: 12.345.678-9" />
+          </div>
+
+          <div class="flex space-x-4">
+            <div class="flex-1">
+              <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
+              <input type="date" id="fecha" name="fecha" th:value="${fecha}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
+            </div>
+            <div class="flex-1">
+              <label for="hora" class="block text-sm font-medium text-gray-700">Hora ingreso</label>
+              <input type="time" id="hora" name="hora" th:value="${hora}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
+            </div>
+          </div>
+
+          <div>
+            <label for="empresa" class="block text-sm font-medium text-gray-700">Empresa</label>
+            <input type="text" id="empresa" name="empresa" th:value="${empresa}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Empresa" />
+          </div>
+
+          <div>
+            <label for="contratista" class="block text-sm font-medium text-gray-700">Contratista</label>
+            <input type="text" id="contratista" name="contratista" th:value="${contratista}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Contratista" />
+          </div>
+
+          <div>
+            <label for="tipoRemedy" class="block text-sm font-medium text-gray-700">Tipo de REMEDY</label>
+            <select id="tipoRemedy" name="tipoRemedy" required class="block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900">
+              <option value="" th:selected="${tipoRemedy == null or tipoRemedy == ''}">Selecciona una opción</option>
+              <option value="CRQ" th:selected="${tipoRemedy == 'CRQ'}">CRQ</option>
+              <option value="INC" th:selected="${tipoRemedy == 'INC'}">INC</option>
+              <option value="VISITA" th:selected="${tipoRemedy == 'VISITA'}">VISITA</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="ticket" class="block text-sm font-medium text-gray-700">Número de ticket</label>
+            <input type="text" id="ticket" name="ticket" th:value="${ticket}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Ej: INC123456" />
+          </div>
+
+          <div>
+            <label for="aprobador" class="block text-sm font-medium text-gray-700">Aprobador</label>
+            <input type="text" id="aprobador" name="aprobador" th:value="${aprobador}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Nombre del aprobador" />
+          </div>
+
+          <div>
+            <label for="motivo" class="block text-sm font-medium text-gray-700">Motivo visita</label>
+            <textarea id="motivo" name="motivo" th:text="${motivo}" required rows="2" class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Motivo de la visita"></textarea>
+          </div>
+
+          <div>
+            <button type="submit" class="w-full py-3 rounded-lg bg-accent text-white font-bold text-lg shadow hover:bg-indigo-700 transition mt-2">Registrar ingreso</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- modals for error/success -->
+    <div th:if="${errorMessage}" id="errorModal" style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(4,10,25,0.4); z-index:60;">
+      <div style="width:90%; max-width:480px; padding:1rem; border-radius:12px; background:linear-gradient(180deg,#fff,#f4fbff); box-shadow:0 30px 80px rgba(0,29,77,0.18); border:1px solid rgba(0,61,165,0.08); transform: translateZ(8px);">
+        <h3 style="color:#002B5C; font-weight:700; margin:0 0 .5rem 0;">Error</h3>
+        <div style="color:#003DA5;" th:text="${errorMessage}"></div>
+        <div style="display:flex; justify-content:flex-end; margin-top:12px;"><button onclick="document.getElementById('errorModal').style.display='none'" class="btn-3d" style="background:linear-gradient(90deg,#003DA5,#00A1E6);">Cerrar</button></div>
+      </div>
+    </div>
+
+    <div th:if="${successMessage}" id="successModal" style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(4,10,25,0.2); z-index:60;">
+      <div style="width:90%; max-width:420px; padding:1rem; border-radius:12px; background:linear-gradient(180deg,#fff,#f4fbff); box-shadow:0 30px 80px rgba(0,29,77,0.18); border:1px solid rgba(0,61,165,0.08); transform: translateZ(8px);">
+        <h3 style="color:#002B5C; font-weight:700; margin:0 0 .5rem 0;">Éxito</h3>
+        <div style="color:#003DA5;" th:text="${successMessage}"></div>
+        <div style="display:flex; justify-content:flex-end; margin-top:12px;"><a th:href="@{/}" class="btn-3d" style="background:linear-gradient(90deg,#003DA5,#00A1E6); color:white; padding:.6rem 1rem; border-radius:10px;">Aceptar</a></div>
+      </div>
+    </div>
+
+    <script>
+      // simple client-side RUT validation and auto-fill date/time
+      (function(){
+        const rutInput = document.getElementById('rut');
+        const fechaInput = document.getElementById('fecha');
+        const horaInput = document.getElementById('hora');
+        // autofill date/time if empty
+        const now = new Date();
+        if(fechaInput && !fechaInput.value){ fechaInput.value = now.toISOString().slice(0,10); }
+        if(horaInput && !horaInput.value){ horaInput.value = now.toTimeString().slice(0,5); }
+
+        function validRut(val){
+          return /^\d{1,3}(\.\d{3})*-?[\dkK]$/.test(val.trim());
+        }
+
+        const form = document.getElementById('ingresoForm');
+        if(form){
+          form.addEventListener('submit', function(e){
+            if(rutInput && !validRut(rutInput.value)){
+              e.preventDefault();
+              alert('RUT con formato inválido');
+              rutInput.focus();
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
