@@ -55,28 +55,28 @@ public String getRut() {
         this.updateAt = new Date();
     }
 
-    public String getemail() {
+    public String getEmail() {
         return email;
     }
 
-    public void setemail(String email) {
+    public void setEmail(String email) {
         this.email = email;
         this.updateAt = new Date();
     }
 
-    public String getpassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setpassword(String password) {
+    public void setPassword(String password) {
         this.password = password;
         this.updateAt = new Date();
     }
-    public String getubicacion() {
+    public String getUbicacion() {
         return ubicacion;
     }
 
-    public void setubicacion(String ubicacion) {
+    public void setUbicacion(String ubicacion) {
         this.ubicacion = ubicacion;
         this.updateAt = new Date();
     }
