@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="fragments/headers :: headers"></th:block>
+    <title>Ver Registro de Acceso</title>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <th:block th:insert="fragments/headers :: headers"></th:block>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Título y navegación -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Detalles del Registro</h1>
+                <nav class="text-sm text-gray-600 mt-2">
+                    <a href="/user/dashboard" class="hover:text-blue-600">Dashboard</a> > 
+                    <a href="/ingreso/ap/list" class="hover:text-blue-600">Lista de Registros</a> > 
+                    <span>Ver Registro</span>
+                </nav>
+            </div>
+            <a href="/ingreso/ap/list" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Volver
+            </a>
+        </div>
+
+        <!-- Tarjeta de detalles -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Header de la tarjeta -->
+            <div class="bg-blue-600 text-white px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Registro #<span th:text="${ingreso.id}"></span></h2>
+                    <div class="flex space-x-2">
+                        <a th:href="@{'/ingreso/ap/update/' + ${ingreso.id}}" 
+                           class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm inline-flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            Editar
+                        </a>
+                        <a th:href="@{'/ingreso/ap/delete/' + ${ingreso.id}}" 
+                           class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm inline-flex items-center"
+                           onclick="return confirm('¿Está seguro que desea eliminar este registro?')">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Eliminar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido de la tarjeta -->
+            <div class="p-6">
+                <!-- Información del Técnico -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información del Técnico</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.nombreTecnico}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.rutTecnico}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.emailTecnico ?: 'No registrado'}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de la Empresa -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información de la Empresa</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Empresa Contratista</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.empresaContratista}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Empresa Demandante</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.empresaDemandante ?: 'No especificada'}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cargo Técnico</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.cargoTecnico ?: 'No registrado'}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Aprobador</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.aprobador ?: 'No registrado'}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del Acceso -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información del Acceso</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${#dates.format(ingreso.fechaInicio, 'dd/MM/yyyy')}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Turno</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.turno}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Entrada</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${#dates.format(ingreso.horaInicio, 'HH:mm')}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Salida</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.horaTermino != null ? #dates.format(ingreso.horaTermino, 'HH:mm') : 'Aún en curso'}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del Trabajo -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información del Trabajo</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Ticket</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.tipoTicket}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número de Ticket</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.numeroTicket ?: 'No asignado'}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sala</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.salaIngresa}"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <span th:if="${ingreso.activo}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    Activo
+                                </span>
+                                <span th:unless="${ingreso.activo}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                    Inactivo
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Motivo de Ingreso -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de Ingreso</label>
+                    <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md min-h-[100px]">
+                        <span th:text="${ingreso.motivoIngreso ?: 'Sin descripción'}"></span>
+                    </div>
+                </div>
+
+                <!-- Información de Auditoría -->
+                <div class="border-t pt-4 text-xs text-gray-500">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <strong>Creado:</strong> <span th:text="${#dates.format(ingreso.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span>
+                        </div>
+                        <div th:if="${ingreso.fechaModificacion}">
+                            <strong>Modificado:</strong> <span th:text="${#dates.format(ingreso.fechaModificacion, 'dd/MM/yyyy HH:mm')}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <th:block th:insert="fragments/footer :: footer"></th:block>
+</body>
+</html>

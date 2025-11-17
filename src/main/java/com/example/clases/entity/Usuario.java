@@ -1,31 +1,67 @@
 package com.example.clases.entity;
 import java.util.Date;
+import jakarta.persistence.*;
 
-
-
+@Entity
+@Table(name = "usuario")
 public class Usuario {
+  
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  
+  @Column(unique = true, nullable = false, length = 12)
   private String rut;
+  
+  @Column(nullable = false, length = 100)
   private String nombre;
+  
+  @Column(nullable = false, length = 100)
   private String apellido;
+  
+  @Column(unique = true, nullable = false, length = 150)
   private String email;
+  
+  @Column(nullable = false)
   private String password;
+  
+  @Column(length = 100)
   private String ubicacion;
+  
+  @Column(nullable = false, length = 20)
   private String rol;
+  
+  @Column(name = "creat_at")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date creatAt;
+  
+  @Column(name = "update_at")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date updateAt;
 
     // No-arg constructor
     public Usuario() {
     }
 
-    public Usuario(String nombre, String apellido, String email, String password, String ubicacion, String rol) {
+    public Usuario(String rut, String nombre, String apellido, String email, String password, String ubicacion, String rol) {
+        this.rut = rut;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
         this.password = password;
         this.ubicacion = ubicacion;
         this.rol = rol;
-       
+        this.creatAt = new Date();
+        this.updateAt = new Date();
+    }
+
+    // Getters y Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
 public String getRut() {

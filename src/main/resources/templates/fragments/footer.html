@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<footer th:fragment="footer" class="w-full bg-transparent mt-auto border-t border-gray-200 border-opacity-30">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="flex flex-col md:flex-row items-center justify-between py-8">
+      <!-- Logo y nombre del proyecto -->
+      <div class="flex items-center gap-3 mb-4 md:mb-0">
+        <div style="width:48px; height:48px; border-radius:8px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,#e6f7ff,#f0fbff); border:1px solid rgba(0,61,165,0.08); box-shadow:0 8px 24px rgba(0,61,165,0.06);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="5" fill="#003DA5" />
+            <text x="12" y="16" text-anchor="middle" font-family="Inter, Arial" font-size="10" fill="#ffffff" font-weight="700">DC</text>
+          </svg>
+        </div>
+        <div class="leading-tight">
+          <div style="font-weight:700; color:#003DA5; font-size:0.95rem;">DATA CENTER COMMODITIES</div>
+          <div style="font-size:0.8rem; color:#004a99;">Sistema de Gestión Técnica</div>
+        </div>
+      </div>
+
+      <!-- Enlaces de navegación -->
+      <div class="flex items-center gap-4 text-sm">
+        <a th:href="@{/}" class="text-[#003DA5] hover:underline px-2 py-1 rounded">Inicio</a>
+        <span class="text-gray-400">|</span>
+        <a th:href="@{/user/list}" class="text-[#003DA5] hover:underline px-2 py-1 rounded" th:if="${#authentication?.name}">Usuarios</a>
+        <a th:href="@{/login}" class="text-[#003DA5] hover:underline px-2 py-1 rounded" th:unless="${#authentication?.name}">Acceder</a>
+        <span class="text-gray-400" th:if="${#authentication?.name}">|</span>
+        <span class="text-[#004a99] text-xs" th:if="${#authentication?.name}">Conectado como: <span th:text="${#authentication.name}" class="font-semibold"></span></span>
+      </div>
+
+      <!-- Copyright y año -->
+      <div class="text-center md:text-right mt-4 md:mt-0">
+        <div style="color:#004a99; font-size:0.8rem;">
+          © <span th:text="${#dates.year(#dates.createNow())}">2025</span> IPSS - Servicio Commodities
+        </div>
+        <div style="color:#6b7280; font-size:0.75rem; margin-top:2px;">
+          Data Center & Mega Centrales
+        </div>
+      </div>
+    </div>
+
+    <!-- Línea decorativa -->
+    <div class="border-t border-gray-200 border-opacity-20 pt-4 pb-6">
+      <div class="text-center">
+        <div style="color:#6b7280; font-size:0.7rem;">
+          Desarrollado por Arturo Chacón 
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</html>

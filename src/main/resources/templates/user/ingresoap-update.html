@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="fragments/headers :: headers"></th:block>
+    <title>Editar Registro de Acceso</title>
+    <style>
+        .field-error {
+            border-color: #f56565 !important;
+            box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <th:block th:insert="fragments/headers :: headers"></th:block>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Título y navegación -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Editar Registro</h1>
+                <nav class="text-sm text-gray-600 mt-2">
+                    <a href="/user/dashboard" class="hover:text-blue-600">Dashboard</a> > 
+                    <a href="/ingreso/ap/list" class="hover:text-blue-600">Lista de Registros</a> > 
+                    <span>Editar Registro</span>
+                </nav>
+            </div>
+            <a href="/ingreso/ap/list" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Cancelar
+            </a>
+        </div>
+
+        <!-- Formulario de edición -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-blue-600 text-white px-6 py-4">
+                <h2 class="text-xl font-bold">Editando Registro #<span th:text="${ingreso.id}"></span></h2>
+            </div>
+
+            <div class="p-6">
+                <form th:action="@{'/ingreso/ap/update/' + ${ingreso.id}}" th:object="${ingreso}" method="post">
+                    <!-- Buscar técnico existente -->
+                    <div class="mb-8 bg-blue-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Buscar Técnico Existente</h3>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <label for="rutBusqueda" class="block text-sm font-medium text-gray-700 mb-1">RUT del Técnico</label>
+                                <input type="text" id="rutBusqueda" placeholder="Ej: 12345678-9" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="button" onclick="buscarTecnico()" 
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md inline-flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    Buscar
+                                </button>
+                            </div>
+                        </div>
+                        <div id="mensajeBusqueda" class="mt-2 text-sm hidden"></div>
+                    </div>
+
+                    <!-- Información del Técnico -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información del Técnico</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="nombreTecnico" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+                                <input type="text" th:field="*{nombreTecnico}" id="nombreTecnico" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p th:if="${#fields.hasErrors('nombreTecnico')}" th:errors="*{nombreTecnico}" 
+                                   class="mt-1 text-sm text-red-600"></p>
+                            </div>
+                            <div>
+                                <label for="rutTecnico" class="block text-sm font-medium text-gray-700 mb-1">RUT *</label>
+                                <input type="text" th:field="*{rutTecnico}" id="rutTecnico" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p th:if="${#fields.hasErrors('rutTecnico')}" th:errors="*{rutTecnico}" 
+                                   class="mt-1 text-sm text-red-600"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de la Empresa -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información de la Empresa</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="empresaContratista" class="block text-sm font-medium text-gray-700 mb-1">Empresa *</label>
+                                <input type="text" th:field="*{empresaContratista}" id="empresaContratista" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p th:if="${#fields.hasErrors('empresaContratista')}" th:errors="*{empresaContratista}" 
+                                   class="mt-1 text-sm text-red-600"></p>
+                            </div>
+                            <div>
+                                <label for="cargoTecnico" class="block text-sm font-medium text-gray-700 mb-1">Cargo del Técnico</label>
+                                <input type="text" th:field="*{cargoTecnico}" id="cargoTecnico"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="empresaDemandante" class="block text-sm font-medium text-gray-700 mb-1">Empresa Demandante</label>
+                                <input type="text" th:field="*{empresaDemandante}" id="empresaDemandante"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="aprobador" class="block text-sm font-medium text-gray-700 mb-1">Aprobador</label>
+                                <select th:field="*{aprobador}" id="aprobador"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccione un aprobador</option>
+                                    <option value="Paulo Hernandez">Paulo Hernández</option>
+                                    <option value="Arturo Chacón">Arturo Chacón</option>
+                                    <option value="Marcelo Robles">Marcelo Robles</option>
+                                    <option value="Facilities">Facilities</option>
+                                    <option value="Rodrigo Aguilera">Rodrigo Aguilera</option>
+                                    <option value="Operador Turno">Operador Turno</option>
+                                    <option value="No Autorizado">No Autorizado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del Acceso -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información del Acceso</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="fechaInicio" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio *</label>
+                                <input type="date" th:field="*{fechaInicio}" id="fechaInicio" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p th:if="${#fields.hasErrors('fechaInicio')}" th:errors="*{fechaInicio}" 
+                                   class="mt-1 text-sm text-red-600"></p>
+                            </div>
+                            <div>
+                                <label for="turno" class="block text-sm font-medium text-gray-700 mb-1">Turno *</label>
+                                <select th:field="*{turno}" id="turno" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccione un turno</option>
+                                    <option value="MAÑANA">Mañana</option>
+                                    <option value="TARDE">Tarde</option>
+                                    <option value="NOCHE">Noche</option>
+                                    <option value="24_HORAS">24 Horas</option>
+                                </select>
+                                <p th:if="${#fields.hasErrors('turno')}" th:errors="*{turno}" 
+                                   class="mt-1 text-sm text-red-600"></p>
+                            </div>
+                            <div>
+                                <label for="horaInicio" class="block text-sm font-medium text-gray-700 mb-1">Hora de Entrada *</label>
+                                <input type="time" th:field="*{horaInicio}" id="horaInicio" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p th:if="${#fields.hasErrors('horaInicio')}" th:errors="*{horaInicio}" 
+                                   class="mt-1 text-sm text-red-600"></p>
+                            </div>
+                            <div>
+                                <label for="horaTermino" class="block text-sm font-medium text-gray-700 mb-1">Hora de Salida</label>
+                                <input type="time" th:field="*{horaTermino}" id="horaTermino"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del Trabajo -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información del Trabajo</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="tipoTicket" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Ticket *</label>
+                                <select th:field="*{tipoTicket}" id="tipoTicket" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccione un tipo</option>
+                                    <option value="CRQ">CRQ</option>
+                                    <option value="INC">INC</option>
+                                    <option value="Visita Inspectiva">Visita Inspectiva</option>
+                                    <option value="Ronda Rutinaria">Ronda Rutinaria</option>
+                                </select>
+                                <p th:if="${#fields.hasErrors('tipoTicket')}" th:errors="*{tipoTicket}" 
+                                   class="mt-1 text-sm text-red-600"></p>
+                            </div>
+                            <div>
+                                <label for="numeroTicket" class="block text-sm font-medium text-gray-700 mb-1">Número de Ticket</label>
+                                <input type="text" th:field="*{numeroTicket}" id="numeroTicket"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="salaIngresa" class="block text-sm font-medium text-gray-700 mb-1">Sala *</label>
+                                <select th:field="*{salaIngresa}" id="salaIngresa" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccione una sala</option>
+                                    <option value="SALA_A">Sala A</option>
+                                    <option value="SALA_B">Sala B</option>
+                                    <option value="SALA_C">Sala C</option>
+                                    <option value="SALA_D">Sala D</option>
+                                    <option value="PASILLO_PRINCIPAL">Pasillo Principal</option>
+                                    <option value="AREA_COMUN">Área Común</option>
+                                </select>
+                                <p th:if="${#fields.hasErrors('salaIngresa')}" th:errors="*{salaIngresa}" 
+                                   class="mt-1 text-sm text-red-600"></p>
+                            </div>
+                            <div>
+                                <label for="activo" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                                <select th:field="*{activo}" id="activo"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Descripción del Trabajo -->
+                    <div class="mb-6">
+                        <label for="motivoIngreso" class="block text-sm font-medium text-gray-700 mb-1">Motivo de Ingreso</label>
+                        <textarea th:field="*{motivoIngreso}" id="motivoIngreso" rows="4"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder="Describa el motivo del ingreso..."></textarea>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="flex justify-end space-x-4">
+                        <a href="/ingreso/ap/list" 
+                           class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            Cancelar
+                        </a>
+                        <button type="submit" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function buscarTecnico() {
+            const rut = document.getElementById('rutBusqueda').value.trim();
+            const mensaje = document.getElementById('mensajeBusqueda');
+            
+            if (!rut) {
+                mostrarMensaje('Por favor ingrese un RUT para buscar', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/ingreso/ap/buscar-tecnico?rut=' + encodeURIComponent(rut));
+                const data = await response.json();
+                
+                if (data.encontrado) {
+                    // Llenar formulario con datos encontrados
+                    document.getElementById('nombreTecnico').value = data.nombreTecnico || '';
+                    document.getElementById('rutTecnico').value = data.rutTecnico || '';
+                    document.getElementById('empresaContratista').value = data.empresaContratista || '';
+                    document.getElementById('cargoTecnico').value = data.cargoTecnico || '';
+                    document.getElementById('empresaDemandante').value = data.empresaDemandante || '';
+                    document.getElementById('aprobador').value = data.aprobador || '';
+                    
+                    mostrarMensaje('Técnico encontrado. Datos cargados automáticamente.', 'success');
+                } else {
+                    mostrarMensaje('No se encontró un técnico con este RUT. Complete manualmente los datos.', 'info');
+                    document.getElementById('rutTecnico').value = rut;
+                }
+            } catch (error) {
+                console.error('Error al buscar técnico:', error);
+                mostrarMensaje('Error al buscar el técnico. Intente nuevamente.', 'error');
+            }
+        }
+        
+        function mostrarMensaje(texto, tipo) {
+            const mensaje = document.getElementById('mensajeBusqueda');
+            mensaje.textContent = texto;
+            mensaje.className = 'mt-2 text-sm';
+            
+            switch(tipo) {
+                case 'success':
+                    mensaje.className += ' text-green-600';
+                    break;
+                case 'warning':
+                    mensaje.className += ' text-yellow-600';
+                    break;
+                case 'error':
+                    mensaje.className += ' text-red-600';
+                    break;
+                default:
+                    mensaje.className += ' text-blue-600';
+            }
+            
+            mensaje.classList.remove('hidden');
+            
+            // Ocultar mensaje después de 5 segundos
+            setTimeout(() => {
+                mensaje.classList.add('hidden');
+            }, 5000);
+        }
+        
+        // Permitir buscar con Enter
+        document.getElementById('rutBusqueda').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarTecnico();
+            }
+        });
+    </script>
+
+    <!-- Footer -->
+    <th:block th:insert="fragments/footer :: footer"></th:block>
+</body>
+</html>

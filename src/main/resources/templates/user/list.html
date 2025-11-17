@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head th:replace="fragments/headers :: headers"></head>
-  <body>
+  <body class="min-h-screen flex flex-col">
     <nav th:replace="fragments/navdar :: nav"></nav>
     <style>
       /* Static 3D card look in Telefónica colors */
@@ -18,64 +18,182 @@
       .btn-3d { background: linear-gradient(90deg,#003DA5,#00A1E6); color:#fff; padding:.45rem .7rem; border-radius:10px; border:none; }
       /* explicitly disable motion */
       .no-motion { transition: none !important; animation: none !important; }
+      .stat-card {
+        background: linear-gradient(135deg, #003DA5 0%, #00A1E6 100%);
+        color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0,61,165,0.2);
+      }
+      .success-alert {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+      }
     </style>
-    <main class="max-w-5xl mx-auto p-6">
+    <main class="max-w-6xl mx-auto p-6 flex-1">
+      
+      <!-- Success message -->
+      <div th:if="${param.success}" class="success-alert no-motion">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+          <span th:if="${param.success[0] == 'created'}">Usuario creado exitosamente</span>
+          <span th:if="${param.success[0] == 'updated'}">Usuario actualizado exitosamente</span>
+          <span th:if="${param.success[0] == 'deleted'}">Usuario eliminado exitosamente</span>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      <div th:if="${error}" class="bg-red-500 text-white rounded-lg p-4 mb-6">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <span th:text="${error}">Error message</span>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="stat-card no-motion p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-blue-100 text-sm font-medium">Total Usuarios</p>
+              <p class="text-3xl font-bold" th:text="${totalUsuarios ?: 0}">0</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="stat-card no-motion p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-blue-100 text-sm font-medium">Administradores</p>
+              <p class="text-3xl font-bold" th:text="${administradores ?: 0}">0</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c.552 0 1-.448 1-1V5c0-.552-.448-1-1-1H3c-.552 0-1 .448-1 1v6c0 .552.448 1 1 1h18zM21 16H3c-.552 0-1 .448-1 1v2c0 .552.448 1 1 1h18c.552 0 1-.448 1-1v-2c0-.552-.448-1-1-1z"/></svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="stat-card no-motion p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-blue-100 text-sm font-medium">Técnicos</p>
+              <p class="text-3xl font-bold" th:text="${tecnicos ?: 0}">0</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="card-3d no-motion p-6">
-        <h1 class="text-2xl font-bold mb-4">Listado de usuarios</h1>
-        <table class="min-w-full table-auto border-collapse table-3d">
-          <thead>
-            <tr class="bg-gray-100">
-              <th class="px-4 py-2 text-left">#</th>
-              <th class="px-4 py-2 text-left">Nombre</th>
-              <th class="px-4 py-2 text-left">Apellido</th>
-              <th class="px-4 py-2 text-left">Email</th>
-              <th class="px-4 py-2 text-left">RUT</th>
-              <th class="px-4 py-2 text-left">Contraseña</th>
-              <th class="px-4 py-2 text-left">Ubicación</th>
-              <th class="px-4 py-2 text-left">Rol</th>
-              <th class="px-4 py-2 text-left">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="u, iterStat : ${usuarios}">
-              <td class="px-4 py-2" th:text="${iterStat.count}">1</td>
-              <td class="px-4 py-2" th:text="${u['nombre']}">Nombre</td>
-              <td class="px-4 py-2" th:text="${u['apellido']}">Apellido</td>
-              <td class="px-4 py-2" th:text="${u['email']}">email@example.com</td>
-              <td class="px-4 py-2" th:text="${u['rut']}">rut</td>
-              <td class="px-4 py-2" th:text="${u['password']}">******</td>
-              <td class="px-4 py-2" th:text="${u['ubicacion']}">Ubicacion</td>
-              <td class="px-4 py-2">
-                <span th:text="${u['rol']}" th:classappend="${u['rol'] == 'ADMIN'} ? ' text-red-600 font-semibold' : ' text-gray-700'">ROLE</span>
-              </td>
-              <td class="px-4 py-2 flex items-center gap-3">
-                <!-- If user's ubicacion is DC APOQUINDO, provide direct link to ingreso form -->
-                <button type="button" th:if="${u['ubicacion'] == 'DC APOQUINDO'}" title="Registrar ingreso" class="text-[#003DA5] hover:text-[#005ea8] bg-transparent p-0 border-0" th:attr="data-nombre=${u['nombre']},data-rut=${u['rut']}" onclick="goToIngreso(this)">
-                  <!-- enter icon -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5"/><path d="M5 12h14"/></svg>
-                </button>
-                <!-- Always show edit icon -->
-                <a th:href="@{/user/update(idx=${iterStat.index})}" title="Editar" class="text-[#003DA5] hover:text-[#005ea8]">
-                  <!-- pencil icon -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-                </a>
-                <!-- Always show delete icon -->
-                <a th:href="@{/user/delete(idx=${iterStat.index})}" title="Eliminar" class="text-red-600 hover:text-red-800" onclick="return confirm('¿Eliminar usuario?');">
-                  <!-- trash icon -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h2a2 2 0 012 2v2"/></svg>
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Botón Dashboard -->
+        <div class="mb-4">
+          <div th:replace="fragments/dashboard-button :: breadcrumb"></div>
+        </div>
+        
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold">Gestión de Usuarios - Base de Datos H2</h1>
+          <a href="/user/create" class="btn-3d no-motion">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuevo Usuario
+          </a>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full table-auto border-collapse table-3d">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="px-4 py-2 text-left">ID</th>
+                <th class="px-4 py-2 text-left">Nombre</th>
+                <th class="px-4 py-2 text-left">Apellido</th>
+                <th class="px-4 py-2 text-left">Email</th>
+                <th class="px-4 py-2 text-left">RUT</th>
+                <th class="px-4 py-2 text-left">Ubicación</th>
+                <th class="px-4 py-2 text-left">Rol</th>
+                <th class="px-4 py-2 text-left">Creado</th>
+                <th class="px-4 py-2 text-left">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${usuarios == null or usuarios.isEmpty()}">
+                <td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                  No hay usuarios registrados en la base de datos H2
+                </td>
+              </tr>
+              <tr th:each="u : ${usuarios}" class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium" th:text="${u.id}">1</td>
+                <td class="px-4 py-2" th:text="${u.nombre}">Nombre</td>
+                <td class="px-4 py-2" th:text="${u.apellido}">Apellido</td>
+                <td class="px-4 py-2 text-blue-600" th:text="${u.email}">email@example.com</td>
+                <td class="px-4 py-2 font-mono" th:text="${u.rut}">rut</td>
+                <td class="px-4 py-2" th:text="${u.ubicacion}">Ubicacion</td>
+                <td class="px-4 py-2">
+                  <span th:text="${u.rol}" 
+                        th:classappend="${u.rol == 'ADMIN'} ? 'bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold' : 'bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold'">
+                    ROLE
+                  </span>
+                </td>
+                <td class="px-4 py-2 text-sm text-gray-500" th:text="${u.creatAt != null ? #dates.format(u.creatAt, 'dd/MM/yyyy') : 'N/A'}">01/01/2024</td>
+                <td class="px-4 py-2">
+                  <div class="flex items-center gap-2">
+                    <!-- Ver detalles -->
+                    <a th:href="@{/user/read/{id}(id=${u.id})}" title="Ver detalles" class="text-green-600 hover:text-green-800">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </a>
+                    
+                    <!-- Registrar ingreso si es de DC APOQUINDO -->
+                    <button type="button" 
+                            th:if="${u.ubicacion == 'DC APOQUINDO'}" 
+                            title="Registrar ingreso al datacenter" 
+                            class="text-purple-600 hover:text-purple-800 bg-transparent p-0 border-0" 
+                            th:attr="data-nombre=${u.nombre},data-rut=${u.rut}" 
+                            onclick="goToIngreso(this)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 17l5-5-5-5"/><path d="M6 17l5-5-5-5"/></svg>
+                    </button>
+                    
+                    <!-- Editar usuario -->
+                    <a th:href="@{/user/update/{id}(id=${u.id})}" title="Editar usuario" class="text-blue-600 hover:text-blue-800">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                    </a>
+                    
+                    <!-- Eliminar usuario (solo ADMIN) -->
+                    <a th:if="${usuarioLogueado != null and usuarioLogueado.rol == 'ADMIN'}" 
+                       th:href="@{/user/delete/{id}(id=${u.id})}" 
+                       title="Eliminar usuario" 
+                       class="text-red-600 hover:text-red-800" 
+                       onclick="return confirm('¿Está seguro de eliminar este usuario?');">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h2a2 2 0 012 2v2"/></svg>
+                    </a>
+                    <span th:if="${usuarioLogueado == null or usuarioLogueado.rol != 'ADMIN'}" 
+                          title="Solo administradores pueden eliminar usuarios" 
+                          class="text-gray-400 cursor-not-allowed">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h2a2 2 0 012 2v2"/></svg>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div th:if="${usuarios != null and !usuarios.isEmpty()}" class="mt-6 text-sm text-gray-600">
+          <p><strong>Información:</strong> Los datos mostrados provienen de la base de datos H2 en memoria. Los usuarios se cargan desde el archivo <code>import.sql</code> al iniciar la aplicación.</p>
+        </div>
       </div>
     </main>
+    <footer th:replace="fragments/footer :: footer"></footer>
     <script>
       function goToIngreso(btn){
         if(!btn) return;
         const nombre = btn.getAttribute('data-nombre') || '';
         const rut = btn.getAttribute('data-rut') || '';
-        const url = '/ingreso?nombre=' + encodeURIComponent(nombre) + '&rut=' + encodeURIComponent(rut);
+        const url = '/ingresoap?nombre=' + encodeURIComponent(nombre) + '&rut=' + encodeURIComponent(rut);
         window.location.href = url;
       }
     </script>
