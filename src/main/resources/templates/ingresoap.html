@@ -48,7 +48,8 @@
 
           <!-- Fechas y Horas -->
           <div class="bg-green-50 p-4 rounded-lg">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Fechas y Horarios</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Fecha y Hora de Inicio</h3>
+            <p class="text-sm text-gray-600 mb-3">Fecha y hora de inicio se cargan automáticamente con la hora actual del sistema</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -59,14 +60,9 @@
                 <label for="horaInicio" class="block text-sm font-medium text-gray-700">Hora Inicio</label>
                 <input type="time" id="horaInicio" name="horaInicio" th:value="${horaInicio}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
               </div>
-              <div>
-                <label for="fechaTermino" class="block text-sm font-medium text-gray-700">Fecha Término (Opcional)</label>
-                <input type="date" id="fechaTermino" name="fechaTermino" th:value="${fechaTermino}" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
-              </div>
-              <div>
-                <label for="horaTermino" class="block text-sm font-medium text-gray-700">Hora Término (Opcional)</label>
-                <input type="time" id="horaTermino" name="horaTermino" th:value="${horaTermino}" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
-              </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded">
+              📌 <strong>Nota:</strong> Las fechas y horas de término solo se registrarán al modificar el registro en la sección de actualización.
             </div>
           </div>
 
@@ -229,7 +225,7 @@
       <div style="width:90%; max-width:420px; padding:1rem; border-radius:12px; background:linear-gradient(180deg,#fff,#f4fbff); box-shadow:0 30px 80px rgba(0,29,77,0.18); border:1px solid rgba(0,61,165,0.08); transform: translateZ(8px);">
         <h3 style="color:#002B5C; font-weight:700; margin:0 0 .5rem 0;">Éxito</h3>
         <div style="color:#003DA5;" th:text="${successMessage}"></div>
-        <div style="display:flex; justify-content:flex-end; margin-top:12px;"><a th:href="@{/}" class="btn-3d" style="background:linear-gradient(90deg,#003DA5,#00A1E6); color:white; padding:.6rem 1rem; border-radius:10px;">Aceptar</a></div>
+        <div style="display:flex; justify-content:flex-end; margin-top:12px;"><button onclick="document.getElementById('successModal').style.display='none'; clearForm();" class="btn-3d" style="background:linear-gradient(90deg,#003DA5,#00A1E6); color:white; padding:.6rem 1rem; border-radius:10px;">Aceptar</button></div>
       </div>
     </div>
 
@@ -326,6 +322,43 @@
           });
         }
       })();
+
+      // Función para limpiar el formulario después de un registro exitoso
+      function clearForm() {
+        const form = document.getElementById('ingresoForm');
+        if (form) {
+          // Limpiar todos los campos excepto fechaInicio, horaInicio, nombreUsuario y turno
+          const camposALimpiar = [
+            'nombreTecnico', 'rutTecnico', 'empresaDemandante', 'empresaContratista', 
+            'cargoTecnico', 'salaRemedy', 'tipoTicket', 'numeroTicket', 'aprobador', 
+            'escolta', 'motivoIngreso', 'guiaDespacho', 'salaIngresa', 'rackIngresa', 
+            'actividadRemedy'
+          ];
+          
+          camposALimpiar.forEach(campo => {
+            const elemento = document.getElementById(campo);
+            if (elemento) {
+              if (elemento.tagName === 'SELECT') {
+                elemento.selectedIndex = 0;
+              } else {
+                elemento.value = '';
+              }
+            }
+          });
+          
+          // Mantener fecha y hora actualizadas para el siguiente ingreso
+          const now = new Date();
+          const fechaInicioInput = document.getElementById('fechaInicio');
+          const horaInicioInput = document.getElementById('horaInicio');
+          
+          if (fechaInicioInput) {
+            fechaInicioInput.value = now.toISOString().slice(0,10);
+          }
+          if (horaInicioInput) {
+            horaInicioInput.value = now.toTimeString().slice(0,5);
+          }
+        }
+      }
     </script>
   </body>
 </html>

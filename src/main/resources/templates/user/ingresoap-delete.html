@@ -1,211 +1,300 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-        <th:block th:insert="fragments/headers :: headers"></th:block>
-    <title>Confirmar Eliminación</title>
-</head>
-<body class="bg-gray-100">
-    <!-- Header -->
-    <th:block th:insert="fragments/headers :: headers"></th:block>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="fragments/headers :: headers"></head>
+  <body class="min-h-screen flex flex-col">
+    <nav th:replace="fragments/navdar :: nav"></nav>
+    
+    <style>
+      /* Static 3D card look in Telefónica colors */
+      .card-3d {
+        background: linear-gradient(180deg,#ffffff 0%, #f4fbff 100%);
+        border-radius: 14px;
+        box-shadow: 0 20px 50px rgba(0,61,165,0.12), inset 0 -8px 18px rgba(0,0,0,0.02);
+        border: 1px solid rgba(0,61,165,0.08);
+        color: #002B5C;
+      }
+      .btn-3d { 
+        padding:.6rem 1rem; 
+        border-radius:10px; 
+        border:none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        font-weight: 600;
+      }
+      .btn-primary { background: linear-gradient(90deg,#003DA5,#00A1E6); color: white; }
+      .btn-secondary { background: linear-gradient(90deg, #6B7280, #9CA3AF); color: white; }
+      .btn-danger { background: linear-gradient(90deg, #dc2626, #ef4444); color: white; }
+      .info-grid {
+        display: grid;
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      @media (min-width: 768px) {
+        .info-grid { grid-template-columns: 1fr 1fr; }
+      }
+      .info-card {
+        background: linear-gradient(135deg, rgba(240,246,252,0.9), rgba(230,242,255,0.7));
+        border: 1px solid rgba(0,61,165,0.06);
+        border-radius: 12px;
+        padding: 1.5rem;
+      }
+      .warning-banner {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+      }
+      .danger-banner {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+      }
+    </style>
 
-    <div class="container mx-auto px-4 py-8">
-        <!-- Título y navegación -->
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Confirmar Eliminación</h1>
-                <nav class="text-sm text-gray-600 mt-2">
-                    <a href="/user/dashboard" class="hover:text-blue-600">Dashboard</a> > 
-                    <a href="/ingreso/ap/list" class="hover:text-blue-600">Lista de Registros</a> > 
-                    <span>Eliminar Registro</span>
-                </nav>
+    <main class="max-w-6xl mx-auto p-6 flex-1">
+      
+      <!-- Dashboard Navigation -->
+      <div th:replace="~{fragments/dashboard-button :: breadcrumb}"></div>
+      
+      <!-- Deletion warning -->
+      <div class="danger-banner">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span><strong>Acción Irreversible:</strong> Esta operación eliminará permanentemente el registro de acceso de la base de datos H2</span>
+        </div>
+      </div>
+
+      <div class="card-3d p-6">
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <h1 class="text-2xl font-bold mb-2" style="color:#dc2626;">Confirmar Eliminación de Registro de Acceso</h1>
+            <p class="text-gray-600">ID: <span class="font-mono" th:text="${ingreso.id}">1</span></p>
+            <p class="text-gray-600">Registrado: <span th:text="${ingreso.fechaRegistro != null ? #dates.format(ingreso.fechaRegistro, 'dd/MM/yyyy HH:mm') : 'No disponible'}"></span></p>
+          </div>
+          <a href="/ingreso/ap/list" class="btn-3d btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
+            Cancelar y Volver
+          </a>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-gray-700 mb-4">
+            Estás a punto de eliminar permanentemente el siguiente registro de acceso al Data Center:
+          </p>
+        </div>
+
+        <!-- IngresoAP Information to be deleted -->
+        <div class="info-grid">
+          <!-- Información del Técnico -->
+          <div class="info-card">
+            <h3 class="text-lg font-semibold mb-4" style="color:#003DA5;">🧑‍💼 Información del Técnico</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="text-sm font-medium text-gray-600">Nombre Completo</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.nombreTecnico}">Nombre Técnico</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">RUT Técnico</div>
+                <div class="text-lg font-medium font-mono" style="color:#002B5C;" th:text="${ingreso.rutTecnico}">12.345.678-9</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Cargo/Función</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.cargoTecnico}">Cargo Técnico</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Usuario que Registra</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.nombreUsuario}">Usuario</div>
+              </div>
             </div>
-            <a href="/ingreso/ap/list" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-                Cancelar
+          </div>
+
+          <!-- Información de Empresas -->
+          <div class="info-card">
+            <h3 class="text-lg font-semibold mb-4" style="color:#003DA5;">🏢 Información de Empresas</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="text-sm font-medium text-gray-600">Empresa Demandante</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.empresaDemandante}">Empresa Demandante</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Empresa Contratista</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.empresaContratista}">Empresa Contratista</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Aprobador</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.aprobador}">Aprobador</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Escolta</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.escolta}">Escolta</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Horarios -->
+          <div class="info-card">
+            <h3 class="text-lg font-semibold mb-4" style="color:#003DA5;">⏰ Información de Horarios</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="text-sm font-medium text-gray-600">Turno</div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                      th:classappend="${ingreso.turno == 'AM'} ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'"
+                      th:text="${ingreso.turno == 'AM' ? 'AM (Noche) 19:00-06:59' : 'PM (Día) 07:00-18:59'}">
+                  Turno
+                </span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Fecha de Ingreso</div>
+                <div class="text-lg font-medium font-mono" style="color:#002B5C;" th:text="${ingreso.fechaInicio != null ? #temporals.format(ingreso.fechaInicio, 'dd/MM/yyyy') : 'No registrada'}">01/01/2024</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Hora de Ingreso</div>
+                <div class="text-lg font-medium font-mono text-green-600" th:text="${ingreso.horaInicio != null ? #temporals.format(ingreso.horaInicio, 'HH:mm') : 'No registrada'}">10:00</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Estado del Acceso</div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                      th:classappend="${ingreso.activo} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                      th:text="${ingreso.activo} ? '✅ TÉCNICO ACTIVO' : '❌ TÉCNICO FINALIZADO'">
+                  Estado
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Ticket/Trabajo -->
+          <div class="info-card">
+            <h3 class="text-lg font-semibold mb-4" style="color:#003DA5;">🎫 Información del Ticket</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="text-sm font-medium text-gray-600">Tipo de Ticket</div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                      th:classappend="${ingreso.tipoTicket == 'CRQ'} ? 'bg-blue-100 text-blue-800' : (${ingreso.tipoTicket == 'INC'} ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')"
+                      th:text="${ingreso.tipoTicket}">
+                  CRQ
+                </span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Número de Ticket</div>
+                <div class="text-lg font-medium font-mono" style="color:#002B5C;" th:text="${ingreso.numeroTicket}">Número Ticket</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Sala REMEDY</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.salaRemedy}">Sala REMEDY</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Guía de Despacho</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.guiaDespacho != null and !#strings.isEmpty(ingreso.guiaDespacho) ? ingreso.guiaDespacho : 'No aplica'}">No aplica</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Ubicación -->
+          <div class="info-card">
+            <h3 class="text-lg font-semibold mb-4" style="color:#003DA5;">📍 Información de Ubicación</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="text-sm font-medium text-gray-600">Sala de Ingreso</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.salaIngresa}">Sala Ingresa</div>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Rack de Acceso</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.rackIngresa != null and !#strings.isEmpty(ingreso.rackIngresa) ? ingreso.rackIngresa : 'No especificado'}">Rack</div>
+              </div>
+              <div class="col-span-2">
+                <div class="text-sm font-medium text-gray-600">Motivo de Ingreso</div>
+                <div class="text-lg font-medium" style="color:#002B5C;" th:text="${ingreso.motivoIngreso}">Motivo Ingreso</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Fechas de Salida -->
+          <div class="info-card">
+            <h3 class="text-lg font-semibold mb-4" style="color:#003DA5;">🚪 Información de Salida</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="text-sm font-medium text-gray-600">Fecha de Salida</div>
+                <div class="text-lg font-medium font-mono" style="color:#002B5C;" 
+                     th:if="${ingreso.fechaTermino != null}" 
+                     th:text="${#temporals.format(ingreso.fechaTermino, 'dd/MM/yyyy')}">Fecha Salida</div>
+                <span th:unless="${ingreso.fechaTermino != null}" class="text-orange-600 font-medium italic">🔄 Aún en curso</span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-600">Hora de Salida</div>
+                <div class="text-lg font-medium font-mono text-red-600" 
+                     th:if="${ingreso.horaTermino != null}" 
+                     th:text="${#temporals.format(ingreso.horaTermino, 'HH:mm')}">Hora Salida</div>
+                <span th:unless="${ingreso.horaTermino != null}" class="text-orange-600 font-medium italic">🔄 Aún en curso</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actividad REMEDY -->
+        <div class="info-card mb-6">
+          <h3 class="text-lg font-semibold mb-4" style="color:#003DA5;">📋 Descripción de Actividad REMEDY</h3>
+          <div class="bg-gray-50 p-4 rounded-md border">
+            <p class="text-gray-700 whitespace-pre-wrap" th:text="${ingreso.actividadRemedy}">Actividad REMEDY</p>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="mt-8 border-t pt-6">
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-gray-600">
+              <p><strong>¿Estás seguro?</strong> Esta acción no se puede deshacer.</p>
+              <p>El registro de acceso será eliminado permanentemente de la base de datos H2.</p>
+            </div>
+            <div class="flex gap-3">
+              <a href="/ingreso/ap/list" class="btn-3d btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                No, Cancelar
+              </a>
+              
+              <form th:action="@{'/ingreso/ap/delete/' + ${ingreso.id}}" method="post" style="display: inline;">
+                <button type="submit" class="btn-3d btn-danger" 
+                        onclick="return confirm('⚠️ ÚLTIMA CONFIRMACIÓN: ¿Realmente deseas eliminar este registro de acceso? Esta acción es IRREVERSIBLE.');">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h2a2 2 0 012 2v2"/></svg>
+                  Sí, Eliminar Permanentemente
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Database Information -->
+        <div class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <h3 class="text-sm font-medium text-red-800 mb-2">⚠️ Información Importante sobre la Eliminación</h3>
+          <p class="text-xs text-red-600">
+            Al eliminar este registro de acceso, se perderá permanentemente toda la información del técnico, 
+            horarios de ingreso/salida, tickets asociados y actividades realizadas en la base de datos H2. 
+            Esta operación es <strong>irreversible</strong> y los datos no podrán ser recuperados 
+            una vez eliminados del import.sql.
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="mt-6 pt-4 border-t border-gray-200">
+          <div class="flex justify-center space-x-6 text-sm">
+            <a th:href="@{'/ingreso/ap/read/' + ${ingreso.id}}" 
+               class="text-blue-600 hover:text-blue-800 inline-flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Ver todos los detalles
             </a>
+            <a th:href="@{'/ingreso/ap/update/' + ${ingreso.id}}" 
+               class="text-yellow-600 hover:text-yellow-800 inline-flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+              Editar en su lugar
+            </a>
+          </div>
         </div>
-
-        <!-- Tarjeta de confirmación -->
-        <div class="max-w-2xl mx-auto">
-            <!-- Alerta de advertencia -->
-            <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800">¡Atención!</h3>
-                        <div class="mt-2 text-sm text-red-700">
-                            <p>Esta acción eliminará permanentemente el registro de acceso. Esta operación no se puede deshacer.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Detalles del registro a eliminar -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="bg-red-600 text-white px-6 py-4">
-                    <div class="flex items-center">
-                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                        <h2 class="text-xl font-bold">Eliminar Registro #<span th:text="${ingreso.id}"></span></h2>
-                    </div>
-                </div>
-
-                <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Información del registro que será eliminado:</h3>
-                    
-                    <!-- Resumen del registro -->
-                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Técnico:</label>
-                                <p class="mt-1 text-sm text-gray-900" th:text="${ingreso.nombreTecnico}"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">RUT:</label>
-                                <p class="mt-1 text-sm text-gray-900" th:text="${ingreso.rutTecnico}"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Empresa:</label>
-                                <p class="mt-1 text-sm text-gray-900" th:text="${ingreso.empresaContratista}"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Fecha:</label>
-                                <p class="mt-1 text-sm text-gray-900" th:text="${#dates.format(ingreso.fechaInicio, 'dd/MM/yyyy')}"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Turno:</label>
-                                <p class="mt-1 text-sm text-gray-900" th:text="${ingreso.turno}"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Tipo de Ticket:</label>
-                                <p class="mt-1 text-sm text-gray-900" th:text="${ingreso.tipoTicket}"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Sala:</label>
-                                <p class="mt-1 text-sm text-gray-900" th:text="${ingreso.salaIngresa}"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Estado:</label>
-                                <p class="mt-1 text-sm">
-                                    <span th:if="${ingreso.activo}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                        Activo
-                                    </span>
-                                    <span th:unless="${ingreso.activo}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                                        Inactivo
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div th:if="${ingreso.motivoIngreso}" class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700">Motivo de Ingreso:</label>
-                            <p class="mt-1 text-sm text-gray-900" th:text="${ingreso.motivoIngreso}"></p>
-                        </div>
-                        
-                        <div th:if="${ingreso.numeroTicket}" class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700">Número de Ticket:</label>
-                            <p class="mt-1 text-sm text-gray-900" th:text="${ingreso.numeroTicket}"></p>
-                        </div>
-                    </div>
-
-                    <!-- Formulario de confirmación -->
-                    <form th:action="@{'/ingreso/ap/delete/' + ${ingreso.id}}" method="post">
-                        <div class="mb-6">
-                            <label class="flex items-center">
-                                <input type="checkbox" id="confirmarEliminacion" required 
-                                       class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-                                <span class="ml-2 text-sm text-gray-900">
-                                    Confirmo que deseo eliminar permanentemente este registro. Entiendo que esta acción no se puede deshacer.
-                                </span>
-                            </label>
-                        </div>
-
-                        <!-- Razón de eliminación (opcional) -->
-                        <div class="mb-6">
-                            <label for="razonEliminacion" class="block text-sm font-medium text-gray-700 mb-2">
-                                Razón de eliminación (opcional):
-                            </label>
-                            <textarea id="razonEliminacion" name="razonEliminacion" rows="3" 
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                      placeholder="Describa la razón por la cual elimina este registro..."></textarea>
-                            <p class="mt-1 text-xs text-gray-500">Esta información será registrada en el log de auditoría.</p>
-                        </div>
-
-                        <!-- Botones de acción -->
-                        <div class="flex justify-end space-x-4">
-                            <a href="/ingreso/ap/list" 
-                               class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded inline-flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                                Cancelar
-                            </a>
-                            <button type="submit" id="btnEliminar" disabled
-                                    class="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-2 px-6 rounded inline-flex items-center transition-all duration-200">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                                Eliminar Registro
-                            </button>
-                        </div>
-                    </form>
-
-                    <!-- Enlaces adicionales -->
-                    <div class="mt-6 pt-4 border-t border-gray-200">
-                        <div class="flex justify-center space-x-6 text-sm">
-                            <a th:href="@{'/ingreso/ap/read/' + ${ingreso.id}}" 
-                               class="text-blue-600 hover:text-blue-800 inline-flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                                Ver todos los detalles
-                            </a>
-                            <a th:href="@{'/ingreso/ap/update/' + ${ingreso.id}}" 
-                               class="text-yellow-600 hover:text-yellow-800 inline-flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
-                                Editar en su lugar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Habilitar/deshabilitar botón de eliminar basado en el checkbox
-        document.getElementById('confirmarEliminacion').addEventListener('change', function() {
-            const btnEliminar = document.getElementById('btnEliminar');
-            btnEliminar.disabled = !this.checked;
-            
-            if (this.checked) {
-                btnEliminar.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                btnEliminar.classList.add('bg-red-600', 'hover:bg-red-700');
-            } else {
-                btnEliminar.classList.add('bg-gray-400', 'cursor-not-allowed');
-                btnEliminar.classList.remove('bg-red-600', 'hover:bg-red-700');
-            }
-        });
-
-        // Confirmación adicional antes del envío
-        document.querySelector('form').addEventListener('submit', function(e) {
-            if (!confirm('¿Está absolutamente seguro que desea eliminar este registro? Esta acción no se puede deshacer.')) {
-                e.preventDefault();
-            }
-        });
-    </script>
-
-    <!-- Footer -->
-    <th:block th:insert="fragments/footer :: footer"></th:block>
-</body>
+      </div>
+    </main>
+    <footer th:replace="fragments/footer :: footer"></footer>
+  </body>
 </html>

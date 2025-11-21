@@ -41,6 +41,15 @@ interface IngresoAPDataRepository extends JpaRepository<IngresoAP, Long> {
     
     @Query("SELECT i FROM IngresoAP i ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
     List<IngresoAP> findUltimosRegistros();
+    
+    @Query("SELECT i FROM IngresoAP i WHERE i.fechaInicio BETWEEN :fechaInicio AND :fechaFin ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
+    List<IngresoAP> findByFechaInicioBetweenOrderByFechaDesc(@Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFin") LocalDate fechaFin);
+    
+    @Query("SELECT i FROM IngresoAP i WHERE i.activo = true ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
+    List<IngresoAP> findActivosOrdenadosPorFecha();
+    
+    @Query("SELECT i FROM IngresoAP i ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
+    List<IngresoAP> findAllOrdenadosPorFecha();
 }
 
 /**
@@ -66,10 +75,8 @@ public class IngresoAPServiceImpl implements IngresoAPService {
         
         validarDatosIngreso(ingresoAP);
         
-        // Verificar si la persona ya está en el edificio
-        if (estaPersonaEnEdificio(ingresoAP.getRutTecnico())) {
-            throw new Exception("La persona ya se encuentra registrada como presente en el edificio");
-        }
+        // PERMITIR MÚLTIPLES INGRESOS - Los técnicos pueden ingresar varias veces al día
+        // Se ha removido la restricción de duplicados para permitir múltiples registros del mismo técnico
         
         // Acceso 24/7 - Sin restricciones de horario
         // La validación de horario se ha removido para permitir acceso las 24 horas
@@ -114,8 +121,11 @@ public class IngresoAPServiceImpl implements IngresoAPService {
             throw new Exception("Ya se registró la salida para este ingreso");
         }
         
+        // Registrar salida automática
         ingreso.setHoraTermino(LocalTime.now());
         ingreso.setFechaTermino(LocalDate.now());
+        ingreso.setActivo(false); // Auto-inactivar al registrar salida
+        
         return ingresoAPRepository.save(ingreso);
     }
     
@@ -266,6 +276,37 @@ public class IngresoAPServiceImpl implements IngresoAPService {
                 .anyMatch(ingreso -> rut.trim().equals(ingreso.getRutTecnico()));
     }
     
+    /**
+     * Verifica si un técnico tiene ingresos activos (sin fecha/hora de término)
+     * @param rut RUT del técnico a verificar
+     * @return true si tiene ingresos activos, false si no
+     */
+    @Override
+    public boolean tieneIngresoActivo(String rut) {
+        if (rut == null || rut.trim().isEmpty()) {
+            return false;
+        }
+        
+        return ingresoAPRepository.findRegistrosSinSalida().stream()
+                .anyMatch(ingreso -> rut.trim().equals(ingreso.getRutTecnico()));
+    }
+    
+    /**
+     * Obtiene el ingreso activo de un técnico (sin fecha/hora de término)
+     * @param rut RUT del técnico
+     * @return Optional con el ingreso activo si existe
+     */
+    @Override
+    public Optional<IngresoAP> obtenerIngresoActivoPorRut(String rut) {
+        if (rut == null || rut.trim().isEmpty()) {
+            return Optional.empty();
+        }
+        
+        return ingresoAPRepository.findRegistrosSinSalida().stream()
+                .filter(ingreso -> rut.trim().equals(ingreso.getRutTecnico()))
+                .findFirst();
+    }
+    
     @Override
     public Long contarIngresosPorFecha(LocalDate fecha) {
         if (fecha == null) {
@@ -358,5 +399,29 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     @Override
     public List<IngresoAP> listarTodos() {
         return obtenerTodosLosIngresos();
+    }
+    
+    /**
+     * Obtiene todos los ingresos ordenados por fecha (más recientes primero)
+     */
+    public List<IngresoAP> obtenerIngresosOrdenadosPorFecha() {
+        return ingresoAPRepository.findAllOrdenadosPorFecha();
+    }
+    
+    /**
+     * Obtiene ingresos por rango de fechas ordenados
+     */
+    public List<IngresoAP> obtenerIngresosPorRangoOrdenados(LocalDate fechaInicio, LocalDate fechaFin) {
+        if (fechaInicio == null || fechaFin == null) {
+            return obtenerIngresosOrdenadosPorFecha();
+        }
+        return ingresoAPRepository.findByFechaInicioBetweenOrderByFechaDesc(fechaInicio, fechaFin);
+    }
+    
+    /**
+     * Obtiene solo ingresos activos ordenados por fecha
+     */
+    public List<IngresoAP> obtenerIngresosActivosOrdenados() {
+        return ingresoAPRepository.findActivosOrdenadosPorFecha();
     }
 }

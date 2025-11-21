@@ -120,7 +120,33 @@ public class LoginController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
+    public String logout(@RequestParam(name = "loginAs", required = false) String loginAsEmail,
+                         HttpSession session, 
+                         Model model) {
+        
+        // Si se especifica loginAs, preparar login automático
+        if (loginAsEmail != null && !loginAsEmail.trim().isEmpty()) {
+            try {
+                // Buscar el usuario por email
+                Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorEmail(loginAsEmail.trim());
+                
+                if (usuarioOpt.isPresent()) {
+                    // Invalidar sesión actual
+                    session.invalidate();
+                    
+                    // Pasar el email para pre-cargar en login
+                    model.addAttribute("loginAsEmail", loginAsEmail.trim());
+                    model.addAttribute("autoLogin", true);
+                    
+                    System.out.println("[LoginController] Redirigiendo a login para usuario: " + loginAsEmail);
+                    return "login";
+                }
+            } catch (Exception e) {
+                System.err.println("[LoginController] Error al buscar usuario para loginAs: " + e.getMessage());
+            }
+        }
+        
+        // Logout normal
         session.invalidate();
         return "redirect:/login?logout=true";
     }
@@ -131,6 +157,8 @@ public class LoginController {
         if (usuario == null) {
             return "redirect:/login";
         }
+        
+        System.out.println("[LoginController] Acceso al dashboard - Usuario: " + usuario.getEmail());
         
         model.addAttribute("usuario", usuario);
         return "dashboard";

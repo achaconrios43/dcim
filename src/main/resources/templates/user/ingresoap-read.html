@@ -1,49 +1,56 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:insert="fragments/headers :: headers"></th:block>
-    <title>Ver Registro de Acceso</title>
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
+    <title>Ver Registro de Acceso - Sistema de Control</title>
 </head>
 <body class="bg-gray-100">
     <!-- Header -->
-    <th:block th:insert="fragments/headers :: headers"></th:block>
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
 
     <div class="container mx-auto px-4 py-8">
         <!-- Título y navegación -->
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Detalles del Registro</h1>
+                <h1 class="text-3xl font-bold text-gray-900">📋 Detalles del Registro de Acceso</h1>
                 <nav class="text-sm text-gray-600 mt-2">
                     <a href="/user/dashboard" class="hover:text-blue-600">Dashboard</a> > 
                     <a href="/ingreso/ap/list" class="hover:text-blue-600">Lista de Registros</a> > 
-                    <span>Ver Registro</span>
+                    <span class="text-blue-600">Ver Registro #<span th:text="${ingreso.id}"></span></span>
                 </nav>
             </div>
-            <a href="/ingreso/ap/list" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+            <a href="/ingreso/ap/list" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center transition-colors duration-200">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
-                Volver
+                Volver a Lista
             </a>
         </div>
 
-        <!-- Tarjeta de detalles -->
+        <!-- Tarjeta principal -->
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <!-- Header de la tarjeta -->
-            <div class="bg-blue-600 text-white px-6 py-4">
+            <!-- Header de la tarjeta con estado -->
+            <div th:class="${ingreso.activo ? 'bg-green-600' : 'bg-red-600'} + ' text-white px-6 py-4'">
                 <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold">Registro #<span th:text="${ingreso.id}"></span></h2>
+                    <div>
+                        <h2 class="text-xl font-bold">🏢 Registro de Acceso #<span th:text="${ingreso.id}"></span></h2>
+                        <p class="text-sm opacity-90 mt-1">
+                            <span th:if="${ingreso.activo}" class="bg-green-500 px-2 py-1 rounded text-xs">✅ TÉCNICO ACTIVO</span>
+                            <span th:unless="${ingreso.activo}" class="bg-red-500 px-2 py-1 rounded text-xs">❌ TÉCNICO INACTIVO</span>
+                            - Registrado el <span th:text="${ingreso.fechaRegistro != null ? #dates.format(ingreso.fechaRegistro, 'dd/MM/yyyy HH:mm') : 'No disponible'}"></span>
+                        </p>
+                    </div>
                     <div class="flex space-x-2">
                         <a th:href="@{'/ingreso/ap/update/' + ${ingreso.id}}" 
-                           class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm inline-flex items-center">
+                           class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded text-sm inline-flex items-center transition-colors duration-200">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
                             Editar
                         </a>
                         <a th:href="@{'/ingreso/ap/delete/' + ${ingreso.id}}" 
-                           class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm inline-flex items-center"
-                           onclick="return confirm('¿Está seguro que desea eliminar este registro?')">
+                           class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm inline-flex items-center transition-colors duration-200"
+                           onclick="return confirm('¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.')">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
@@ -56,152 +63,271 @@
             <!-- Contenido de la tarjeta -->
             <div class="p-6">
                 <!-- Información del Técnico -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información del Técnico</h3>
-                    <div class="grid md:grid-cols-2 gap-6">
+                <div class="mb-8 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h3 class="text-lg font-semibold text-blue-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        Información del Técnico
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.nombreTecnico}"></span>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.nombreTecnico}" class="font-medium text-gray-900"></span>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">RUT</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.rutTecnico}"></span>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">RUT Técnico</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.rutTecnico}" class="font-mono text-gray-900"></span>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.emailTecnico ?: 'No registrado'}"></span>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cargo/Función</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.cargoTecnico}" class="text-gray-900"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Información de la Empresa -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información de la Empresa</h3>
+                <!-- Información de Empresas -->
+                <div class="mb-8 bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <h3 class="text-lg font-semibold text-purple-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h1a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        Información de Empresas
+                    </h3>
                     <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Empresa Contratista</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.empresaContratista}"></span>
-                            </div>
-                        </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Empresa Demandante</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.empresaDemandante ?: 'No especificada'}"></span>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.empresaDemandante}" class="text-gray-900"></span>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Cargo Técnico</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.cargoTecnico ?: 'No registrado'}"></span>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Aprobador</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.aprobador ?: 'No registrado'}"></span>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Empresa Contratista</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.empresaContratista}" class="text-gray-900"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Información del Acceso -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información del Acceso</h3>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${#dates.format(ingreso.fechaInicio, 'dd/MM/yyyy')}"></span>
-                            </div>
-                        </div>
+                <!-- Información del Acceso/Ingreso -->
+                <div class="mb-8 bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h3 class="text-lg font-semibold text-green-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Información de Acceso
+                    </h3>
+                    <div class="grid md:grid-cols-4 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Turno</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.turno}"></span>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.turno == 'AM' ? 'AM (Noche) 19:00-06:59' : 'PM (Día) 07:00-18:59'}" 
+                                      th:class="${ingreso.turno == 'AM' ? 'text-blue-600 font-medium' : 'text-orange-600 font-medium'}"></span>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Entrada</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${#dates.format(ingreso.horaInicio, 'HH:mm')}"></span>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Usuario Registra</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.nombreUsuario}" class="text-gray-900"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Ingreso</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.fechaInicio != null ? #temporals.format(ingreso.fechaInicio, 'dd/MM/yyyy') : 'No registrada'}" class="font-mono text-gray-900"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Ingreso</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.horaInicio != null ? #temporals.format(ingreso.horaInicio, 'HH:mm') : 'No registrada'}" class="font-mono text-green-600 font-medium"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de Salida -->
+                <div class="mb-8 bg-red-50 p-4 rounded-lg border border-red-200">
+                    <h3 class="text-lg font-semibold text-red-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Información de Salida
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Salida</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:if="${ingreso.fechaTermino != null}" 
+                                      th:text="${#temporals.format(ingreso.fechaTermino, 'dd/MM/yyyy')}" 
+                                      class="font-mono text-gray-900"></span>
+                                <span th:unless="${ingreso.fechaTermino != null}" 
+                                      class="text-orange-600 font-medium italic">🔄 Aún en curso</span>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Hora de Salida</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.horaTermino != null ? #dates.format(ingreso.horaTermino, 'HH:mm') : 'Aún en curso'}"></span>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:if="${ingreso.horaTermino != null}" 
+                                      th:text="${#temporals.format(ingreso.horaTermino, 'HH:mm')}" 
+                                      class="font-mono text-red-600 font-medium"></span>
+                                <span th:unless="${ingreso.horaTermino != null}" 
+                                      class="text-orange-600 font-medium italic">🔄 Aún en curso</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Información del Trabajo -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Información del Trabajo</h3>
-                    <div class="grid md:grid-cols-2 gap-6">
+                <!-- Información del Ticket/Trabajo -->
+                <div class="mb-8 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <h3 class="text-lg font-semibold text-yellow-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Información del Ticket y Trabajo
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-6 mb-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Ticket</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.tipoTicket}"></span>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.tipoTicket}" 
+                                      th:class="${ingreso.tipoTicket == 'CRQ' ? 'bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold' : 
+                                                 ingreso.tipoTicket == 'INC' ? 'bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold' : 
+                                                 'bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs font-semibold'}"></span>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Número de Ticket</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.numeroTicket ?: 'No asignado'}"></span>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.numeroTicket}" class="font-mono text-gray-900"></span>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Sala</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:text="${ingreso.salaIngresa}"></span>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sala REMEDY</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.salaRemedy}" class="text-gray-900"></span>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-                                <span th:if="${ingreso.activo}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                    Activo
-                                </span>
-                                <span th:unless="${ingreso.activo}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                                    Inactivo
-                                </span>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Guía de Despacho</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.guiaDespacho != null and !#strings.isEmpty(ingreso.guiaDespacho) ? ingreso.guiaDespacho : 'No aplica'}" 
+                                      class="text-gray-900"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Motivo de Ingreso -->
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de Ingreso</label>
-                    <div class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md min-h-[100px]">
-                        <span th:text="${ingreso.motivoIngreso ?: 'Sin descripción'}"></span>
+                <!-- Información de Ubicación y Acceso -->
+                <div class="mb-8 bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                    <h3 class="text-lg font-semibold text-indigo-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Ubicación y Control de Acceso
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sala de Ingreso</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.salaIngresa}" class="text-gray-900"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Rack de Acceso</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.rackIngresa != null and !#strings.isEmpty(ingreso.rackIngresa) ? ingreso.rackIngresa : 'No especificado'}" 
+                                      class="text-gray-900"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Aprobador</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.aprobador}" class="text-gray-900"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Escolta</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.escolta}" class="text-gray-900"></span>
+                            </div>
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de Ingreso</label>
+                            <div class="px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <span th:text="${ingreso.motivoIngreso}" class="text-gray-900"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actividad REMEDY -->
+                <div class="mb-8 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Descripción de Actividad REMEDY
+                    </h3>
+                    <div class="px-4 py-3 bg-white border border-gray-300 rounded-md min-h-[120px]">
+                        <p th:text="${ingreso.actividadRemedy}" class="text-gray-900 whitespace-pre-wrap"></p>
                     </div>
                 </div>
 
                 <!-- Información de Auditoría -->
-                <div class="border-t pt-4 text-xs text-gray-500">
-                    <div class="grid md:grid-cols-2 gap-4">
+                <div class="border-t pt-6 mt-6">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Información de Auditoría
+                    </h4>
+                    <div class="grid md:grid-cols-3 gap-4 text-xs text-gray-600 bg-gray-50 p-3 rounded">
                         <div>
-                            <strong>Creado:</strong> <span th:text="${#dates.format(ingreso.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span>
+                            <strong>ID del Registro:</strong> <span th:text="${ingreso.id}" class="font-mono"></span>
                         </div>
-                        <div th:if="${ingreso.fechaModificacion}">
-                            <strong>Modificado:</strong> <span th:text="${#dates.format(ingreso.fechaModificacion, 'dd/MM/yyyy HH:mm')}"></span>
+                        <div>
+                            <strong>Fecha de Registro:</strong> 
+                            <span th:text="${ingreso.fechaRegistro != null ? #dates.format(ingreso.fechaRegistro, 'dd/MM/yyyy HH:mm:ss') : 'No disponible'}"></span>
+                        </div>
+                        <div>
+                            <strong>Estado Actual:</strong> 
+                            <span th:if="${ingreso.activo}" class="text-green-600 font-semibold">✅ ACTIVO</span>
+                            <span th:unless="${ingreso.activo}" class="text-red-600 font-semibold">❌ FINALIZADO</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- Botones de acción adicionales -->
+                <div class="flex justify-center space-x-4 mt-8 pt-6 border-t">
+                    <a th:href="@{'/ingreso/ap/update/' + ${ingreso.id}}" 
+                       class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg inline-flex items-center transition-colors duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Editar Registro
+                    </a>
+                    <a href="/ingreso/ap/list" 
+                       class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg inline-flex items-center transition-colors duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                        Ver Todos los Registros
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <th:block th:insert="fragments/footer :: footer"></th:block>
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
 </body>
 </html>

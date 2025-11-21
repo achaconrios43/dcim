@@ -43,6 +43,8 @@ public interface IngresoAPService {
     List<IngresoAP> obtenerIngresosActivos();
     List<IngresoAP> obtenerUltimosIngresos();
     boolean estaPersonaEnEdificio(String rut);
+    boolean tieneIngresoActivo(String rut);
+    Optional<IngresoAP> obtenerIngresoActivoPorRut(String rut);
     
     // Estadísticas y reportes
     Long contarIngresosPorFecha(LocalDate fecha);
@@ -61,4 +63,9 @@ public interface IngresoAPService {
     void eliminar(Long id);
     List<IngresoAP> buscarPorRutTecnico(String rut);
     List<IngresoAP> listarTodos();
+    
+    // Métodos para listado mejorado
+    List<IngresoAP> obtenerIngresosOrdenadosPorFecha();
+    List<IngresoAP> obtenerIngresosPorRangoOrdenados(LocalDate fechaInicio, LocalDate fechaFin);
+    List<IngresoAP> obtenerIngresosActivosOrdenados();
 }

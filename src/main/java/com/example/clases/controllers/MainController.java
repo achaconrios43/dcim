@@ -11,6 +11,16 @@ public class MainController {
     public String index() {
         return "index";
     }
+    
+    @GetMapping("/home")
+    public String home() {
+        return "redirect:/";
+    }
+    
+    @GetMapping("/index")
+    public String indexDirect() {
+        return "redirect:/";
+    }
 
     @GetMapping("/inventario")
     public String inventario(Model model) {

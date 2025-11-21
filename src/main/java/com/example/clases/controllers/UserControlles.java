@@ -33,12 +33,17 @@ public class UserControlles {
 
     @GetMapping("/create")
     public String createUser(HttpSession session, Model model){
-        // Permitir acceso al formulario de creación sin autenticación
-        // ya que es necesario para crear usuarios iniciales
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario != null) {
-            model.addAttribute("usuarioLogueado", usuario);
+        if (!verificarAutenticacion(session, model)) {
+            return "redirect:/login";
         }
+        
+        // Solo administradores pueden crear usuarios
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        if (!"ADMIN".equals(usuarioLogueado.getRol())) {
+            model.addAttribute("error", "Solo los administradores pueden crear usuarios");
+            return "redirect:/dashboard";
+        }
+        
         return "user/create";
     }
 
@@ -53,10 +58,15 @@ public class UserControlles {
                                HttpSession session,
                                Model model){
         
-        // Permitir creación sin autenticación para usuarios iniciales
+        if (!verificarAutenticacion(session, model)) {
+            return "redirect:/login";
+        }
+        
+        // Solo administradores pueden crear usuarios
         Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuarioLogueado != null) {
-            model.addAttribute("usuarioLogueado", usuarioLogueado);
+        if (!"ADMIN".equals(usuarioLogueado.getRol())) {
+            model.addAttribute("error", "Solo los administradores pueden crear usuarios");
+            return "redirect:/dashboard";
         }
         
         // Validaciones
@@ -104,9 +114,10 @@ public class UserControlles {
             Usuario usuarioGuardado = usuarioService.crearUsuario(nuevoUsuario);
             
             System.out.println("[UserController] Usuario creado exitosamente: " + usuarioGuardado.getEmail());
-            model.addAttribute("successMessage", "Usuario creado exitosamente");
             
-            return "redirect:/user/list?success=created";
+            // Redirigir al dashboard después de crear el usuario
+            System.out.println("[UserController] REDIRIGIENDO AL DASHBOARD CON SUCCESS=user-created");
+            return "redirect:/dashboard?success=user-created";
         } catch (Exception e) {
             System.err.println("[UserController] Error al crear usuario: " + e.getMessage());
             model.addAttribute("errorMessage", "Error al crear usuario: " + e.getMessage());
