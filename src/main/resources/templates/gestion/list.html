@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Gestión de Accesos</title>
+    <div th:replace="fragments/headers :: headers"></div>
+  </head>
+  <body class="bg-gray-100">
+    <div th:replace="fragments/navdar :: nav"></div>
+
+    <div th:replace="fragments/dashboard-button :: button-compact"></div>
+
+    <div class="container mx-auto px-4 py-8">
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <!-- Encabezado -->
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-clipboard-list mr-2 text-accent"></i>
+            <span th:text="${titulo}">Gestión de Accesos</span>
+          </h1>
+          <a href="/gestion/create" class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-300">
+            <i class="fas fa-plus mr-2"></i>Nueva Gestión
+          </a>
+        </div>
+
+        <!-- Mensajes de alerta -->
+        <div th:if="${success}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          <i class="fas fa-check-circle mr-2"></i>
+          <span th:text="${success}"></span>
+        </div>
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <i class="fas fa-exclamation-circle mr-2"></i>
+          <span th:text="${error}"></span>
+        </div>
+
+        <!-- Filtros -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Sitio</label>
+              <select id="filtroSitio" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                <option value="">Todos los sitios</option>
+                <option value="DC San Martin">DC San Martin</option>
+                <option value="DC Apoquindo">DC Apoquindo</option>
+                <option value="MC La Florida">MC La Florida</option>
+                <option value="MC Chiloé">MC Chiloé</option>
+                <option value="MC Independencia">MC Independencia</option>
+                <option value="MC Providencia">MC Providencia</option>
+                <option value="MC Pedro de Valdivia">MC Pedro de Valdivia</option>
+                <option value="MC Manuel Montt">MC Manuel Montt</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Estado</label>
+              <select id="filtroEstado" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                <option value="">Todos los estados</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Aprobada">Aprobada</option>
+                <option value="Rechazada por NXT">Rechazada por NXT</option>
+                <option value="Devuelta al cliente por falta de Datos">Devuelta por falta de datos</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Buscar por Ticket</label>
+              <input type="text" id="buscarTicket" placeholder="Número de ticket..." class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de gestiones -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+            <thead class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
+              <tr>
+                <th class="px-4 py-3 text-left text-sm font-semibold">ID</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold">Fecha Registro</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold">Usuario</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold">Ticket</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold">Actividad</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold">Sitio</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold">Estado</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold">Gestión</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaGestiones">
+              <tr th:each="gestion : ${gestiones}" class="border-b hover:bg-gray-50 gestion-row">
+                <td class="px-4 py-3 text-sm" th:text="${gestion.id}">1</td>
+                <td class="px-4 py-3 text-sm">
+                  <div th:text="${#temporals.format(gestion.fechaRegistro, 'dd/MM/yyyy')}">15/11/2024</div>
+                  <div class="text-xs text-gray-500" th:text="${#temporals.format(gestion.horaRegistro, 'HH:mm')}">08:30</div>
+                </td>
+                <td class="px-4 py-3 text-sm" th:text="${gestion.usuarioIngresa}">Usuario</td>
+                <td class="px-4 py-3 text-sm font-mono" th:text="${gestion.numeroTicket}">CRQ0001</td>
+                <td class="px-4 py-3 text-sm max-w-xs truncate" th:text="${gestion.nombreActividad}">Actividad</td>
+                <td class="px-4 py-3 text-sm" th:text="${gestion.sitio}">DC San Martin</td>
+                <td class="px-4 py-3 text-sm">
+                  <span th:if="${gestion.estadoAprobacion == 'Aprobada'}" class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                    <i class="fas fa-check-circle mr-1"></i>Aprobada
+                  </span>
+                  <span th:if="${gestion.estadoAprobacion == 'Pendiente'}" class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
+                    <i class="fas fa-clock mr-1"></i>Pendiente
+                  </span>
+                  <span th:if="${gestion.estadoAprobacion == 'Rechazada por NXT'}" class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
+                    <i class="fas fa-times-circle mr-1"></i>Rechazada
+                  </span>
+                  <span th:if="${gestion.estadoAprobacion == 'Devuelta al cliente por falta de Datos'}" class="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-semibold">
+                    <i class="fas fa-undo mr-1"></i>Devuelta
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm">
+                  <span th:if="${gestion.gestionRealizada}" class="text-green-600 font-semibold">
+                    <i class="fas fa-check mr-1"></i>Realizada
+                  </span>
+                  <span th:unless="${gestion.gestionRealizada}" class="text-gray-500">
+                    <i class="fas fa-hourglass-half mr-1"></i>Pendiente
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex justify-center space-x-2">
+                    <a th:href="@{/gestion/view/{id}(id=${gestion.id})}" class="text-blue-600 hover:text-blue-800" title="Ver detalle">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <a th:href="@{/gestion/edit/{id}(id=${gestion.id})}" class="text-yellow-600 hover:text-yellow-800" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a th:href="@{/gestion/delete/{id}(id=${gestion.id})}" 
+                       onclick="return confirm('¿Está seguro de eliminar esta gestión?')"
+                       class="text-red-600 hover:text-red-800" title="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(gestiones)}">
+                <td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                  <i class="fas fa-inbox text-4xl mb-2"></i>
+                  <p>No hay gestiones registradas</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <div class="text-sm text-blue-600 font-semibold">Total Gestiones</div>
+            <div class="text-2xl font-bold text-blue-800" th:text="${#lists.size(gestiones)}">0</div>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg">
+            <div class="text-sm text-green-600 font-semibold">Aprobadas</div>
+            <div class="text-2xl font-bold text-green-800" th:text="${#lists.size(gestiones.?[estadoAprobacion == 'Aprobada'])}">0</div>
+          </div>
+          <div class="bg-yellow-50 p-4 rounded-lg">
+            <div class="text-sm text-yellow-600 font-semibold">Pendientes</div>
+            <div class="text-2xl font-bold text-yellow-800" th:text="${#lists.size(gestiones.?[estadoAprobacion == 'Pendiente'])}">0</div>
+          </div>
+          <div class="bg-red-50 p-4 rounded-lg">
+            <div class="text-sm text-red-600 font-semibold">Rechazadas/Devueltas</div>
+            <div class="text-2xl font-bold text-red-800" th:text="${#lists.size(gestiones.?[estadoAprobacion == 'Rechazada por NXT']) + #lists.size(gestiones.?[estadoAprobacion == 'Devuelta al cliente por falta de Datos'])}">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer th:replace="fragments/footer :: footer"></footer>
+
+    <script>
+      // Filtros en tiempo real
+      document.getElementById('filtroSitio').addEventListener('change', filtrarTabla);
+      document.getElementById('filtroEstado').addEventListener('change', filtrarTabla);
+      document.getElementById('buscarTicket').addEventListener('input', filtrarTabla);
+
+      function filtrarTabla() {
+        const sitio = document.getElementById('filtroSitio').value.toLowerCase();
+        const estado = document.getElementById('filtroEstado').value.toLowerCase();
+        const ticket = document.getElementById('buscarTicket').value.toLowerCase();
+        
+        const filas = document.querySelectorAll('.gestion-row');
+        
+        filas.forEach(fila => {
+          const sitioFila = fila.cells[5].textContent.toLowerCase();
+          const estadoFila = fila.cells[6].textContent.toLowerCase();
+          const ticketFila = fila.cells[3].textContent.toLowerCase();
+          
+          const cumpleSitio = !sitio || sitioFila.includes(sitio);
+          const cumpleEstado = !estado || estadoFila.includes(estado);
+          const cumpleTicket = !ticket || ticketFila.includes(ticket);
+          
+          if (cumpleSitio && cumpleEstado && cumpleTicket) {
+            fila.style.display = '';
+          } else {
+            fila.style.display = 'none';
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -148,12 +148,90 @@
                     </div>
                 </div>
 
-                <!-- Estadísticas Rápidas -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <!-- Gestión de Acceso -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="p-2 bg-indigo-100 rounded-lg">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Gestión de Acceso</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Control de tickets y actividades programadas</p>
+                    <div class="space-y-2">
+                        <a th:href="@{/gestion/list}" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                            📋 Lista de Gestiones
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                        <a th:href="@{/gestion/create}" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                            ➕ Registrar Gestión
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                        <a th:href="@{/dashboard/cliente}" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                            📊 Ver Estadísticas
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                            ✅ Gestiones Aprobadas
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Dashboard Cliente -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                     <div class="flex items-center mb-4">
                         <div class="p-2 bg-yellow-100 rounded-lg">
                             <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Dashboard Cliente</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Estadísticas y reportes del mes actual</p>
+                    <div class="space-y-2">
+                        <a th:href="@{/dashboard/cliente}" class="flex items-center text-yellow-600 hover:text-yellow-800 text-sm font-medium">
+                            📊 Ver Estadísticas
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                        <a th:href="@{/dashboard/cliente}" class="flex items-center text-yellow-600 hover:text-yellow-800 text-sm font-medium">
+                            📈 Ingresos del Mes
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                        <a th:href="@{/dashboard/cliente}" class="flex items-center text-yellow-600 hover:text-yellow-800 text-sm font-medium">
+                            🎫 Tickets Únicos
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                        <a th:href="@{/dashboard/cliente}" class="flex items-center text-yellow-600 hover:text-yellow-800 text-sm font-medium">
+                            🏢 Por Tipo de Sala
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Estadísticas Rápidas -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="p-2 bg-indigo-100 rounded-lg">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                             </svg>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 ml-3">Estadísticas</h3>
@@ -187,6 +265,9 @@
                     <div class="space-y-2">
                         <a th:href="@{/ingreso/ap}" class="flex items-center justify-between p-2 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
                             <span class="text-sm font-medium">📝 Nuevo Registro</span>
+                        </a>
+                        <a th:href="@{/gestion/create}" class="flex items-center justify-between p-2 border border-indigo-200 rounded hover:bg-indigo-50 transition-colors">
+                            <span class="text-sm font-medium text-indigo-600">📋 Nueva Gestión</span>
                         </a>
                         <a href="/h2-console" target="_blank" class="flex items-center justify-between p-2 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
                             <span class="text-sm font-medium">💾 Base de Datos</span>

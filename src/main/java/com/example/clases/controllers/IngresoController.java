@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -69,6 +71,8 @@ public class IngresoController {
                                 @RequestParam(name="nombreUsuario", required=false) String nombreUsuario,
                                 @RequestParam(name="fechaInicio", required=false) String fechaInicio,
                                 @RequestParam(name="horaInicio", required=false) String horaInicio,
+                                @RequestParam(name="fechaFinFicticia", required=false) String fechaFinFicticia,
+                                @RequestParam(name="horaFinFicticia", required=false) String horaFinFicticia,
                                 @RequestParam(name="fechaTermino", required=false) String fechaTermino,
                                 @RequestParam(name="horaTermino", required=false) String horaTermino,
                                 @RequestParam(name="nombreTecnico", required=false) String nombreTecnico,
@@ -76,6 +80,7 @@ public class IngresoController {
                                 @RequestParam(name="empresaDemandante", required=false) String empresaDemandante,
                                 @RequestParam(name="empresaContratista", required=false) String empresaContratista,
                                 @RequestParam(name="cargoTecnico", required=false) String cargoTecnico,
+                                @RequestParam(name="sitioIngreso", required=false) String sitioIngreso,
                                 @RequestParam(name="salaRemedy", required=false) String salaRemedy,
                                 @RequestParam(name="tipoTicket", required=false) String tipoTicket,
                                 @RequestParam(name="numeroTicket", required=false) String numeroTicket,
@@ -102,18 +107,18 @@ public class IngresoController {
         }
         
         // Validar campos requeridos
-        String[] campos = {turno, nombreUsuario, fechaInicio, horaInicio, nombreTecnico, rutTecnico,
-                          empresaDemandante, empresaContratista, cargoTecnico, salaRemedy, tipoTicket,
+        String[] campos = {turno, nombreUsuario, fechaInicio, horaInicio, fechaFinFicticia, horaFinFicticia, nombreTecnico, rutTecnico,
+                          empresaDemandante, empresaContratista, cargoTecnico, sitioIngreso, salaRemedy, tipoTicket,
                           numeroTicket, aprobador, escolta, motivoIngreso, salaIngresa, rackIngresa, actividadRemedy};
-        String[] nombres = {"Turno", "Nombre Usuario", "Fecha Inicio", "Hora Inicio", "Nombre Técnico", "RUT Técnico",
-                           "Empresa Demandante", "Empresa Contratista", "Cargo Técnico", "Sala REMEDY", "Tipo Ticket",
+        String[] nombres = {"Turno", "Nombre Usuario", "Fecha Inicio", "Hora Inicio", "Fecha Final Estimada", "Hora Final Estimada", "Nombre Técnico", "RUT Técnico",
+                           "Empresa Demandante", "Empresa Contratista", "Cargo Técnico", "Sitio de Ingreso", "Tipo de Sala REMEDY", "Tipo Ticket",
                            "Número Ticket", "Aprobador", "Escolta", "Motivo Ingreso", "Sala Ingresa", "Rack Ingresa", "Actividad Remedy"};
         
         for (int i = 0; i < campos.length; i++) {
             if (campos[i] == null || campos[i].trim().isEmpty()) {
                 model.addAttribute("errorMessage", "Falta el campo: " + nombres[i]);
                 addAllValuesToModel(model, turno, nombreUsuario, fechaInicio, horaInicio, fechaTermino, horaTermino,
-                                  nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico,
+                                  nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico, sitioIngreso,
                                   salaRemedy, tipoTicket, numeroTicket, aprobador, escolta, motivoIngreso,
                                   guiaDespacho, salaIngresa, rackIngresa, actividadRemedy);
                 return "ingresoap";
@@ -125,7 +130,7 @@ public class IngresoController {
         if (!rutLimpio.matches("^[\\d]{1,2}\\.?[\\d]{3}\\.?[\\d]{3}-?[\\dkK]$")){
             model.addAttribute("errorMessage", "Por favor ingrese un RUT válido (formato: 12.345.678-9)");
             addAllValuesToModel(model, turno, nombreUsuario, fechaInicio, horaInicio, fechaTermino, horaTermino,
-                              nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico,
+                              nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico, sitioIngreso,
                               salaRemedy, tipoTicket, numeroTicket, aprobador, escolta, motivoIngreso,
                               guiaDespacho, salaIngresa, rackIngresa, actividadRemedy);
             return "ingresoap";
@@ -147,7 +152,7 @@ public class IngresoController {
                     "Debe cerrar el ingreso anterior para poder volver a ingresar al técnico.");
             }
             addAllValuesToModel(model, turno, nombreUsuario, fechaInicio, horaInicio, fechaTermino, horaTermino,
-                              nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico,
+                              nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico, sitioIngreso,
                               salaRemedy, tipoTicket, numeroTicket, aprobador, escolta, motivoIngreso,
                               guiaDespacho, salaIngresa, rackIngresa, actividadRemedy);
             return "ingresoap";
@@ -160,6 +165,21 @@ public class IngresoController {
             ingreso.setNombreUsuario(nombreUsuario.trim());
             ingreso.setFechaInicio(LocalDate.parse(fechaInicio));
             ingreso.setHoraInicio(LocalTime.parse(horaInicio));
+            
+            // Procesar fecha y hora final ficticia (estimada)
+            ingreso.setFechaFinFicticia(LocalDate.parse(fechaFinFicticia));
+            ingreso.setHoraFinFicticia(LocalTime.parse(horaFinFicticia));
+            
+            // Calcular hora media de supervisión
+            LocalDateTime inicioDateTime = LocalDateTime.of(ingreso.getFechaInicio(), ingreso.getHoraInicio());
+            LocalDateTime finFicticioDateTime = LocalDateTime.of(ingreso.getFechaFinFicticia(), ingreso.getHoraFinFicticia());
+            
+            long minutosTotal = java.time.Duration.between(inicioDateTime, finFicticioDateTime).toMinutes();
+            LocalDateTime supervisionMediaDateTime = inicioDateTime.plusMinutes(minutosTotal / 2);
+            
+            ingreso.setFechaSupervisionMedia(supervisionMediaDateTime.toLocalDate());
+            ingreso.setHoraSupervisionMedia(supervisionMediaDateTime.toLocalTime());
+            ingreso.setSegundaSupervisionRealizada(false);
             
             // Manejo de fecha/hora de término y auto-inactivación
             if (fechaTermino != null && !fechaTermino.trim().isEmpty()) {
@@ -183,6 +203,7 @@ public class IngresoController {
             ingreso.setCargoTecnico(cargoTecnico.trim());
             ingreso.setEmpresaDemandante(empresaDemandante.trim());
             ingreso.setEmpresaContratista(empresaContratista.trim());
+            ingreso.setSitioIngreso(sitioIngreso.trim());
             ingreso.setSalaRemedy(salaRemedy.trim());
             ingreso.setTipoTicket(tipoTicket.trim());
             ingreso.setNumeroTicket(numeroTicket.trim());
@@ -209,7 +230,7 @@ public class IngresoController {
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Error al procesar el registro: " + e.getMessage());
             addAllValuesToModel(model, turno, nombreUsuario, fechaInicio, horaInicio, fechaTermino, horaTermino,
-                              nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico,
+                              nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico, sitioIngreso,
                               salaRemedy, tipoTicket, numeroTicket, aprobador, escolta, motivoIngreso,
                               guiaDespacho, salaIngresa, rackIngresa, actividadRemedy);
             return "ingresoap";
@@ -400,6 +421,92 @@ public class IngresoController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al actualizar el ingreso: " + e.getMessage());
             return "redirect:/ingreso/ap/update/" + id;
+        }
+    }
+
+    // ACCIÓN - Marcar segunda supervisión realizada
+    @PostMapping("/ap/marcar-segunda-supervision/{id}")
+    public String marcarSegundaSupervision(@PathVariable Long id, 
+                                          HttpSession session, 
+                                          RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        try {
+            Optional<IngresoAP> ingresoOpt = ingresoAPService.buscarPorId(id);
+            if (!ingresoOpt.isPresent()) {
+                redirectAttributes.addFlashAttribute("error", "Ingreso no encontrado");
+                return "redirect:/ingreso/ap/list";
+            }
+            
+            IngresoAP ingreso = ingresoOpt.get();
+            
+            // Verificar que el ingreso esté activo
+            if (!ingreso.getActivo()) {
+                redirectAttributes.addFlashAttribute("error", "No se puede marcar supervisión en un registro cerrado");
+                return "redirect:/ingreso/ap/read/" + id;
+            }
+            
+            // Marcar como realizada
+            ingreso.setSegundaSupervisionRealizada(true);
+            ingreso.setFechaSegundaSupervision(LocalDate.now());
+            ingreso.setHoraSegundaSupervision(LocalTime.now());
+            
+            ingresoAPService.guardar(ingreso);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "✅ Segunda supervisión marcada como realizada exitosamente a las " + 
+                LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+            return "redirect:/ingreso/ap/read/" + id;
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al marcar supervisión: " + e.getMessage());
+            return "redirect:/ingreso/ap/read/" + id;
+        }
+    }
+    
+    // ACCIÓN - Cerrar registro (finalizar ingreso)
+    @PostMapping("/ap/cerrar/{id}")
+    public String cerrarIngreso(@PathVariable Long id, 
+                               HttpSession session, 
+                               RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        try {
+            Optional<IngresoAP> ingresoOpt = ingresoAPService.buscarPorId(id);
+            if (!ingresoOpt.isPresent()) {
+                redirectAttributes.addFlashAttribute("error", "Ingreso no encontrado");
+                return "redirect:/ingreso/ap/list";
+            }
+            
+            IngresoAP ingreso = ingresoOpt.get();
+            
+            // Verificar que el ingreso esté activo
+            if (!ingreso.getActivo()) {
+                redirectAttributes.addFlashAttribute("error", "Este registro ya está cerrado");
+                return "redirect:/ingreso/ap/read/" + id;
+            }
+            
+            // Cerrar el ingreso con fecha y hora actual
+            ingreso.setFechaTermino(LocalDate.now());
+            ingreso.setHoraTermino(LocalTime.now());
+            ingreso.setActivo(false);
+            
+            ingresoAPService.guardar(ingreso);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "🔒 Registro cerrado exitosamente. Técnico " + ingreso.getNombreTecnico() + 
+                " marcado como inactivo a las " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+            return "redirect:/ingreso/ap/read/" + id;
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al cerrar el ingreso: " + e.getMessage());
+            return "redirect:/ingreso/ap/read/" + id;
         }
     }
 
@@ -651,7 +758,7 @@ public class IngresoController {
     private void addAllValuesToModel(Model model, String turno, String nombreUsuario, 
                                      String fechaInicio, String horaInicio, String fechaTermino, String horaTermino,
                                      String nombreTecnico, String rutTecnico, String empresaDemandante, 
-                                     String empresaContratista, String cargoTecnico, String salaRemedy,
+                                     String empresaContratista, String cargoTecnico, String sitioIngreso, String salaRemedy,
                                      String tipoTicket, String numeroTicket, String aprobador, String escolta,
                                      String motivoIngreso, String guiaDespacho, String salaIngresa, 
                                      String rackIngresa, String actividadRemedy){
@@ -666,6 +773,7 @@ public class IngresoController {
         model.addAttribute("empresaDemandante", empresaDemandante);
         model.addAttribute("empresaContratista", empresaContratista);
         model.addAttribute("cargoTecnico", cargoTecnico);
+        model.addAttribute("sitioIngreso", sitioIngreso);
         model.addAttribute("salaRemedy", salaRemedy);
         model.addAttribute("tipoTicket", tipoTicket);
         model.addAttribute("numeroTicket", numeroTicket);

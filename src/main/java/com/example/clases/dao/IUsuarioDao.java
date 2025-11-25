@@ -1,38 +1,27 @@
 package com.example.clases.dao;
 
 import com.example.clases.entity.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Interfaz DAO para operaciones de acceso a datos de Usuario
- * Patrón DAO tradicional para gestión de usuarios del Centro de Datos
+ * Repositorio de datos para Usuario usando Spring Data JPA
  */
-public interface IUsuarioDao {
-    
-    // Operaciones CRUD básicas
-    Usuario save(Usuario usuario);
-    Optional<Usuario> findById(Long id);
-    List<Usuario> findAll();
-    void delete(Usuario usuario);
-    void deleteById(Long id);
-    boolean existsById(Long id);
-    
-    // Búsquedas específicas
+@Repository
+public interface IUsuarioDao extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
     Optional<Usuario> findByRut(String rut);
-    Optional<Usuario> findByEmailOrNombre(String emailOrName);
-    
-    // Búsquedas por criterios
     List<Usuario> findByRol(String rol);
-    List<Usuario> findByUbicacion(String ubicacion);
     List<Usuario> findByRolOrderByNombre(String rol);
-    
-    // Validaciones de existencia
+    List<Usuario> findByUbicacion(String ubicacion);
     boolean existsByEmail(String email);
     boolean existsByRut(String rut);
     
-    // Operaciones de conteo
-    long count();
+    @Query("SELECT u FROM Usuario u WHERE u.email = :emailOrName OR u.nombre = :emailOrName")
+    Optional<Usuario> findByEmailOrNombre(@Param("emailOrName") String emailOrName);
 }

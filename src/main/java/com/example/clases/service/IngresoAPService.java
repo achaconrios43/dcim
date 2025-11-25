@@ -68,4 +68,21 @@ public interface IngresoAPService {
     List<IngresoAP> obtenerIngresosOrdenadosPorFecha();
     List<IngresoAP> obtenerIngresosPorRangoOrdenados(LocalDate fechaInicio, LocalDate fechaFin);
     List<IngresoAP> obtenerIngresosActivosOrdenados();
+    
+    // Métodos para estadísticas del dashboard de cliente
+    Long contarIngresosMesActual();
+    Long contarTicketsUnicos(LocalDate fechaInicio, LocalDate fechaFin);
+    Long contarPorTipoTicket(String tipoTicket, LocalDate fechaInicio, LocalDate fechaFin);
+    Long contarPorSalaRemedy(String salaRemedy, LocalDate fechaInicio, LocalDate fechaFin);
+    List<IngresoAP> obtenerRegistrosActivosRecientes(int limite);
+    
+    // Métodos para contar tickets únicos por tipo
+    Long contarTicketsUnicosPorTipo(String tipoTicket, LocalDate fechaInicio, LocalDate fechaFin);
+    
+    // Métodos para estadísticas por sitio
+    Long contarIngresosPorSitio(String sitio, LocalDate fechaInicio, LocalDate fechaFin);
+    Long contarTicketsUnicosPorSitio(String sitio, LocalDate fechaInicio, LocalDate fechaFin);
+    Long contarTicketsUnicosPorTipoYSitio(String tipoTicket, String sitio, LocalDate fechaInicio, LocalDate fechaFin);
+    Long contarPorSalaRemedyYSitio(String salaRemedy, String sitio, LocalDate fechaInicio, LocalDate fechaFin);
+    List<IngresoAP> obtenerRegistrosActivosRecientesPorSitio(String sitio, int limite);
 }

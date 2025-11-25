@@ -31,6 +31,28 @@ public class IngresoAP {
     @Column(name = "hora_termino")
     private LocalTime horaTermino;
     
+    // Campos para supervisión programada
+    @Column(name = "fecha_fin_ficticia")
+    private LocalDate fechaFinFicticia;
+    
+    @Column(name = "hora_fin_ficticia")
+    private LocalTime horaFinFicticia;
+    
+    @Column(name = "hora_supervision_media")
+    private LocalTime horaSupervisionMedia;
+    
+    @Column(name = "fecha_supervision_media")
+    private LocalDate fechaSupervisionMedia;
+    
+    @Column(name = "segunda_supervision_realizada")
+    private Boolean segundaSupervisionRealizada = false;
+    
+    @Column(name = "fecha_segunda_supervision")
+    private LocalDate fechaSegundaSupervision;
+    
+    @Column(name = "hora_segunda_supervision")
+    private LocalTime horaSegundaSupervision;
+    
     @Column(name = "nombre_tecnico", nullable = false, length = 100)
     private String nombreTecnico;
     
@@ -67,8 +89,11 @@ public class IngresoAP {
     @Column(name = "guia_despacho", length = 50)
     private String guiaDespacho;
     
-    @Column(name = "sala_ingresa", nullable = false, length = 50)
-    private String salaIngresa;
+    @Column(name = "sitio_ingreso", length = 100)
+    private String sitioIngreso; // DC San Martin, DC Apoquindo, MC La Florida, etc.
+    
+    @Column(name = "sala_ingresa", nullable = false, columnDefinition = "TEXT")
+    private String salaIngresa; // Ahora acepta múltiples salas separadas por comas
     
     @Column(name = "rack_ingresa", length = 50)
     private String rackIngresa;
@@ -270,6 +295,14 @@ public class IngresoAP {
         this.guiaDespacho = guiaDespacho;
     }
     
+    public String getSitioIngreso() {
+        return sitioIngreso;
+    }
+    
+    public void setSitioIngreso(String sitioIngreso) {
+        this.sitioIngreso = sitioIngreso;
+    }
+    
     public String getSalaIngresa() {
         return salaIngresa;
     }
@@ -308,6 +341,62 @@ public class IngresoAP {
     
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+    
+    public LocalDate getFechaFinFicticia() {
+        return fechaFinFicticia;
+    }
+    
+    public void setFechaFinFicticia(LocalDate fechaFinFicticia) {
+        this.fechaFinFicticia = fechaFinFicticia;
+    }
+    
+    public LocalTime getHoraFinFicticia() {
+        return horaFinFicticia;
+    }
+    
+    public void setHoraFinFicticia(LocalTime horaFinFicticia) {
+        this.horaFinFicticia = horaFinFicticia;
+    }
+    
+    public LocalTime getHoraSupervisionMedia() {
+        return horaSupervisionMedia;
+    }
+    
+    public void setHoraSupervisionMedia(LocalTime horaSupervisionMedia) {
+        this.horaSupervisionMedia = horaSupervisionMedia;
+    }
+    
+    public LocalDate getFechaSupervisionMedia() {
+        return fechaSupervisionMedia;
+    }
+    
+    public void setFechaSupervisionMedia(LocalDate fechaSupervisionMedia) {
+        this.fechaSupervisionMedia = fechaSupervisionMedia;
+    }
+    
+    public Boolean getSegundaSupervisionRealizada() {
+        return segundaSupervisionRealizada;
+    }
+    
+    public void setSegundaSupervisionRealizada(Boolean segundaSupervisionRealizada) {
+        this.segundaSupervisionRealizada = segundaSupervisionRealizada;
+    }
+    
+    public LocalDate getFechaSegundaSupervision() {
+        return fechaSegundaSupervision;
+    }
+    
+    public void setFechaSegundaSupervision(LocalDate fechaSegundaSupervision) {
+        this.fechaSegundaSupervision = fechaSegundaSupervision;
+    }
+    
+    public LocalTime getHoraSegundaSupervision() {
+        return horaSegundaSupervision;
+    }
+    
+    public void setHoraSegundaSupervision(LocalTime horaSegundaSupervision) {
+        this.horaSegundaSupervision = horaSegundaSupervision;
     }
     
     @Override

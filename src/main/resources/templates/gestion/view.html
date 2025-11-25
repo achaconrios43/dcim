@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Gestión</title>
+    <div th:replace="fragments/headers :: headers"></div>
+  </head>
+  <body class="bg-gray-100">
+    <div th:replace="fragments/navdar :: nav"></div>
+    <div th:replace="fragments/dashboard-button :: button-compact"></div>
+
+    <div class="container mx-auto px-4 py-8">
+      <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-file-alt mr-2 text-accent"></i>Detalle de Gestión #<span th:text="${gestion.id}">1</span>
+          </h1>
+          <div class="space-x-2">
+            <a th:href="@{/gestion/edit/{id}(id=${gestion.id})}" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+              <i class="fas fa-edit mr-2"></i>Editar
+            </a>
+            <a href="/gestion/list" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+              <i class="fas fa-arrow-left mr-2"></i>Volver
+            </a>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-3"><i class="fas fa-info-circle mr-2"></i>Información de Registro</h3>
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <span class="text-sm text-gray-600">Fecha:</span>
+                <p class="font-semibold" th:text="${#temporals.format(gestion.fechaRegistro, 'dd/MM/yyyy')}">15/11/2024</p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-600">Hora:</span>
+                <p class="font-semibold" th:text="${#temporals.format(gestion.horaRegistro, 'HH:mm')}">08:30</p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-600">Usuario:</span>
+                <p class="font-semibold" th:text="${gestion.usuarioIngresa}">Usuario</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-3"><i class="fas fa-ticket-alt mr-2"></i>Información del Ticket</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <span class="text-sm text-gray-600">Número de Ticket:</span>
+                <p class="font-semibold font-mono text-lg" th:text="${gestion.numeroTicket}">CRQ0001</p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-600">Sitio:</span>
+                <p class="font-semibold" th:text="${gestion.sitio}">DC San Martin</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-teal-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-3"><i class="fas fa-calendar-alt mr-2"></i>Programación de Actividad</h3>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <span class="text-sm text-gray-600">Inicio:</span>
+                <p class="font-semibold">
+                  <span th:text="${#temporals.format(gestion.fechaInicioActividad, 'dd/MM/yyyy')}">15/11/2024</span>
+                  a las 
+                  <span th:text="${#temporals.format(gestion.horaInicioActividad, 'HH:mm')}">14:00</span>
+                </p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-600">Término:</span>
+                <p class="font-semibold">
+                  <span th:text="${#temporals.format(gestion.fechaTerminoActividad, 'dd/MM/yyyy')}">15/11/2024</span>
+                  a las 
+                  <span th:text="${#temporals.format(gestion.horaTerminoActividad, 'HH:mm')}">18:00</span>
+                </p>
+              </div>
+            </div>
+            <div>
+              <span class="text-sm text-gray-600">Descripción de la Actividad:</span>
+              <p class="mt-2 p-3 bg-white rounded border border-gray-200" th:text="${gestion.nombreActividad}">Actividad</p>
+            </div>
+          </div>
+
+          <div class="bg-yellow-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-3"><i class="fas fa-users mr-2"></i>Aprobación y Estado</h3>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <span class="text-sm text-gray-600">Estado de Aprobación:</span>
+                <p class="mt-2">
+                  <span th:if="${gestion.estadoAprobacion == 'Aprobada'}" class="px-3 py-1 bg-green-100 text-green-800 rounded-full font-semibold">
+                    <i class="fas fa-check-circle mr-1"></i>Aprobada
+                  </span>
+                  <span th:if="${gestion.estadoAprobacion == 'Pendiente'}" class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full font-semibold">
+                    <i class="fas fa-clock mr-1"></i>Pendiente
+                  </span>
+                  <span th:if="${gestion.estadoAprobacion == 'Rechazada por NXT'}" class="px-3 py-1 bg-red-100 text-red-800 rounded-full font-semibold">
+                    <i class="fas fa-times-circle mr-1"></i>Rechazada por NXT
+                  </span>
+                  <span th:if="${gestion.estadoAprobacion == 'Devuelta al cliente por falta de Datos'}" class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full font-semibold">
+                    <i class="fas fa-undo mr-1"></i>Devuelta por falta de datos
+                  </span>
+                </p>
+              </div>
+              <div>
+                <span class="text-sm text-gray-600">Gestión Realizada:</span>
+                <p class="mt-2 font-semibold">
+                  <span th:if="${gestion.gestionRealizada}" class="text-green-600">
+                    <i class="fas fa-check-circle mr-1"></i>Sí, realizada
+                  </span>
+                  <span th:unless="${gestion.gestionRealizada}" class="text-gray-500">
+                    <i class="fas fa-hourglass-half mr-1"></i>No realizada
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div th:if="${gestion.aprobadoresPendientes}">
+              <span class="text-sm text-gray-600">Aprobadores Pendientes:</span>
+              <p class="mt-2 p-3 bg-white rounded border border-gray-200" th:text="${gestion.aprobadoresPendientes}">Aprobadores</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer th:replace="fragments/footer :: footer"></footer>
+  </body>
+</html>

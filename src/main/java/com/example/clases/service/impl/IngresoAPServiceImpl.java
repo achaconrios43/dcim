@@ -1,12 +1,9 @@
 package com.example.clases.service.impl;
 
+import com.example.clases.dao.IIngresoAPDao;
 import com.example.clases.entity.IngresoAP;
 import com.example.clases.service.IngresoAPService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,52 +14,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Repositorio interno para acceso a datos de IngresoAP
- */
-@Repository
-interface IngresoAPDataRepository extends JpaRepository<IngresoAP, Long> {
-    Optional<IngresoAP> findByNumeroTicket(String numeroTicket);
-    List<IngresoAP> findByRutTecnico(String rutTecnico);
-    List<IngresoAP> findByNombreTecnicoAndRutTecnico(String nombreTecnico, String rutTecnico);
-    List<IngresoAP> findByFechaInicio(LocalDate fechaInicio);
-    List<IngresoAP> findByFechaInicioAndFechaTermino(LocalDate fechaInicio, LocalDate fechaTermino);
-    List<IngresoAP> findByFechaInicioBetween(LocalDate fechaInicio, LocalDate fechaFin);
-    List<IngresoAP> findByEmpresaDemandante(String empresaDemandante);
-    List<IngresoAP> findByEmpresaContratista(String empresaContratista);
-    List<IngresoAP> findByTipoTicket(String tipoTicket);
-    List<IngresoAP> findBySalaRemedy(String salaRemedy);
-    Long countByFechaInicio(LocalDate fechaInicio);
-    
-    @Query("SELECT i FROM IngresoAP i WHERE i.fechaInicio = :fechaInicio ORDER BY i.horaInicio")
-    List<IngresoAP> findByFechaInicioOrderByHoraInicio(@Param("fechaInicio") LocalDate fechaInicio);
-    
-    @Query("SELECT i FROM IngresoAP i WHERE i.horaTermino IS NULL OR i.fechaTermino IS NULL")
-    List<IngresoAP> findRegistrosSinSalida();
-    
-    @Query("SELECT i FROM IngresoAP i ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
-    List<IngresoAP> findUltimosRegistros();
-    
-    @Query("SELECT i FROM IngresoAP i WHERE i.fechaInicio BETWEEN :fechaInicio AND :fechaFin ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
-    List<IngresoAP> findByFechaInicioBetweenOrderByFechaDesc(@Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFin") LocalDate fechaFin);
-    
-    @Query("SELECT i FROM IngresoAP i WHERE i.activo = true ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
-    List<IngresoAP> findActivosOrdenadosPorFecha();
-    
-    @Query("SELECT i FROM IngresoAP i ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
-    List<IngresoAP> findAllOrdenadosPorFecha();
-}
-
-/**
  * Implementación del servicio para lógica de negocio de IngresoAP
  * Maneja toda la lógica de negocio y validaciones para control de acceso al Centro de Datos
  */
 @Service
 public class IngresoAPServiceImpl implements IngresoAPService {
-    
+
     @Autowired
-    private IngresoAPDataRepository ingresoAPRepository;
-    
-    // Horarios de acceso - DESHABILITADO para permitir acceso 24/7
+    private IIngresoAPDao ingresoAPRepository;    // Horarios de acceso - DESHABILITADO para permitir acceso 24/7
     // private static final LocalTime HORA_INICIO_ACCESO = LocalTime.of(7, 0);
     // private static final LocalTime HORA_FIN_ACCESO = LocalTime.of(22, 0);
     
@@ -423,5 +382,87 @@ public class IngresoAPServiceImpl implements IngresoAPService {
      */
     public List<IngresoAP> obtenerIngresosActivosOrdenados() {
         return ingresoAPRepository.findActivosOrdenadosPorFecha();
+    }
+    
+    /**
+     * Cuenta total de ingresos del mes actual
+     */
+    @Override
+    public Long contarIngresosMesActual() {
+        LocalDate now = LocalDate.now();
+        LocalDate primerDiaMes = now.withDayOfMonth(1);
+        LocalDate ultimoDiaMes = now.withDayOfMonth(now.lengthOfMonth());
+        return ingresoAPRepository.countByFechaInicioBetween(primerDiaMes, ultimoDiaMes);
+    }
+    
+    /**
+     * Cuenta tickets únicos (no repetidos) en un rango de fechas
+     */
+    @Override
+    public Long contarTicketsUnicos(LocalDate fechaInicio, LocalDate fechaFin) {
+        return ingresoAPRepository.countDistinctNumeroTicketByFechaInicioBetween(fechaInicio, fechaFin);
+    }
+    
+    /**
+     * Cuenta ingresos por tipo de ticket en un rango de fechas
+     */
+    @Override
+    public Long contarPorTipoTicket(String tipoTicket, LocalDate fechaInicio, LocalDate fechaFin) {
+        return ingresoAPRepository.countByTipoTicketAndFechaInicioBetween(tipoTicket, fechaInicio, fechaFin);
+    }
+    
+    /**
+     * Cuenta ingresos por sala REMEDY en un rango de fechas
+     */
+    @Override
+    public Long contarPorSalaRemedy(String salaRemedy, LocalDate fechaInicio, LocalDate fechaFin) {
+        return ingresoAPRepository.countBySalaRemedyAndFechaInicioBetween(salaRemedy, fechaInicio, fechaFin);
+    }
+    
+    /**
+     * Obtiene los registros activos más recientes limitados
+     */
+    @Override
+    public List<IngresoAP> obtenerRegistrosActivosRecientes(int limite) {
+        List<IngresoAP> todos = ingresoAPRepository.findTop10ByActivoTrueOrderByFechaInicioDescHoraInicioDesc();
+        if (todos.size() > limite) {
+            return todos.subList(0, limite);
+        }
+        return todos;
+    }
+    
+    @Override
+    public Long contarTicketsUnicosPorTipo(String tipoTicket, LocalDate fechaInicio, LocalDate fechaFin) {
+        return ingresoAPRepository.countDistinctNumeroTicketByTipoTicketAndFechaInicioBetween(tipoTicket, fechaInicio, fechaFin);
+    }
+    
+    // Implementación de métodos para filtrar por sitio
+    @Override
+    public Long contarIngresosPorSitio(String sitio, LocalDate fechaInicio, LocalDate fechaFin) {
+        return ingresoAPRepository.countBySitioIngresoAndFechaInicioBetween(sitio, fechaInicio, fechaFin);
+    }
+    
+    @Override
+    public Long contarTicketsUnicosPorSitio(String sitio, LocalDate fechaInicio, LocalDate fechaFin) {
+        return ingresoAPRepository.countDistinctNumeroTicketBySitioIngresoAndFechaInicioBetween(sitio, fechaInicio, fechaFin);
+    }
+    
+    @Override
+    public Long contarTicketsUnicosPorTipoYSitio(String tipoTicket, String sitio, LocalDate fechaInicio, LocalDate fechaFin) {
+        return ingresoAPRepository.countDistinctNumeroTicketByTipoTicketAndSitioIngresoAndFechaInicioBetween(tipoTicket, sitio, fechaInicio, fechaFin);
+    }
+    
+    @Override
+    public Long contarPorSalaRemedyYSitio(String salaRemedy, String sitio, LocalDate fechaInicio, LocalDate fechaFin) {
+        return ingresoAPRepository.countBySalaRemedyAndSitioIngresoAndFechaInicioBetween(salaRemedy, sitio, fechaInicio, fechaFin);
+    }
+    
+    @Override
+    public List<IngresoAP> obtenerRegistrosActivosRecientesPorSitio(String sitio, int limite) {
+        List<IngresoAP> todos = ingresoAPRepository.findByActivoTrueAndSitioIngresoOrderByFechaInicioDescHoraInicioDesc(sitio);
+        if (todos.size() > limite) {
+            return todos.subList(0, limite);
+        }
+        return todos;
     }
 }

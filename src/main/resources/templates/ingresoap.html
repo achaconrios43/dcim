@@ -61,8 +61,32 @@
                 <input type="time" id="horaInicio" name="horaInicio" th:value="${horaInicio}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
               </div>
             </div>
+            
+            <h3 class="text-lg font-semibold text-gray-800 mt-5 mb-3">Fecha y Hora Final Estimada</h3>
+            <p class="text-sm text-gray-600 mb-3">Ingrese la fecha y hora estimada de finalización de la actividad</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="fechaFinFicticia" class="block text-sm font-medium text-gray-700">Fecha Final Estimada *</label>
+                <input type="date" id="fechaFinFicticia" name="fechaFinFicticia" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
+              </div>
+              <div>
+                <label for="horaFinFicticia" class="block text-sm font-medium text-gray-700">Hora Final Estimada *</label>
+                <input type="time" id="horaFinFicticia" name="horaFinFicticia" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
+              </div>
+            </div>
+            
+            <div class="mt-3 p-3 bg-blue-100 border-l-4 border-blue-500 rounded">
+              <p class="text-sm text-blue-800">
+                <svg class="inline w-5 h-5 mr-1 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                </svg>
+                <strong>Supervisión Automática:</strong> El sistema calculará automáticamente la hora intermedia entre el inicio y fin estimado para programar la segunda supervisión. Recibirá una alerta 10 minutos antes de la hora programada.
+              </p>
+            </div>
+            
             <div class="mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded">
-              📌 <strong>Nota:</strong> Las fechas y horas de término solo se registrarán al modificar el registro en la sección de actualización.
+              📌 <strong>Nota:</strong> Las fechas y horas de término real solo se registrarán al cerrar definitivamente el registro.
             </div>
           </div>
 
@@ -109,11 +133,26 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label for="salaRemedy" class="block text-sm font-medium text-gray-700">Sala REMEDY</label>
+                <label for="sitioIngreso" class="block text-sm font-medium text-gray-700">Sitio de Ingreso *</label>
+                <select id="sitioIngreso" name="sitioIngreso" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900">
+                  <option value="">Seleccionar sitio</option>
+                  <option value="DC San Martin" th:selected="${sitioIngreso == 'DC San Martin'}">DC San Martin</option>
+                  <option value="DC Apoquindo" th:selected="${sitioIngreso == 'DC Apoquindo'}">DC Apoquindo</option>
+                  <option value="MC La Florida" th:selected="${sitioIngreso == 'MC La Florida'}">MC La Florida</option>
+                  <option value="MC Providencia" th:selected="${sitioIngreso == 'MC Providencia'}">MC Providencia</option>
+                  <option value="MC Pedro de Valdivia" th:selected="${sitioIngreso == 'MC Pedro de Valdivia'}">MC Pedro de Valdivia</option>
+                  <option value="MC Manuel Montt" th:selected="${sitioIngreso == 'MC Manuel Montt'}">MC Manuel Montt</option>
+                  <option value="MC Independencia" th:selected="${sitioIngreso == 'MC Independencia'}">MC Independencia</option>
+                  <option value="MC Chiloé" th:selected="${sitioIngreso == 'MC Chiloé'}">MC Chiloé</option>
+                </select>
+              </div>
+              <div>
+                <label for="salaRemedy" class="block text-sm font-medium text-gray-700">Tipo de Sala REMEDY *</label>
                 <select id="salaRemedy" name="salaRemedy" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900">
-                  <option value="">Seleccionar sala</option>
-                  <option value="Salas de RED" th:selected="${salaRemedy == 'Salas de RED'}">Salas de RED</option>
+                  <option value="">Seleccionar tipo</option>
                   <option value="Salas TI" th:selected="${salaRemedy == 'Salas TI'}">Salas TI</option>
+                  <option value="Salas de RED" th:selected="${salaRemedy == 'Salas de RED'}">Salas de RED</option>
+                  <option value="Salas TI & RED" th:selected="${salaRemedy == 'Salas TI & RED'}">Salas TI & RED</option>
                 </select>
               </div>
               <div>
@@ -130,6 +169,388 @@
                 <label for="numeroTicket" class="block text-sm font-medium text-gray-700">Número de Ticket</label>
                 <input type="text" id="numeroTicket" name="numeroTicket" th:value="${numeroTicket}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Ej: INC123456" />
               </div>
+            </div>
+          </div>
+
+          <!-- Selección de Salas según Sitio y Tipo -->
+          <div id="salasCard" class="bg-orange-50 p-4 rounded-lg hidden">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Selección de Salas</h3>
+            <p class="text-sm text-gray-600 mb-3">Seleccione las salas donde ingresará el técnico según el sitio y tipo de sala</p>
+            
+            <!-- Checkboxes de Salas TI - DC San Martin -->
+            <div id="salasTISanMartin" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas TI - DC San Martin</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Comunicaciones" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Comunicaciones</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CPD" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CPD</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="MidRange" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>MidRange</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Mundo" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Mundo</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Reso" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Reso</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkboxes de Salas TI - DC Apoquindo -->
+            <div id="salasTIApoquindo" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas TI - DC Apoquindo</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="GSM" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>GSM</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CPD1" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CPD1</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CPD2" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CPD2</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Mainframe" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Mainframe</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkboxes de Salas de RED - DC San Martin -->
+            <div id="salasREDSanMartin" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas de RED - DC San Martin</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Alcatel" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Alcatel</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Ason TX" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Ason TX</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CCI" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CCI</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Conmutación" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Conmutación</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CrossConnect" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CrossConnect</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Housing" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Housing</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Movil" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Movil</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Multiportadores" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Multiportadores</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Noc1" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Noc1</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Noc2" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Noc2</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Principal 9" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Principal 9</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="SDH" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>SDH</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Datos" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Datos</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="GSM" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>GSM</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="NEC" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>NEC</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Nokia" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Nokia</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Prepago" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Prepago</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="PSSBA" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>PSSBA</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkboxes de Salas de RED - DC Apoquindo -->
+            <div id="salasREDApoquindo" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas de RED - DC Apoquindo</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CrossConnect" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CrossConnect</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Movil" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Movil</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="M8" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>M8</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="SDH" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>SDH</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Conmutacion" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Conmutacion</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkboxes de Salas de RED - MC Chiloé -->
+            <div id="salasREDChiloe" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas de RED - MC Chiloé</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CX2" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CX2</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Sala Datos" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Sala Datos</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Conmutación" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Conmutación</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Ericsson" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Ericsson</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Movil" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Movil</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Nueva Chiloé" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Nueva Chiloé</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="SDH" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>SDH</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Transmision" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Transmision</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Huawei" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Huawei</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkboxes de Salas de RED - MC Providencia -->
+            <div id="salasREDProvidencia" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas de RED - MC Providencia</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Conmutacion" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Conmutacion</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CrossConnect" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CrossConnect</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Datos" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Datos</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Housing" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Housing</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="SDH" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>SDH</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="M8" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>M8</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="MDF" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>MDF</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Transmision" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Transmision</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkboxes de Salas de RED - MC Pedro de Valdivia -->
+            <div id="salasREDPedroValdivia" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas de RED - MC Pedro de Valdivia</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Conmutacion" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Conmutacion</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CrossConnect" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CrossConnect</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CX" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CX</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Datos" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Datos</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Ericsson" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Ericsson</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="M8" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>M8</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Movil" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Movil</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Nueva Datos" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Nueva Datos</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="PCM" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>PCM</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="SDH" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>SDH</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkboxes de Salas de RED - MC Manuel Montt -->
+            <div id="salasREDManuelMontt" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas de RED - MC Manuel Montt</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Datos" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Datos</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="GSM" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>GSM</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Unicast" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Unicast</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkboxes de Salas de RED - MC La Florida -->
+            <div id="salasREDLaFlorida" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas de RED - MC La Florida</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="CCI" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>CCI</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Conmutación" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Conmutación</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Alcatel" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Alcatel</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Datos" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Datos</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="M8" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>M8</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Movil" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Movil</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="PCM" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>PCM</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkboxes de Salas de RED - MC Independencia -->
+            <div id="salasREDIndependencia" class="mb-4 hidden">
+              <h4 class="font-semibold text-gray-700 mb-2">Salas de RED - MC Independencia</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Conmutación" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Conmutación</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Datos" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Datos</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="Independencia" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>Independencia</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="LTE" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>LTE</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="M8" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>M8</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="salasSeleccionadas" value="SDH" class="rounded border-gray-300 text-accent focus:ring-accent">
+                  <span>SDH</span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="mt-3 p-3 bg-yellow-100 border-l-4 border-yellow-500 rounded">
+              <p class="text-sm text-yellow-800">
+                <strong>Nota:</strong> Las salas seleccionadas se registrarán automáticamente en el campo "Sala Ingresa".
+              </p>
             </div>
           </div>
 
@@ -187,7 +608,8 @@
               </div>
               <div>
                 <label for="salaIngresa" class="block text-sm font-medium text-gray-700">Sala Ingresa</label>
-                <input type="text" id="salaIngresa" name="salaIngresa" th:value="${salaIngresa}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Sala de ingreso" />
+                <textarea id="salaIngresa" name="salaIngresa" th:text="${salaIngresa}" required readonly rows="2" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 bg-gray-100 text-gray-700 cursor-not-allowed resize-none" placeholder="Las salas seleccionadas aparecerán aquí automáticamente"></textarea>
+                <small class="text-gray-500 text-xs">Este campo se llena automáticamente con las salas seleccionadas</small>
               </div>
               <div>
                 <label for="rackIngresa" class="block text-sm font-medium text-gray-700">Rack Ingresa</label>
@@ -232,6 +654,135 @@
     <footer th:replace="fragments/footer :: footer"></footer>
 
     <script>
+      // Lógica para mostrar/ocultar salas según sitio y tipo de sala
+      (function(){
+        const sitioIngresoSelect = document.getElementById('sitioIngreso');
+        const salaRemedySelect = document.getElementById('salaRemedy');
+        const salasCard = document.getElementById('salasCard');
+        const salasTISanMartin = document.getElementById('salasTISanMartin');
+        const salasTIApoquindo = document.getElementById('salasTIApoquindo');
+        const salasREDSanMartin = document.getElementById('salasREDSanMartin');
+        const salasREDApoquindo = document.getElementById('salasREDApoquindo');
+        const salasREDChiloe = document.getElementById('salasREDChiloe');
+        const salasREDProvidencia = document.getElementById('salasREDProvidencia');
+        const salasREDPedroValdivia = document.getElementById('salasREDPedroValdivia');
+        const salasREDManuelMontt = document.getElementById('salasREDManuelMontt');
+        const salasREDLaFlorida = document.getElementById('salasREDLaFlorida');
+        const salasREDIndependencia = document.getElementById('salasREDIndependencia');
+        const salaIngresaTextarea = document.getElementById('salaIngresa');
+        
+        function actualizarSalasVisibles() {
+          const sitio = sitioIngresoSelect.value;
+          
+          // Si es un MC, automáticamente seleccionar "Salas de RED"
+          if (sitio && sitio.startsWith('MC ')) {
+            salaRemedySelect.value = 'Salas de RED';
+          }
+          
+          const tipoSala = salaRemedySelect.value;
+          
+          // Ocultar todo por defecto
+          salasCard.classList.add('hidden');
+          salasTISanMartin.classList.add('hidden');
+          salasTIApoquindo.classList.add('hidden');
+          salasREDSanMartin.classList.add('hidden');
+          salasREDApoquindo.classList.add('hidden');
+          salasREDChiloe.classList.add('hidden');
+          salasREDProvidencia.classList.add('hidden');
+          salasREDPedroValdivia.classList.add('hidden');
+          salasREDManuelMontt.classList.add('hidden');
+          salasREDLaFlorida.classList.add('hidden');
+          salasREDIndependencia.classList.add('hidden');
+          
+          // Desmarcar todos los checkboxes
+          document.querySelectorAll('input[name="salasSeleccionadas"]').forEach(cb => {
+            cb.checked = false;
+          });
+          
+          // Limpiar campo de sala ingresa
+          salaIngresaTextarea.value = '';
+          
+          // Mostrar card solo si sitio y tipo están seleccionados
+          if (sitio && tipoSala) {
+            salasCard.classList.remove('hidden');
+            
+            // Mostrar salas según el sitio y tipo seleccionado
+            if (sitio === 'DC San Martin') {
+              if (tipoSala === 'Salas TI') {
+                salasTISanMartin.classList.remove('hidden');
+              } else if (tipoSala === 'Salas de RED') {
+                salasREDSanMartin.classList.remove('hidden');
+              } else if (tipoSala === 'Salas TI & RED') {
+                salasTISanMartin.classList.remove('hidden');
+                salasREDSanMartin.classList.remove('hidden');
+              }
+            } else if (sitio === 'DC Apoquindo') {
+              if (tipoSala === 'Salas TI') {
+                salasTIApoquindo.classList.remove('hidden');
+              } else if (tipoSala === 'Salas de RED') {
+                salasREDApoquindo.classList.remove('hidden');
+              } else if (tipoSala === 'Salas TI & RED') {
+                salasTIApoquindo.classList.remove('hidden');
+                salasREDApoquindo.classList.remove('hidden');
+              }
+            } else if (sitio === 'MC Chiloé') {
+              // MC Chiloé solo tiene Salas de RED
+              if (tipoSala === 'Salas de RED' || tipoSala === 'Salas TI & RED') {
+                salasREDChiloe.classList.remove('hidden');
+              }
+            } else if (sitio === 'MC Providencia') {
+              // MC Providencia solo tiene Salas de RED
+              if (tipoSala === 'Salas de RED' || tipoSala === 'Salas TI & RED') {
+                salasREDProvidencia.classList.remove('hidden');
+              }
+            } else if (sitio === 'MC Pedro de Valdivia') {
+              // MC Pedro de Valdivia solo tiene Salas de RED
+              if (tipoSala === 'Salas de RED' || tipoSala === 'Salas TI & RED') {
+                salasREDPedroValdivia.classList.remove('hidden');
+              }
+            } else if (sitio === 'MC Manuel Montt') {
+              // MC Manuel Montt solo tiene Salas de RED
+              if (tipoSala === 'Salas de RED' || tipoSala === 'Salas TI & RED') {
+                salasREDManuelMontt.classList.remove('hidden');
+              }
+            } else if (sitio === 'MC La Florida') {
+              // MC La Florida solo tiene Salas de RED
+              if (tipoSala === 'Salas de RED' || tipoSala === 'Salas TI & RED') {
+                salasREDLaFlorida.classList.remove('hidden');
+              }
+            } else if (sitio === 'MC Independencia') {
+              // MC Independencia solo tiene Salas de RED
+              if (tipoSala === 'Salas de RED' || tipoSala === 'Salas TI & RED') {
+                salasREDIndependencia.classList.remove('hidden');
+              }
+            }
+          }
+        }
+        
+        function actualizarSalaIngresa() {
+          const checkboxes = document.querySelectorAll('input[name="salasSeleccionadas"]:checked');
+          const salasSeleccionadas = Array.from(checkboxes).map(cb => cb.value);
+          salaIngresaTextarea.value = salasSeleccionadas.join(', ');
+        }
+        
+        // Event listeners
+        if (sitioIngresoSelect) {
+          sitioIngresoSelect.addEventListener('change', actualizarSalasVisibles);
+        }
+        
+        if (salaRemedySelect) {
+          salaRemedySelect.addEventListener('change', actualizarSalasVisibles);
+        }
+        
+        // Actualizar campo salaIngresa cuando se marcan/desmarcan checkboxes
+        document.querySelectorAll('input[name="salasSeleccionadas"]').forEach(checkbox => {
+          checkbox.addEventListener('change', actualizarSalaIngresa);
+        });
+        
+        // Inicializar al cargar la página (por si hay valores pre-seleccionados)
+        actualizarSalasVisibles();
+      })();
+      
       // validación del RUT del técnico y auto-llenar fecha/hora
       (function(){
         const rutTecnicoInput = document.getElementById('rutTecnico');
@@ -330,9 +881,9 @@
           // Limpiar todos los campos excepto fechaInicio, horaInicio, nombreUsuario y turno
           const camposALimpiar = [
             'nombreTecnico', 'rutTecnico', 'empresaDemandante', 'empresaContratista', 
-            'cargoTecnico', 'salaRemedy', 'tipoTicket', 'numeroTicket', 'aprobador', 
+            'cargoTecnico', 'sitioIngreso', 'salaRemedy', 'tipoTicket', 'numeroTicket', 'aprobador', 
             'escolta', 'motivoIngreso', 'guiaDespacho', 'salaIngresa', 'rackIngresa', 
-            'actividadRemedy'
+            'actividadRemedy', 'fechaFinFicticia', 'horaFinFicticia'
           ];
           
           camposALimpiar.forEach(campo => {
@@ -345,6 +896,17 @@
               }
             }
           });
+          
+          // Desmarcar todos los checkboxes de salas
+          document.querySelectorAll('input[name="salasSeleccionadas"]').forEach(cb => {
+            cb.checked = false;
+          });
+          
+          // Ocultar card de salas
+          const salasCard = document.getElementById('salasCard');
+          if (salasCard) {
+            salasCard.classList.add('hidden');
+          }
           
           // Mantener fecha y hora actualizadas para el siguiente ingreso
           const now = new Date();

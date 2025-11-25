@@ -1,13 +1,10 @@
 package com.example.clases.service.impl;
 
+import com.example.clases.dao.IUsuarioDao;
 import com.example.clases.entity.Usuario;
 import com.example.clases.service.UsuarioService;
 import com.example.clases.service.ImportSqlService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,33 +12,14 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * Repositorio interno para acceso a datos de Usuario
- */
-@Repository
-interface UsuarioDataRepository extends JpaRepository<Usuario, Long> {
-    Optional<Usuario> findByEmail(String email);
-    Optional<Usuario> findByRut(String rut);
-    List<Usuario> findByRol(String rol);
-    List<Usuario> findByRolOrderByNombre(String rol);
-    List<Usuario> findByUbicacion(String ubicacion);
-    boolean existsByEmail(String email);
-    boolean existsByRut(String rut);
-    
-    @Query("SELECT u FROM Usuario u WHERE u.email = :emailOrName OR u.nombre = :emailOrName")
-    Optional<Usuario> findByEmailOrNombre(@Param("emailOrName") String emailOrName);
-}
-
-/**
  * Implementación del servicio para lógica de negocio de Usuario
  * Maneja toda la lógica de negocio y validaciones para gestión de usuarios
  */
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
-    
+
     @Autowired
-    private UsuarioDataRepository usuarioRepository;
-    
-    @Autowired
+    private IUsuarioDao usuarioRepository;    @Autowired
     private ImportSqlService importSqlService;
     
     // Patrón para validar email

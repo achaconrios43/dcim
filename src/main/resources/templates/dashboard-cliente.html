@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
+    <title>Dashboard Cliente - Sistema de Control</title>
+    <style>
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Título y navegación -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">📊 Dashboard Cliente</h1>
+                <nav class="text-sm text-gray-600 mt-2">
+                    <a href="/dashboard" class="hover:text-blue-600">Dashboard</a> > 
+                    <span class="text-blue-600">Estadísticas del Cliente</span>
+                </nav>
+                <p class="text-gray-600 mt-2">
+                    <span class="font-semibold" th:text="${mesActual}">Mes</span> 
+                    <span th:text="${anioActual}">2025</span>
+                </p>
+            </div>
+            <a href="/dashboard" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center transition-colors duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Volver
+            </a>
+        </div>
+
+        <!-- Selector de Sitio -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                Seleccionar Sitio
+            </h2>
+            <form method="get" action="/dashboard/cliente" class="flex flex-wrap gap-4 items-end">
+                <div class="flex-1 min-w-[300px]">
+                    <label for="sitio" class="block text-sm font-medium text-gray-700 mb-2">Sitio de Ingreso</label>
+                    <select id="sitio" name="sitio" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="" th:selected="${sitioSeleccionado == null or sitioSeleccionado == ''}">Seleccione un sitio</option>
+                        <option value="DC San Martin" th:selected="${sitioSeleccionado == 'DC San Martin'}">DC San Martin</option>
+                        <option value="DC Apoquindo" th:selected="${sitioSeleccionado == 'DC Apoquindo'}">DC Apoquindo</option>
+                        <option value="MC Chiloé" th:selected="${sitioSeleccionado == 'MC Chiloé'}">MC Chiloé</option>
+                        <option value="MC Independencia" th:selected="${sitioSeleccionado == 'MC Independencia'}">MC Independencia</option>
+                        <option value="MC la Florida" th:selected="${sitioSeleccionado == 'MC la Florida'}">MC la Florida</option>
+                        <option value="MC Manuel Montt" th:selected="${sitioSeleccionado == 'MC Manuel Montt'}">MC Manuel Montt</option>
+                        <option value="MC Pedro de Valdivia" th:selected="${sitioSeleccionado == 'MC Pedro de Valdivia'}">MC Pedro de Valdivia</option>
+                        <option value="MC Providencia" th:selected="${sitioSeleccionado == 'MC Providencia'}">MC Providencia</option>
+                    </select>
+                </div>
+                <button type="submit" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg inline-flex items-center shadow-lg transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Ver Estadísticas
+                </button>
+            </form>
+            <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}" class="mt-4">
+                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Mostrando estadísticas para: <strong class="ml-1" th:text="${sitioSeleccionado}">Sitio</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- Contenedor de estadísticas (solo visible si hay sitio seleccionado) -->
+        <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}">
+
+        <!-- Tarjetas de Estadísticas Principales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Ingresos del Mes -->
+            <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm font-medium opacity-90">Ingresos Totales</div>
+                    <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <div class="text-4xl font-bold" th:text="${ingresosTotalesMes}">0</div>
+                <div class="text-sm opacity-80 mt-1">del mes en curso</div>
+            </div>
+
+            <!-- Tickets Únicos -->
+            <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm font-medium opacity-90">Tickets Únicos</div>
+                    <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                    </svg>
+                </div>
+                <div class="text-4xl font-bold" th:text="${ticketsUnicos}">0</div>
+                <div class="text-sm opacity-80 mt-1">no repetidos</div>
+            </div>
+
+            <!-- Salas TI -->
+            <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm font-medium opacity-90">Salas TI</div>
+                    <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <div class="text-4xl font-bold" th:text="${salasTI}">0</div>
+                <div class="text-sm opacity-80 mt-1">accesos registrados</div>
+            </div>
+
+            <!-- Salas RED -->
+            <div class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm font-medium opacity-90">Salas RED</div>
+                    <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+                    </svg>
+                </div>
+                <div class="text-4xl font-bold" th:text="${salasRED}">0</div>
+                <div class="text-sm opacity-80 mt-1">accesos registrados</div>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS DE GESTIÓN DE ACCESOS -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 mb-8 text-white">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fas fa-clipboard-list mr-3"></i>
+                Gestión de Accesos - Estadísticas del Día
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Gestionados Hoy</div>
+                        <i class="fas fa-check-circle text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${gestionesDelDia}">0</div>
+                    <div class="text-xs opacity-90 mt-1">tickets gestionados</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">No Llegaron</div>
+                        <i class="fas fa-calendar-times text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${gestionesNoLlegaronEnDia}">0</div>
+                    <div class="text-xs opacity-90 mt-1">programados posterior</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Vigentes</div>
+                        <i class="fas fa-hourglass-half text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${gestionesVigentes}">0</div>
+                    <div class="text-xs opacity-90 mt-1">actividad en curso</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Tickets Únicos</div>
+                        <i class="fas fa-ticket-alt text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsGestionados}">0</div>
+                    <div class="text-xs opacity-90 mt-1">sin repetir</div>
+                </div>
+            </div>
+            <div class="mt-4 text-center">
+                <a href="/gestion/list" class="inline-block bg-white text-indigo-600 px-6 py-2 rounded-lg font-semibold hover:bg-indigo-50 transition-colors">
+                    <i class="fas fa-eye mr-2"></i>Ver Todas las Gestiones
+                </a>
+            </div>
+        </div>
+
+        <!-- Tipos de Tickets -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Distribución por Tipo de Ticket
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- CRQ -->
+                <div class="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="text-sm font-medium text-gray-600">CRQ</div>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">Change Request</span>
+                    </div>
+                    <div class="text-3xl font-bold text-blue-600" th:text="${cantidadCRQ}">0</div>
+                    <div class="text-sm text-gray-500 mt-1">solicitudes de cambio</div>
+                    <div class="mt-3 bg-blue-100 h-2 rounded-full">
+                        <div class="bg-blue-600 h-2 rounded-full" 
+                             th:style="'width: ' + ${cantidadCRQ > 0 ? (cantidadCRQ * 100.0 / ticketsUnicos) : 0} + '%'"></div>
+                    </div>
+                </div>
+
+                <!-- INC -->
+                <div class="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="text-sm font-medium text-gray-600">INC</div>
+                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Incidente</span>
+                    </div>
+                    <div class="text-3xl font-bold text-red-600" th:text="${cantidadINC}">0</div>
+                    <div class="text-sm text-gray-500 mt-1">incidentes reportados</div>
+                    <div class="mt-3 bg-red-100 h-2 rounded-full">
+                        <div class="bg-red-600 h-2 rounded-full" 
+                             th:style="'width: ' + ${cantidadINC > 0 ? (cantidadINC * 100.0 / ticketsUnicos) : 0} + '%'"></div>
+                    </div>
+                </div>
+
+                <!-- Inspección + Ronda -->
+                <div class="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="text-sm font-medium text-gray-600">Inspección / Ronda</div>
+                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Preventivo</span>
+                    </div>
+                    <div class="text-3xl font-bold text-green-600" th:text="${cantidadInspeccionRonda}">0</div>
+                    <div class="text-sm text-gray-500 mt-1">visitas de inspección y rondas</div>
+                    <div class="mt-3 bg-green-100 h-2 rounded-full">
+                        <div class="bg-green-600 h-2 rounded-full" 
+                             th:style="'width: ' + ${cantidadInspeccionRonda > 0 ? (cantidadInspeccionRonda * 100.0 / ticketsUnicos) : 0} + '%'"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registros Recientes Activos -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Detalles de Registros Recientes (Solo ACTIVOS)</h2>
+            </div>
+
+            <div th:if="${#lists.isEmpty(registrosRecientes)}" class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No hay registros</h3>
+                <p class="mt-1 text-sm text-gray-500">No se encontraron registros activos en este sitio.</p>
+            </div>
+
+            <!-- Tarjetas de Registros -->
+            <div th:unless="${#lists.isEmpty(registrosRecientes)}" class="space-y-4">
+                <div th:each="ingreso : ${registrosRecientes}" 
+                     class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow bg-white">
+                    
+                    <!-- Header de la tarjeta -->
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-gray-900" th:text="${ingreso.nombreTecnico}">judith linco</h3>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                ACTIVO
+                            </span>
+                            <span class="text-sm font-medium text-gray-900" th:text="${ingreso.id}">129</span>
+                        </div>
+                    </div>
+
+                    <!-- Grid de información -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <p class="text-sm text-gray-600">Empresa Demandante:</p>
+                            <p class="font-medium text-gray-900" th:text="${ingreso.empresaDemandante ?: 'N/A'}">Telefonica</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Cargo:</p>
+                            <p class="font-medium text-gray-900" th:text="${ingreso.cargoTecnico ?: 'N/A'}">Tecnico en Redes</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Aprobador:</p>
+                            <p class="font-medium text-gray-900" th:text="${ingreso.aprobador ?: 'N/A'}">Operador Turno</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Escolta:</p>
+                            <p class="font-medium text-gray-900" th:text="${ingreso.escolta ?: 'N/A'}">Personal de Facilities</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Motivo:</p>
+                            <p class="font-medium text-gray-900" th:text="${ingreso.motivoIngreso ?: 'N/A'}">Inspectiva</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Actividad REMEDY:</p>
+                            <p class="font-medium text-gray-900" th:text="${ingreso.actividadRemedy ?: 'N/A'}">visita inspectiva</p>
+                        </div>
+                    </div>
+
+                    <!-- Sección de supervisión (si hay datos) -->
+                    <div th:if="${ingreso.fechaSegundaSupervision != null}" class="mb-4">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm font-semibold text-blue-800">SUPERVISIÓN PROGRAMADA</span>
+                            </div>
+                            <div class="bg-yellow-100 border border-yellow-300 rounded p-3 mb-2">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-sm text-gray-700">Hora 2da Supervisión:</p>
+                                        <p class="font-medium text-gray-900" 
+                                           th:text="${ingreso.fechaSegundaSupervision != null ? #temporals.format(ingreso.fechaSegundaSupervision, 'yyyy-MM-dd') : 'N/A'}">2025-11-25</p>
+                                    </div>
+                                    <span class="text-lg font-bold text-gray-900" 
+                                          th:text="${ingreso.horaSegundaSupervision != null ? #temporals.format(ingreso.horaSegundaSupervision, 'HH:mm') : 'N/A'}">12:13</span>
+                                </div>
+                            </div>
+                            <div th:if="${ingreso.horaSegundaSupervision != null}" class="bg-red-100 border border-red-300 rounded p-3 mb-2">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                                    <span class="text-sm font-semibold text-red-800">¡ALERTA! Supervisión en menos de 10 minutos</span>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-gray-200 rounded p-3 mb-2">
+                                <p class="text-sm text-gray-600 mb-1">Tiempo restante:</p>
+                                <p class="text-lg font-bold text-blue-600">¡VENCIDO!</p>
+                            </div>
+                            <div th:if="${ingreso.segundaSupervisionRealizada}" class="bg-green-100 border border-green-300 rounded p-3">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <div>
+                                        <span class="text-sm font-semibold text-green-800">✅ SUPERVISIÓN COMPLETADA</span>
+                                        <p class="text-xs text-gray-700" 
+                                           th:text="${'25/11/25 12:36'}">25/11/25 12:36</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón de detalles completos -->
+                    <div class="mt-4">
+                        <a th:href="@{'/ingreso/ap/read/' + ${ingreso.id}}" 
+                           class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                            Ver Detalles Completos
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer con link a ver todos -->
+            <div th:unless="${#lists.isEmpty(registrosRecientes)}" class="mt-6 text-center border-t border-gray-200 pt-4">
+                <a href="/ingreso/ap/list" 
+                   class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">
+                    Ver todos los registros
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        </div>
+        <!-- Fin del contenedor de estadísticas -->
+
+        <!-- Mensaje si no hay sitio seleccionado -->
+        <div th:unless="${sitioSeleccionado != null and sitioSeleccionado != ''}" class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-8 h-8 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <p class="text-blue-800 font-semibold">Seleccione un sitio para ver las estadísticas</p>
+                    <p class="text-blue-700 text-sm mt-1">Por favor, elija un sitio del menú desplegable de arriba para visualizar las estadísticas correspondientes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción rápida -->
+        <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}" class="mt-8 flex justify-center space-x-4">
+            <a href="/ingreso/ap" 
+               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center shadow-lg transition-colors duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Registrar Nuevo Ingreso
+            </a>
+            <a href="/ingreso/ap/list" 
+               class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center shadow-lg transition-colors duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                Ver Lista Completa
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>
