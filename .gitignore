@@ -4,6 +4,22 @@
 # Log file
 *.log
 
+# Backup files
+*.backup
+
+# Local scripts
+run-app.ps1
+setup-java21.ps1
+
+# Local database files
+data/
+*.db
+*.trace.db
+
+# Temporary files
+desktop.ini
+last-login.html
+
 # BlueJ files
 *.ctxt
 
