@@ -39,9 +39,6 @@ public class SecurityConfig {
                 // Permitir acceso público a registro de usuarios
                 .requestMatchers("/user/create", "/user/exists").permitAll()
                 
-                // Acceso a base de datos (solo ADMIN - hardcoded por seguridad)
-                .requestMatchers("/h2-console/**").hasRole("ADMIN")
-                
                 // TODAS LAS DEMÁS RUTAS: Permitir autenticados y validar en controlador
                 // Esto permite mostrar mensajes personalizados en vez de 403 Forbidden
                 .requestMatchers("/dashboard", "/").authenticated()
@@ -72,17 +69,6 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)  // Invalida la sesión HTTP
                 .deleteCookies("JSESSIONID")  // Elimina la cookie de sesión
                 .permitAll()
-            )
-            
-            // Deshabilitar CSRF solo para H2 Console en desarrollo
-            // NOTA: H2 Console debe estar deshabilitado en producción
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**")
-            )
-            
-            // Permitir frames para H2 Console (solo desarrollo)
-            .headers(headers -> headers
-                .frameOptions(frame -> frame.sameOrigin())
             );
 
         return http.build();

@@ -9,14 +9,57 @@ Sistema integral de gestión de DataCenter desarrollado con **Spring Boot 3** pa
 
 ## 🌐 Aplicación en Producción
 
-**URL:** https://few-laureen-webipss-1b5927a6.koyeb.app/login
+**🔗 URL:** https://few-laureen-webipss-1b5927a6.koyeb.app/login
 
-- ✅ Desplegada en **Koyeb** (Serverless Platform)
-- ✅ Base de datos en **TiDB Cloud** (MySQL compatible)
-- ✅ Imagen Docker en **Docker Hub**: `achaconrios43/clases-app:latest`
-- ✅ CI/CD automatizado con **GitHub Actions**
-- ✅ HTTPS habilitado
-- ✅ Health checks configurados
+**📦 Stack de Producción:**
+- ✅ **Hosting:** Koyeb Serverless (Washington DC)
+- ✅ **Base de Datos:** TiDB Cloud MySQL (gateway01.us-east-1.prod.aws.tidbcloud.com:4000)
+- ✅ **Docker Registry:** Docker Hub - `achaconrios43/clases-app:latest`
+- ✅ **CI/CD:** GitHub Actions (Build automático en cada push)
+- ✅ **Seguridad:** HTTPS/SSL automático
+- ✅ **Monitoreo:** Health checks `/actuator/health`
+
+### 🚀 Quick Start - Ejecutar Desde Terminal
+
+**Opción 1: Ejecutar desde Docker Hub (más rápido)**
+```bash
+# Pull y run de la imagen en producción
+docker run -p 8082:8082 \
+  -e SPRING_DATASOURCE_URL="jdbc:mysql://gateway01.us-east-1.prod.aws.tidbcloud.com:4000/test?sslMode=VERIFY_IDENTITY&useSSL=true" \
+  -e SPRING_DATASOURCE_USERNAME="Tx5LgXBUqorHfYX.root" \
+  -e SPRING_DATASOURCE_PASSWORD="SGRAbutT9e8sGwdD" \
+  achaconrios43/clases-app:latest
+
+# Acceder a: http://localhost:8082
+```
+
+**Opción 2: Clonar y compilar desde GitHub**
+```bash
+# Clonar repositorio
+git clone https://github.com/achaconrios43/clases.git
+cd clases
+
+# Compilar y ejecutar con Maven
+mvn clean install
+mvn spring-boot:run
+
+# Acceder a: http://localhost:8082
+```
+
+**Opción 3: Build y run con Docker local**
+```bash
+# Clonar repositorio
+git clone https://github.com/achaconrios43/clases.git
+cd clases
+
+# Build de imagen Docker
+docker build -t clases-app .
+
+# Run del contenedor
+docker run -p 8082:8082 clases-app
+
+# Acceder a: http://localhost:8082
+```
 
 ### 👤 Usuarios de Prueba
 
