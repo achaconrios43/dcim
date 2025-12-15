@@ -9,7 +9,7 @@
   <body class="bg-gray-100">
     <div th:replace="fragments/navdar :: nav"></div>
 
-    <div th:replace="fragments/dashboard-button :: button-compact"></div>
+    <div th:replace="fragments/dashboard-button :: navigation-buttons"></div>
 
     <div class="container mx-auto px-4 py-8">
       <div class="bg-white rounded-lg shadow-lg p-6">
@@ -81,6 +81,7 @@
                 <th class="px-4 py-3 text-left text-sm font-semibold">Sitio</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold">Estado</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold">Gestión</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold">Ticket</th>
                 <th class="px-4 py-3 text-center text-sm font-semibold">Acciones</th>
               </tr>
             </thead>
@@ -117,24 +118,43 @@
                     <i class="fas fa-hourglass-half mr-1"></i>Pendiente
                   </span>
                 </td>
+                <td class="px-4 py-3 text-sm">
+                  <span th:if="${gestion.ticketCerrado}" class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
+                    <i class="fas fa-times-circle mr-1"></i>Cerrado
+                  </span>
+                  <span th:unless="${gestion.ticketCerrado}" class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                    <i class="fas fa-folder-open mr-1"></i>Abierto
+                  </span>
+                </td>
                 <td class="px-4 py-3 text-center">
-                  <div class="flex justify-center space-x-2">
-                    <a th:href="@{/gestion/view/{id}(id=${gestion.id})}" class="text-blue-600 hover:text-blue-800" title="Ver detalle">
-                      <i class="fas fa-eye"></i>
+                  <div class="flex justify-center space-x-1">
+                    <!-- Botón Ver -->
+                    <a th:href="@{/gestion/view/{id}(id=${gestion.id})}" 
+                       class="px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 inline-flex items-center text-xs" 
+                       title="Ver detalle">
+                      <i class="fas fa-eye mr-1"></i>
+                      <span class="hidden sm:inline">Ver</span>
                     </a>
-                    <a th:href="@{/gestion/edit/{id}(id=${gestion.id})}" class="text-yellow-600 hover:text-yellow-800" title="Editar">
-                      <i class="fas fa-edit"></i>
+                    <!-- Botón Editar -->
+                    <a th:href="@{/gestion/edit/{id}(id=${gestion.id})}" 
+                       class="px-3 py-1.5 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors duration-200 inline-flex items-center text-xs" 
+                       title="Editar">
+                      <i class="fas fa-edit mr-1"></i>
+                      <span class="hidden sm:inline">Editar</span>
                     </a>
+                    <!-- Botón Eliminar -->
                     <a th:href="@{/gestion/delete/{id}(id=${gestion.id})}" 
-                       onclick="return confirm('¿Está seguro de eliminar esta gestión?')"
-                       class="text-red-600 hover:text-red-800" title="Eliminar">
-                      <i class="fas fa-trash"></i>
+                       onclick="return confirm('¿Está seguro de eliminar esta gestión? Esta acción no se puede deshacer.')"
+                       class="px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200 inline-flex items-center text-xs" 
+                       title="Eliminar">
+                      <i class="fas fa-trash mr-1"></i>
+                      <span class="hidden sm:inline">Eliminar</span>
                     </a>
                   </div>
                 </td>
               </tr>
               <tr th:if="${#lists.isEmpty(gestiones)}">
-                <td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                <td colspan="10" class="px-4 py-8 text-center text-gray-500">
                   <i class="fas fa-inbox text-4xl mb-2"></i>
                   <p>No hay gestiones registradas</p>
                 </td>
@@ -143,23 +163,23 @@
           </table>
         </div>
 
-        <!-- Estadísticas rápidas -->
+        <!-- Estadísticas rápidas (dinámicas con filtros) -->
         <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div class="bg-blue-50 p-4 rounded-lg">
             <div class="text-sm text-blue-600 font-semibold">Total Gestiones</div>
-            <div class="text-2xl font-bold text-blue-800" th:text="${#lists.size(gestiones)}">0</div>
+            <div class="text-2xl font-bold text-blue-800" id="totalGestiones" th:text="${#lists.size(gestiones)}">0</div>
           </div>
           <div class="bg-green-50 p-4 rounded-lg">
             <div class="text-sm text-green-600 font-semibold">Aprobadas</div>
-            <div class="text-2xl font-bold text-green-800" th:text="${#lists.size(gestiones.?[estadoAprobacion == 'Aprobada'])}">0</div>
+            <div class="text-2xl font-bold text-green-800" id="totalAprobadas" th:text="${#lists.size(gestiones.?[estadoAprobacion == 'Aprobada'])}">0</div>
           </div>
           <div class="bg-yellow-50 p-4 rounded-lg">
             <div class="text-sm text-yellow-600 font-semibold">Pendientes</div>
-            <div class="text-2xl font-bold text-yellow-800" th:text="${#lists.size(gestiones.?[estadoAprobacion == 'Pendiente'])}">0</div>
+            <div class="text-2xl font-bold text-yellow-800" id="totalPendientes" th:text="${#lists.size(gestiones.?[estadoAprobacion == 'Pendiente'])}">0</div>
           </div>
           <div class="bg-red-50 p-4 rounded-lg">
             <div class="text-sm text-red-600 font-semibold">Rechazadas/Devueltas</div>
-            <div class="text-2xl font-bold text-red-800" th:text="${#lists.size(gestiones.?[estadoAprobacion == 'Rechazada por NXT']) + #lists.size(gestiones.?[estadoAprobacion == 'Devuelta al cliente por falta de Datos'])}">0</div>
+            <div class="text-2xl font-bold text-red-800" id="totalRechazadas" th:text="${#lists.size(gestiones.?[estadoAprobacion == 'Rechazada por NXT']) + #lists.size(gestiones.?[estadoAprobacion == 'Devuelta al cliente por falta de Datos'])}">0</div>
           </div>
         </div>
       </div>
@@ -180,6 +200,12 @@
         
         const filas = document.querySelectorAll('.gestion-row');
         
+        // Contadores para estadísticas
+        let totalVisible = 0;
+        let aprobadas = 0;
+        let pendientes = 0;
+        let rechazadas = 0;
+        
         filas.forEach(fila => {
           const sitioFila = fila.cells[5].textContent.toLowerCase();
           const estadoFila = fila.cells[6].textContent.toLowerCase();
@@ -191,10 +217,26 @@
           
           if (cumpleSitio && cumpleEstado && cumpleTicket) {
             fila.style.display = '';
+            totalVisible++;
+            
+            // Contar según el estado
+            if (estadoFila.includes('aprobada')) {
+              aprobadas++;
+            } else if (estadoFila.includes('pendiente')) {
+              pendientes++;
+            } else if (estadoFila.includes('rechazada') || estadoFila.includes('devuelta')) {
+              rechazadas++;
+            }
           } else {
             fila.style.display = 'none';
           }
         });
+        
+        // Actualizar estadísticas dinámicamente
+        document.getElementById('totalGestiones').textContent = totalVisible;
+        document.getElementById('totalAprobadas').textContent = aprobadas;
+        document.getElementById('totalPendientes').textContent = pendientes;
+        document.getElementById('totalRechazadas').textContent = rechazadas;
       }
     </script>
   </body>

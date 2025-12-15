@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
+    <title>Dashboard Cliente Mensual - Sistema de Control</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Título y navegación -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">📊 Dashboard Cliente - Vista Mensual</h1>
+                <nav class="text-sm text-gray-600 mt-2">
+                    <a href="/dashboard" class="hover:text-blue-600">Dashboard</a> > 
+                    <span class="text-blue-600">Resumen Ejecutivo Mensual</span>
+                </nav>
+                <p class="text-gray-600 mt-2">
+                    <span class="font-semibold" th:text="${mesActual}">Mes</span> 
+                    <span th:text="${anioActual}">2025</span>
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <a href="/dashboard/cliente/diario" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                    <i class="fas fa-calendar-day mr-2"></i>
+                    Vista Diaria
+                </a>
+                <a href="/dashboard" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Volver
+                </a>
+            </div>
+        </div>
+
+        <!-- Selector de Sitio -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>
+                Seleccionar Sitio
+            </h2>
+            <form method="get" action="/dashboard/cliente/mensual" class="flex flex-wrap gap-4 items-end">
+                <div class="flex-1 min-w-[300px]">
+                    <label for="sitio" class="block text-sm font-medium text-gray-700 mb-2">Sitio de Ingreso</label>
+                    <select id="sitio" name="sitio" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Seleccione un sitio</option>
+                        <option value="DC APOQUINDO" th:selected="${sitioSeleccionado == 'DC APOQUINDO'}">DC APOQUINDO</option>
+                        <option value="DC SAN MARTIN" th:selected="${sitioSeleccionado == 'DC SAN MARTIN'}">DC SAN MARTIN</option>
+                        <option value="MC CHILOE" th:selected="${sitioSeleccionado == 'MC CHILOE'}">MC CHILOE</option>
+                        <option value="MC INDEPENDENCIA" th:selected="${sitioSeleccionado == 'MC INDEPENDENCIA'}">MC INDEPENDENCIA</option>
+                        <option value="MC LA FLORIDA" th:selected="${sitioSeleccionado == 'MC LA FLORIDA'}">MC LA FLORIDA</option>
+                        <option value="MC MANUEL MONTT" th:selected="${sitioSeleccionado == 'MC MANUEL MONTT'}">MC MANUEL MONTT</option>
+                        <option value="MC PEDRO DE VALDIVIA" th:selected="${sitioSeleccionado == 'MC PEDRO DE VALDIVIA'}">MC PEDRO DE VALDIVIA</option>
+                        <option value="MC PROVIDENCIA" th:selected="${sitioSeleccionado == 'MC PROVIDENCIA'}">MC PROVIDENCIA</option>
+                    </select>
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                    <i class="fas fa-chart-bar mr-2"></i>
+                    Ver Estadísticas
+                </button>
+            </form>
+            <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}" class="mt-4">
+                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Mostrando estadísticas para: <strong class="ml-1" th:text="${sitioSeleccionado}">Sitio</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- Contenedor de estadísticas -->
+        <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}">
+
+        <!-- Tarjetas Resumen Ejecutivo -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Ingresos Totales -->
+            <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm font-medium opacity-90">Ingresos Totales</div>
+                    <i class="fas fa-users text-3xl opacity-80"></i>
+                </div>
+                <div class="text-4xl font-bold" th:text="${ingresosTotalesMes}">0</div>
+                <div class="text-xs opacity-90 mt-2">registros del mes</div>
+            </div>
+
+            <!-- Tickets Únicos -->
+            <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm font-medium opacity-90">Tickets Únicos</div>
+                    <i class="fas fa-ticket-alt text-3xl opacity-80"></i>
+                </div>
+                <div class="text-4xl font-bold" th:text="${ticketsUnicos}">0</div>
+                <div class="text-xs opacity-90 mt-2">tickets diferentes</div>
+            </div>
+
+            <!-- Gestiones Totales -->
+            <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm font-medium opacity-90">Gestiones Totales</div>
+                    <i class="fas fa-clipboard-list text-3xl opacity-80"></i>
+                </div>
+                <div class="text-4xl font-bold" th:text="${gestionesTotalesMes}">0</div>
+                <div class="text-xs opacity-90 mt-2">gestiones del mes</div>
+            </div>
+
+            <!-- Tickets Aprobados -->
+            <div class="stat-card bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm font-medium opacity-90">Tickets Aprobados</div>
+                    <i class="fas fa-check-circle text-3xl opacity-80"></i>
+                </div>
+                <div class="text-4xl font-bold" th:text="${ticketsAprobadosMes}">0</div>
+                <div class="text-xs opacity-90 mt-2">aprobaciones del mes</div>
+            </div>
+        </div>
+
+        <!-- Sección de Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Gráfico: Distribución de Tipos de Tickets -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-chart-pie text-blue-600 mr-2"></i>
+                    Distribución de Tickets por Tipo
+                </h3>
+                <div class="chart-container">
+                    <canvas id="tiposTicketsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico: Distribución por Salas -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-chart-bar text-green-600 mr-2"></i>
+                    Distribución por Salas
+                </h3>
+                <div class="chart-container">
+                    <canvas id="salasChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico: Estado de Gestiones -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-chart-doughnut text-purple-600 mr-2"></i>
+                    Estado de Gestiones
+                </h3>
+                <div class="chart-container">
+                    <canvas id="gestionesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabla Resumen Ejecutivo -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-table text-indigo-600 mr-2"></i>
+                    Resumen Ejecutivo
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="text-gray-600">CRQ</span>
+                        <span class="font-bold text-blue-600" th:text="${cantidadCRQ}">0</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="text-gray-600">INC</span>
+                        <span class="font-bold text-green-600" th:text="${cantidadINC}">0</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="text-gray-600">Inspección/Ronda</span>
+                        <span class="font-bold text-yellow-600" th:text="${cantidadInspeccionRonda}">0</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="text-gray-600">Salas TI</span>
+                        <span class="font-bold text-purple-600" th:text="${salasTI}">0</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="text-gray-600">Salas RED</span>
+                        <span class="font-bold text-indigo-600" th:text="${salasRED}">0</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="text-gray-600">Tickets Rechazados</span>
+                        <span class="font-bold text-red-600" th:text="${ticketsRechazadosMes}">0</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="text-gray-600">Tickets Devueltos</span>
+                        <span class="font-bold text-orange-600" th:text="${ticketsDevueltosMes}">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Pendientes de Cierre</span>
+                        <span class="font-bold text-yellow-600" th:text="${ticketsPendientesCierre}">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts para los gráficos -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const cantidadCRQ = /*[[${cantidadCRQ}]]*/ 0;
+        const cantidadINC = /*[[${cantidadINC}]]*/ 0;
+        const cantidadInspeccion = /*[[${cantidadInspeccionRonda}]]*/ 0;
+        const salasTI = /*[[${salasTI}]]*/ 0;
+        const salasRED = /*[[${salasRED}]]*/ 0;
+        const ticketsAprobados = /*[[${ticketsAprobadosMes}]]*/ 0;
+        const ticketsRechazados = /*[[${ticketsRechazadosMes}]]*/ 0;
+        const ticketsDevueltos = /*[[${ticketsDevueltosMes}]]*/ 0;
+        const ticketsPendientes = /*[[${ticketsPendientesAprobacion}]]*/ 0;
+
+        // Gráfico de Tipos de Tickets
+        const ctxTipos = document.getElementById('tiposTicketsChart').getContext('2d');
+        new Chart(ctxTipos, {
+            type: 'pie',
+            data: {
+                labels: ['CRQ', 'INC', 'Inspección/Ronda'],
+                datasets: [{
+                    data: [cantidadCRQ, cantidadINC, cantidadInspeccion],
+                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Salas
+        const ctxSalas = document.getElementById('salasChart').getContext('2d');
+        new Chart(ctxSalas, {
+            type: 'bar',
+            data: {
+                labels: ['Salas TI', 'Salas RED'],
+                datasets: [{
+                    label: 'Cantidad',
+                    data: [salasTI, salasRED],
+                    backgroundColor: ['#8B5CF6', '#6366F1']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Gestiones
+        const ctxGestiones = document.getElementById('gestionesChart').getContext('2d');
+        new Chart(ctxGestiones, {
+            type: 'doughnut',
+            data: {
+                labels: ['Aprobados', 'Rechazados', 'Devueltos', 'Pendientes'],
+                datasets: [{
+                    data: [ticketsAprobados, ticketsRechazados, ticketsDevueltos, ticketsPendientes],
+                    backgroundColor: ['#10B981', '#EF4444', '#F97316', '#F59E0B']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        /*]]>*/
+    </script>
+
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>

@@ -1,15 +1,17 @@
 package com.example.clases.service.impl;
 
-import com.example.clases.dao.IUsuarioDao;
-import com.example.clases.entity.Usuario;
-import com.example.clases.service.UsuarioService;
-import com.example.clases.service.ImportSqlService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.example.clases.dao.IUsuarioDao;
+import com.example.clases.entity.Usuario;
+import com.example.clases.service.ImportSqlService;
+import com.example.clases.service.UsuarioService;
 
 /**
  * Implementación del servicio para lógica de negocio de Usuario
@@ -19,8 +21,13 @@ import java.util.regex.Pattern;
 public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
-    private IUsuarioDao usuarioRepository;    @Autowired
+    private IUsuarioDao usuarioRepository;
+    
+    @Autowired
     private ImportSqlService importSqlService;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     // Patrón para validar email
     private static final String EMAIL_PATTERN = 
@@ -64,6 +71,12 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new Exception("Ya existe un usuario con este RUT");
         }
         
+        // Encriptar la contraseña antes de guardar
+        if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+            String passwordEncriptado = passwordEncoder.encode(usuario.getPassword());
+            usuario.setPassword(passwordEncriptado);
+        }
+        
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
         
         // Sincronizar con import.sql
@@ -92,6 +105,18 @@ public class UsuarioServiceImpl implements UsuarioService {
         // Validar RUT solo si cambió
         if (!existente.getRut().equals(usuario.getRut()) && existeRut(usuario.getRut())) {
             throw new Exception("Ya existe otro usuario con este RUT");
+        }
+        
+        // Encriptar la contraseña solo si cambió
+        if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+            // Si la contraseña no está encriptada (no comienza con $2a$ de BCrypt)
+            if (!usuario.getPassword().startsWith("$2a$")) {
+                String passwordEncriptado = passwordEncoder.encode(usuario.getPassword());
+                usuario.setPassword(passwordEncriptado);
+            }
+        } else {
+            // Si no se envió contraseña, mantener la existente
+            usuario.setPassword(existente.getPassword());
         }
         
         Usuario usuarioActualizado = usuarioRepository.save(usuario);
@@ -131,17 +156,58 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.findAll();
     }
     
+    /**
+     * Autentica un usuario verificando sus credenciales en la base de datos
+     * 
+     * NOTA: Este método ya NO es necesario con Spring Security activo.
+     * Spring Security usa CustomUserDetailsService y PasswordEncoder automáticamente.
+     * Se mantiene por compatibilidad pero NO debe usarse para login.
+     * 
+     * Proceso de autenticación con BCrypt:
+     * 1. Valida que email/nombre y password no sean nulos
+     * 2. Busca el usuario en BD por email O nombre
+     * 3. Compara la contraseña ingresada con la encriptada usando BCrypt
+     * 4. Registra logs detallados de cada paso para debugging
+     * 
+     * @param emailOrName Email o nombre del usuario para login
+     * @param password Contraseña en texto plano a verificar
+     * @return Optional con el usuario si autenticación exitosa, vacío si falla
+     */
     @Override
     public Optional<Usuario> autenticarUsuario(String emailOrName, String password) {
+        // Log: inicio del proceso de autenticación
+        System.out.println("[UsuarioService] Intentando autenticar usuario: " + emailOrName);
+        
+        // Validación 1: verificar que las credenciales no sean nulas
         if (emailOrName == null || password == null) {
+            System.out.println("[UsuarioService] Email o password es null");
             return Optional.empty();
         }
         
+        // Búsqueda: consultar usuario en BD por email O nombre
         Optional<Usuario> usuario = usuarioRepository.findByEmailOrNombre(emailOrName);
-        if (usuario.isPresent() && usuario.get().getPassword().equals(password)) {
-            return usuario;
+        
+        // Validación 2: verificar si el usuario existe
+        if (usuario.isEmpty()) {
+            System.out.println("[UsuarioService] Usuario NO encontrado en BD: " + emailOrName);
+            return Optional.empty();
         }
         
+        // Log: mostrar datos del usuario encontrado
+        System.out.println("[UsuarioService] Usuario encontrado: " + usuario.get().getEmail());
+        System.out.println("[UsuarioService] Verificando password con BCrypt...");
+        
+        // Validación 3: comparar contraseñas usando BCrypt
+        boolean passwordCoincide = passwordEncoder.matches(password, usuario.get().getPassword());
+        System.out.println("[UsuarioService] Passwords coinciden: " + passwordCoincide);
+        
+        if (passwordCoincide) {
+            System.out.println("[UsuarioService] ✓ Autenticación exitosa");
+            return usuario;  // Retorna el usuario autenticado
+        }
+        
+        // Autenticación fallida: contraseña incorrecta
+        System.out.println("[UsuarioService] ✗ Password incorrecto");
         return Optional.empty();
     }
     
@@ -249,14 +315,6 @@ public class UsuarioServiceImpl implements UsuarioService {
             return List.of();
         }
         return usuarioRepository.findByRolOrderByNombre(rol.trim());
-    }
-    
-    @Override
-    public List<Usuario> obtenerUsuariosPorUbicacion(String ubicacion) {
-        if (ubicacion == null || ubicacion.trim().isEmpty()) {
-            return List.of();
-        }
-        return usuarioRepository.findByUbicacion(ubicacion.trim());
     }
     
     @Override

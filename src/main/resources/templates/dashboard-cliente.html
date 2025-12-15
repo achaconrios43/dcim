@@ -146,38 +146,56 @@
                 <i class="fas fa-clipboard-list mr-3"></i>
                 Gestión de Accesos - Estadísticas del Día
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="text-sm font-medium">Gestionados Hoy</div>
-                        <i class="fas fa-check-circle text-2xl opacity-80"></i>
+                        <div class="text-sm font-medium">Tickets Gestionados Hoy</div>
+                        <i class="fas fa-clipboard-check text-2xl opacity-80"></i>
                     </div>
                     <div class="text-3xl font-bold" th:text="${gestionesDelDia}">0</div>
-                    <div class="text-xs opacity-90 mt-1">tickets gestionados</div>
+                    <div class="text-xs opacity-90 mt-1">registrados hoy</div>
                 </div>
                 <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="text-sm font-medium">No Llegaron</div>
-                        <i class="fas fa-calendar-times text-2xl opacity-80"></i>
+                        <div class="text-sm font-medium">Tickets Aprobados Hoy</div>
+                        <i class="fas fa-check-circle text-2xl opacity-80"></i>
                     </div>
-                    <div class="text-3xl font-bold" th:text="${gestionesNoLlegaronEnDia}">0</div>
-                    <div class="text-xs opacity-90 mt-1">programados posterior</div>
+                    <div class="text-3xl font-bold" th:text="${ticketsAprobadosHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">aprobados</div>
                 </div>
                 <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="text-sm font-medium">Vigentes</div>
+                        <div class="text-sm font-medium">Pendientes de Aprobación</div>
+                        <i class="fas fa-clock text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsPendientesAprobacion}">0</div>
+                    <div class="text-xs opacity-90 mt-1">esperando aprobación</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Rechazados Hoy</div>
+                        <i class="fas fa-times-circle text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsRechazadosHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">rechazados</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Devueltos Hoy</div>
+                        <i class="fas fa-undo text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsDevueltosHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">devueltos al cliente</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Pendientes de Cierre</div>
                         <i class="fas fa-hourglass-half text-2xl opacity-80"></i>
                     </div>
-                    <div class="text-3xl font-bold" th:text="${gestionesVigentes}">0</div>
-                    <div class="text-xs opacity-90 mt-1">actividad en curso</div>
-                </div>
-                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="text-sm font-medium">Tickets Únicos</div>
-                        <i class="fas fa-ticket-alt text-2xl opacity-80"></i>
-                    </div>
-                    <div class="text-3xl font-bold" th:text="${ticketsGestionados}">0</div>
-                    <div class="text-xs opacity-90 mt-1">sin repetir</div>
+                    <div class="text-3xl font-bold" th:text="${ticketsPendientesCierre}">0</div>
+                    <div class="text-xs opacity-90 mt-1">sin cerrar</div>
                 </div>
             </div>
             <div class="mt-4 text-center">

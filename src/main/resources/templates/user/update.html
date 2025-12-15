@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="fragments/headers :: headers"></head>
+  <head th:replace="~{fragments/headers :: headers}"></head>
   <body class="min-h-screen flex flex-col">
-    <nav th:replace="fragments/navdar :: nav"></nav>
+    <nav th:replace="~{fragments/navdar :: nav}"></nav>
 
     <style>
       /* Static 3D card look in Telefónica colors */
@@ -71,7 +71,7 @@
       <div class="card-3d p-6">
         <!-- Botón Dashboard -->
         <div class="mb-4">
-          <div th:replace="fragments/dashboard-button :: breadcrumb"></div>
+          <div th:replace="~{fragments/dashboard-button :: navigation-buttons}"></div>
         </div>
         
         <div class="flex justify-between items-center mb-6">
@@ -132,6 +132,8 @@
             <p class="text-xs text-gray-500 mt-1">Formato: XX.XXX.XXX-X</p>
           </div>
 
+          <!-- CAMPO UBICACION COMENTADO - No existe en la entidad Usuario -->
+          <!--
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Ubicación *</label>
             <select name="ubicacion" required class="input-3d">
@@ -149,6 +151,7 @@
             </select>
             <p class="text-xs text-gray-500 mt-1">Ubicación principal de trabajo del usuario</p>
           </div>
+          -->
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Rol *</label>
@@ -179,7 +182,7 @@
           <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
             <h3 class="text-sm font-medium text-blue-800 mb-2">Información sobre la Actualización</h3>
             <p class="text-xs text-blue-600">
-              Los cambios se guardarán en la base de datos H2. 
+              Los cambios se guardarán en TiDB Cloud. 
               La fecha de actualización se registrará automáticamente en la base de datos.
               Creado el: <strong th:text="${usuario.creatAt != null ? #dates.format(usuario.creatAt, 'dd/MM/yyyy HH:mm') : 'N/A'}">01/01/2024</strong>
             </p>
@@ -188,7 +191,7 @@
       </div>
     </main>
 
-    <footer th:replace="fragments/footer :: footer"></footer>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 
     <script>
       // Form validation

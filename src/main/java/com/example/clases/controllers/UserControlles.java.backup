@@ -1,14 +1,13 @@
 package com.example.clases.controllers;
 
-import com.example.clases.dao.IUsuarioDao;
 import com.example.clases.entity.Usuario;
 import com.example.clases.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,13 +20,30 @@ public class UserControlles {
 
     @Autowired
     private UsuarioService usuarioService;
-    
-    @Autowired
-    private IUsuarioDao usuarioDao;
+
+    // Verificar autenticación para todas las operaciones
+    private boolean verificarAutenticacion(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return false;
+        }
+        model.addAttribute("usuarioLogueado", usuario);
+        return true;
+    }
 
     @GetMapping("/create")
-    public String createUser(Model model){
-        // Permitir acceso público para registro
+    public String createUser(HttpSession session, Model model){
+        if (!verificarAutenticacion(session, model)) {
+            return "redirect:/login";
+        }
+        
+        // Solo administradores pueden crear usuarios
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        if (!"ADMIN".equals(usuarioLogueado.getRol())) {
+            model.addAttribute("error", "Solo los administradores pueden crear usuarios");
+            return "redirect:/dashboard";
+        }
+        
         return "user/create";
     }
 
@@ -37,8 +53,21 @@ public class UserControlles {
                                @RequestParam(name="email", required=false) String email,
                                @RequestParam(name="password", required=false) String password,
                                @RequestParam(name="rut", required=false) String rut,
+                               @RequestParam(name="ubicacion", required=false) String ubicacion,
                                @RequestParam(name="rol", required=false) String rol,
+                               HttpSession session,
                                Model model){
+        
+        if (!verificarAutenticacion(session, model)) {
+            return "redirect:/login";
+        }
+        
+        // Solo administradores pueden crear usuarios
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        if (!"ADMIN".equals(usuarioLogueado.getRol())) {
+            model.addAttribute("error", "Solo los administradores pueden crear usuarios");
+            return "redirect:/dashboard";
+        }
         
         // Validaciones
         if (nombre == null || nombre.trim().isEmpty()){
@@ -61,25 +90,34 @@ public class UserControlles {
             model.addAttribute("errorMessage", "Falta el campo: RUT");
             return "user/create";
         }
+        if (ubicacion == null || ubicacion.trim().isEmpty()){
+            model.addAttribute("errorMessage", "Falta el campo: Ubicación");
+            return "user/create";
+        }
         if (rol == null || rol.trim().isEmpty()){
             model.addAttribute("errorMessage", "Falta el campo: Rol");
             return "user/create";
         }
 
         try {
+            // Crear nuevo usuario
             Usuario nuevoUsuario = new Usuario();
             nuevoUsuario.setNombre(nombre.trim());
             nuevoUsuario.setApellido(apellido.trim());
             nuevoUsuario.setEmail(email.trim());
             nuevoUsuario.setPassword(password);
             nuevoUsuario.setRut(rut.trim());
-            nuevoUsuario.setRol((rol == null || rol.trim().isEmpty()) ? "USER" : rol.trim());
+            nuevoUsuario.setUbicacion(ubicacion.trim());
+            nuevoUsuario.setRol(rol.trim());
 
+            // Guardar en base de datos
             Usuario usuarioGuardado = usuarioService.crearUsuario(nuevoUsuario);
             
             System.out.println("[UserController] Usuario creado exitosamente: " + usuarioGuardado.getEmail());
             
-            return "redirect:/login?registered=true";
+            // Redirigir al dashboard después de crear el usuario
+            System.out.println("[UserController] REDIRIGIENDO AL DASHBOARD CON SUCCESS=user-created");
+            return "redirect:/dashboard?success=user-created";
         } catch (Exception e) {
             System.err.println("[UserController] Error al crear usuario: " + e.getMessage());
             model.addAttribute("errorMessage", "Error al crear usuario: " + e.getMessage());
@@ -87,32 +125,17 @@ public class UserControlles {
             model.addAttribute("apellido", apellido);
             model.addAttribute("email", email);
             model.addAttribute("rut", rut);
+            model.addAttribute("ubicacion", ubicacion);
             model.addAttribute("rol", rol);
             return "user/create";
         }
     }
 
     @GetMapping("/read/{id}")
-    public String readUser(@PathVariable Long id, Authentication authentication, Model model){
-        if (authentication == null || !authentication.isAuthenticated()) {
+    public String readUser(@PathVariable Long id, HttpSession session, Model model){
+        if (!verificarAutenticacion(session, model)) {
             return "redirect:/login";
         }
-        
-        String email = authentication.getName();
-        Usuario usuarioLogueado = usuarioDao.findByEmail(email).orElse(null);
-        if (usuarioLogueado == null) {
-            return "redirect:/login";
-        }
-        
-        // Solo ADMIN puede ver detalles de usuarios
-        String rol = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().trim() : "";
-        if (!"ADMIN".equalsIgnoreCase(rol)) {
-            model.addAttribute("error", "Acceso denegado. No tiene permisos para gestionar usuarios.");
-            model.addAttribute("usuarioLogueado", usuarioLogueado);
-            return "redirect:/dashboard";
-        }
-        
-        model.addAttribute("usuarioLogueado", usuarioLogueado);
         
         try {
             Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorId(id);
@@ -131,31 +154,16 @@ public class UserControlles {
     }
 
     @GetMapping("/list")
-    public String listUser(Authentication authentication, Model model){
-        if (authentication == null || !authentication.isAuthenticated()) {
+    public String listUser(HttpSession session, Model model){
+        if (!verificarAutenticacion(session, model)) {
             return "redirect:/login";
         }
-        
-        String email = authentication.getName();
-        Usuario usuarioLogueado = usuarioDao.findByEmail(email).orElse(null);
-        if (usuarioLogueado == null) {
-            return "redirect:/login";
-        }
-        
-        // Solo ADMIN puede ver lista de usuarios
-        String rol = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().trim() : "";
-        if (!"ADMIN".equalsIgnoreCase(rol)) {
-            model.addAttribute("error", "Acceso denegado. No tiene permisos para gestionar usuarios. Su rol actual es: " + rol);
-            model.addAttribute("usuarioLogueado", usuarioLogueado);
-            return "redirect:/dashboard";
-        }
-        
-        model.addAttribute("usuarioLogueado", usuarioLogueado);
         
         try {
             List<Usuario> usuarios = usuarioService.obtenerTodosLosUsuarios();
             model.addAttribute("usuarios", usuarios);
             
+            // Estadísticas
             long totalUsuarios = usuarioService.contarUsuarios();
             long administradores = usuarioService.contarUsuariosPorRol("ADMIN");
             long tecnicos = usuarioService.contarUsuariosPorRol("USER");
@@ -173,26 +181,10 @@ public class UserControlles {
     }
 
     @GetMapping("/update/{id}")
-    public String updateUser(@PathVariable Long id, Authentication authentication, Model model){
-        if (authentication == null || !authentication.isAuthenticated()) {
+    public String updateUser(@PathVariable Long id, HttpSession session, Model model){
+        if (!verificarAutenticacion(session, model)) {
             return "redirect:/login";
         }
-        
-        String email = authentication.getName();
-        Usuario usuarioLogueado = usuarioDao.findByEmail(email).orElse(null);
-        if (usuarioLogueado == null) {
-            return "redirect:/login";
-        }
-        
-        // Solo ADMIN puede actualizar usuarios
-        String rol = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().trim() : "";
-        if (!"ADMIN".equalsIgnoreCase(rol)) {
-            model.addAttribute("error", "Acceso denegado. No tiene permisos para actualizar usuarios. Su rol actual es: " + rol);
-            model.addAttribute("usuarioLogueado", usuarioLogueado);
-            return "redirect:/dashboard";
-        }
-        
-        model.addAttribute("usuarioLogueado", usuarioLogueado);
         
         try {
             Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorId(id);
@@ -217,26 +209,13 @@ public class UserControlles {
                                @RequestParam(name="email", required=false) String email,
                                @RequestParam(name="password", required=false) String password,
                                @RequestParam(name="rut", required=false) String rut,
+                               @RequestParam(name="ubicacion", required=false) String ubicacion,
                                @RequestParam(name="rol", required=false) String rol,
-                               Authentication authentication,
+                               HttpSession session,
                                Model model){
         
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (!verificarAutenticacion(session, model)) {
             return "redirect:/login";
-        }
-        
-        String emailLogueado = authentication.getName();
-        Usuario usuarioLogueado = usuarioDao.findByEmail(emailLogueado).orElse(null);
-        if (usuarioLogueado == null) {
-            return "redirect:/login";
-        }
-        
-        // Solo ADMIN puede actualizar usuarios
-        String rolLogueado = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().trim() : "";
-        if (!"ADMIN".equalsIgnoreCase(rolLogueado)) {
-            model.addAttribute("error", "Acceso denegado. No tiene permisos para actualizar usuarios. Su rol actual es: " + rolLogueado);
-            model.addAttribute("usuarioLogueado", usuarioLogueado);
-            return "redirect:/dashboard";
         }
         
         try {
@@ -248,6 +227,7 @@ public class UserControlles {
             
             Usuario usuario = usuarioOpt.get();
             
+            // Validaciones
             if (nombre == null || nombre.trim().isEmpty()){
                 model.addAttribute("errorMessage", "Falta el campo: Nombre");
                 model.addAttribute("usuario", usuario);
@@ -273,17 +253,24 @@ public class UserControlles {
                 model.addAttribute("usuario", usuario);
                 return "user/update";
             }
+            if (ubicacion == null || ubicacion.trim().isEmpty()){
+                model.addAttribute("errorMessage", "Falta el campo: Ubicación");
+                model.addAttribute("usuario", usuario);
+                return "user/update";
+            }
             if (rol == null || rol.trim().isEmpty()){
                 model.addAttribute("errorMessage", "Falta el campo: Rol");
                 model.addAttribute("usuario", usuario);
                 return "user/update";
             }
 
+            // Actualizar datos
             usuario.setNombre(nombre.trim());
             usuario.setApellido(apellido.trim());
             usuario.setEmail(email.trim());
             usuario.setPassword(password);
             usuario.setRut(rut.trim());
+            usuario.setUbicacion(ubicacion.trim());
             usuario.setRol(rol.trim());
             
             Usuario usuarioActualizado = usuarioService.actualizarUsuario(usuario);
@@ -307,25 +294,17 @@ public class UserControlles {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable Long id, Authentication authentication, Model model){
-        if (authentication == null || !authentication.isAuthenticated()) {
+    public String deleteUser(@PathVariable Long id, HttpSession session, Model model){
+        if (!verificarAutenticacion(session, model)) {
             return "redirect:/login";
         }
         
-        String email = authentication.getName();
-        Usuario usuarioLogueado = usuarioDao.findByEmail(email).orElse(null);
-        if (usuarioLogueado == null) {
-            return "redirect:/login";
+        // Solo administradores pueden eliminar usuarios
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        if (!"ADMIN".equals(usuarioLogueado.getRol())) {
+            model.addAttribute("error", "Solo los administradores pueden eliminar usuarios");
+            return "redirect:/user/list";
         }
-        
-        // Solo ADMIN puede eliminar usuarios
-        String rol = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().trim() : "";
-        if (!"ADMIN".equalsIgnoreCase(rol)) {
-            model.addAttribute("error", "Acceso denegado. No tiene permisos para eliminar usuarios. Su rol actual es: " + rol);
-            model.addAttribute("usuarioLogueado", usuarioLogueado);
-            return "redirect:/dashboard";
-        }
-        model.addAttribute("usuarioLogueado", usuarioLogueado);
         
         try {
             Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorId(id);
@@ -344,22 +323,16 @@ public class UserControlles {
     }
 
     @PostMapping("/delete/{id}")
-    public String handleDelete(@PathVariable Long id, Authentication authentication, Model model){
-        if (authentication == null || !authentication.isAuthenticated()) {
+    public String handleDelete(@PathVariable Long id, HttpSession session, Model model){
+        if (!verificarAutenticacion(session, model)) {
             return "redirect:/login";
         }
         
-        String email = authentication.getName();
-        Usuario usuarioLogueado = usuarioDao.findByEmail(email).orElse(null);
-        if (usuarioLogueado == null) {
-            return "redirect:/login";
-        }
-        
-        // Solo ADMIN puede eliminar usuarios
-        String rol = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().trim() : "";
-        if (!"ADMIN".equalsIgnoreCase(rol)) {
-            model.addAttribute("error", "Acceso denegado. No tiene permisos para eliminar usuarios. Su rol actual es: " + rol);
-            return "redirect:/dashboard";
+        // Solo administradores pueden eliminar usuarios
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        if (!"ADMIN".equals(usuarioLogueado.getRol())) {
+            model.addAttribute("error", "Solo los administradores pueden eliminar usuarios");
+            return "redirect:/user/list";
         }
         
         try {

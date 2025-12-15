@@ -8,13 +8,33 @@
   </head>
   <body class="bg-gray-100">
     <div th:replace="fragments/navdar :: nav"></div>
-    <div th:replace="fragments/dashboard-button :: button-compact"></div>
+    <div th:replace="fragments/dashboard-button :: navigation-buttons"></div>
 
     <div class="container mx-auto px-4 py-8">
       <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">
-          <i class="fas fa-edit mr-2 text-accent"></i>Editar Gestión de Acceso
-        </h1>
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-edit mr-2 text-accent"></i>Editar Gestión de Acceso #<span th:text="${gestion.id}">1</span>
+          </h1>
+          <div class="flex space-x-2">
+            <a th:href="@{/gestion/view/{id}(id=${gestion.id})}" 
+               class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+               title="Ver detalle">
+              <i class="fas fa-eye mr-2"></i>Ver
+            </a>
+            <a th:href="@{/gestion/delete/{id}(id=${gestion.id})}" 
+               onclick="return confirm('¿Está seguro de eliminar esta gestión?')"
+               class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+               title="Eliminar">
+              <i class="fas fa-trash mr-2"></i>Eliminar
+            </a>
+            <a href="/gestion/list" 
+               class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+               title="Volver al listado">
+              <i class="fas fa-arrow-left mr-2"></i>Volver
+            </a>
+          </div>
+        </div>
 
         <form th:action="@{/gestion/update/{id}(id=${gestion.id})}" th:object="${gestion}" method="post">
           <input type="hidden" th:field="*{fechaRegistro}">
@@ -42,6 +62,34 @@
                 </select>
               </div>
             </div>
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-users mr-1"></i>Aprobadores Pendientes
+              </label>
+              <input type="hidden" th:field="*{aprobadoresPendientes}" id="aprobadoresHidden">
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="Midrange" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">Midrange</span>
+                </label>
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="Cambio" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">Cambio</span>
+                </label>
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="DataCenter" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">DataCenter</span>
+                </label>
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="DPE" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">DPE</span>
+                </label>
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="Supervision" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">Supervision</span>
+                </label>
+              </div>
+            </div>
           </div>
 
           <div class="bg-teal-50 p-4 rounded-lg mb-4">
@@ -49,24 +97,42 @@
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Fecha Inicio *</label>
-                <input type="date" th:field="*{fechaInicioActividad}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2">
+                <input type="date" th:field="*{fechaInicioActividad}" required readonly class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 bg-gray-100 cursor-not-allowed">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Hora Inicio *</label>
-                <input type="time" th:field="*{horaInicioActividad}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2">
+                <input type="time" th:field="*{horaInicioActividad}" required readonly class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 bg-gray-100 cursor-not-allowed">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Fecha Término *</label>
-                <input type="date" th:field="*{fechaTerminoActividad}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2">
+                <input type="date" th:field="*{fechaTerminoActividad}" required readonly class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 bg-gray-100 cursor-not-allowed">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Hora Término *</label>
-                <input type="time" th:field="*{horaTerminoActividad}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2">
+                <input type="time" th:field="*{horaTerminoActividad}" required id="horaTermino" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2">
               </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Actividad *</label>
               <textarea th:field="*{nombreActividad}" required rows="3" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"></textarea>
+            </div>
+          </div>
+
+          <div class="bg-purple-50 p-4 rounded-lg mb-4">
+            <h3 class="font-semibold text-gray-800 mb-3"><i class="fas fa-comments mr-2"></i>Comentarios</h3>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Comentario Inicio</label>
+                <textarea th:field="*{comentarioInicio}" rows="2" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Comentario Intermedio</label>
+                <textarea th:field="*{comentarioIntermedio}" rows="2" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Comentario Final</label>
+                <textarea th:field="*{comentarioFinal}" rows="2" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"></textarea>
+              </div>
             </div>
           </div>
 
@@ -83,15 +149,20 @@
                 </select>
               </div>
               <div>
-                <label class="inline-flex items-center mt-7">
-                  <input type="checkbox" th:field="*{gestionRealizada}" class="rounded border-gray-300">
-                  <span class="ml-2 text-sm">Gestión realizada</span>
-                </label>
+                <div class="space-y-2 mt-3">
+                  <label class="inline-flex items-center">
+                    <input type="checkbox" th:field="*{gestionRealizada}" id="gestionRealizadaCheckbox" class="rounded border-gray-300">
+                    <span class="ml-2 text-sm">Gestión realizada</span>
+                  </label>
+                  <input type="hidden" th:field="*{fechaCierreGestion}" id="fechaCierreGestion">
+                  <input type="hidden" th:field="*{horaCierreGestion}" id="horaCierreGestion">
+                  <br>
+                  <label class="inline-flex items-center">
+                    <input type="checkbox" th:field="*{ticketCerrado}" class="rounded border-gray-300 text-red-600">
+                    <span class="ml-2 text-sm font-semibold">Ticket Cerrado</span>
+                  </label>
+                </div>
               </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Aprobadores Pendientes</label>
-              <textarea th:field="*{aprobadoresPendientes}" rows="2" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"></textarea>
             </div>
           </div>
 
@@ -106,5 +177,70 @@
     </div>
 
     <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <script>
+      // Capturar fecha y hora cuando se marca gestión realizada para KPI
+      document.addEventListener('DOMContentLoaded', function() {
+        const gestionCheckbox = document.getElementById('gestionRealizadaCheckbox');
+        const fechaCierre = document.getElementById('fechaCierreGestion');
+        const horaCierre = document.getElementById('horaCierreGestion');
+        
+        if (gestionCheckbox) {
+          gestionCheckbox.addEventListener('change', function() {
+            if (this.checked && !fechaCierre.value) {
+              const ahora = new Date();
+              // Formato YYYY-MM-DD para fecha
+              const fecha = ahora.getFullYear() + '-' + 
+                          String(ahora.getMonth() + 1).padStart(2, '0') + '-' + 
+                          String(ahora.getDate()).padStart(2, '0');
+              // Formato HH:mm:ss para hora
+              const hora = String(ahora.getHours()).padStart(2, '0') + ':' + 
+                         String(ahora.getMinutes()).padStart(2, '0') + ':' + 
+                         String(ahora.getSeconds()).padStart(2, '0');
+              fechaCierre.value = fecha;
+              horaCierre.value = hora;
+              console.log('Gestión marcada como realizada:', fecha, hora);
+            } else if (!this.checked) {
+              // Si se desmarca, limpiar los valores
+              fechaCierre.value = '';
+              horaCierre.value = '';
+            }
+          });
+        }
+        
+        // Sincronizar checkboxes con campo hidden de aprobadores
+        const checkboxes = document.querySelectorAll('.aprobador-checkbox');
+        const hiddenInput = document.getElementById('aprobadoresHidden');
+        
+        // Cargar valores existentes si los hay
+        if (hiddenInput.value) {
+          const aprobadores = hiddenInput.value.split(', ');
+          checkboxes.forEach(cb => {
+            if (aprobadores.includes(cb.value)) {
+              cb.checked = true;
+            }
+          });
+        }
+        
+        // Actualizar hidden input cuando cambian los checkboxes
+        checkboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', function() {
+            const selected = Array.from(checkboxes)
+              .filter(cb => cb.checked)
+              .map(cb => cb.value);
+            hiddenInput.value = selected.join(', ');
+          });
+        });
+
+        // Establecer hora actual como predeterminado si el campo de hora término está vacío
+        const horaTermino = document.getElementById('horaTermino');
+        if (horaTermino && !horaTermino.value) {
+          const ahora = new Date();
+          const horas = String(ahora.getHours()).padStart(2, '0');
+          const minutos = String(ahora.getMinutes()).padStart(2, '0');
+          horaTermino.value = `${horas}:${minutos}`;
+        }
+      });
+    </script>
   </body>
 </html>

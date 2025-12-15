@@ -43,4 +43,24 @@ public interface IGestionAccesoDao extends JpaRepository<GestionAcceso, Long> {
     // Contar tickets únicos gestionados en el día
     @Query("SELECT COUNT(DISTINCT g.numeroTicket) FROM GestionAcceso g WHERE g.fechaRegistro = :fecha AND g.sitio = :sitio")
     Long contarTicketsUnicosDelDia(@Param("fecha") LocalDate fecha, @Param("sitio") String sitio);
+
+    // Contar tickets por estado de aprobación y fecha
+    @Query("SELECT COUNT(g) FROM GestionAcceso g WHERE g.estadoAprobacion = :estadoAprobacion AND g.fechaRegistro = :fecha AND g.sitio = :sitio")
+    Long contarTicketsPorEstadoYFecha(@Param("estadoAprobacion") String estadoAprobacion, @Param("fecha") LocalDate fecha, @Param("sitio") String sitio);
+
+    // Contar tickets por estado de aprobación
+    @Query("SELECT COUNT(g) FROM GestionAcceso g WHERE g.estadoAprobacion = :estadoAprobacion AND g.sitio = :sitio")
+    Long contarTicketsPorEstado(@Param("estadoAprobacion") String estadoAprobacion, @Param("sitio") String sitio);
+
+    // Contar tickets rechazados hoy
+    @Query("SELECT COUNT(g) FROM GestionAcceso g WHERE g.estadoAprobacion LIKE '%Rechazada%' AND g.fechaRegistro = :fecha AND g.sitio = :sitio")
+    Long contarTicketsRechazadosHoy(@Param("fecha") LocalDate fecha, @Param("sitio") String sitio);
+
+    // Contar tickets devueltos hoy
+    @Query("SELECT COUNT(g) FROM GestionAcceso g WHERE g.estadoAprobacion LIKE '%Devuelta%' AND g.fechaRegistro = :fecha AND g.sitio = :sitio")
+    Long contarTicketsDevueltosHoy(@Param("fecha") LocalDate fecha, @Param("sitio") String sitio);
+
+    // Contar tickets pendientes de cierre
+    @Query("SELECT COUNT(g) FROM GestionAcceso g WHERE (g.gestionRealizada = false OR g.ticketCerrado = false) AND g.sitio = :sitio")
+    Long contarTicketsPendientesCierre(@Param("sitio") String sitio);
 }

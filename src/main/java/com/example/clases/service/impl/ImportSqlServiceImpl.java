@@ -282,13 +282,12 @@ public class ImportSqlServiceImpl implements ImportSqlService {
         for (Usuario usuario : usuarios) {
             String insert = String.format(
                 "INSERT INTO usuario (rut, nombre, apellido, email, password, ubicacion, rol, creat_at, update_at) " +
-                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);",
+                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);",
                 usuario.getRut(),
                 escapeSql(usuario.getNombre()),
                 escapeSql(usuario.getApellido()),
                 escapeSql(usuario.getEmail()),
                 escapeSql(usuario.getPassword()),
-                escapeSql(usuario.getUbicacion()),
                 usuario.getRol()
             );
             insertStatements.add(insert);

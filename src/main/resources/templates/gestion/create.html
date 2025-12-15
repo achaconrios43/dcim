@@ -9,7 +9,7 @@
   <body class="bg-gray-100">
     <div th:replace="fragments/navdar :: nav"></div>
 
-    <div th:replace="fragments/dashboard-button :: button-compact"></div>
+    <div th:replace="fragments/dashboard-button :: navigation-buttons"></div>
 
     <div class="container mx-auto px-4 py-8">
       <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
@@ -88,6 +88,35 @@
                   <option value="MC Manuel Montt">MC Manuel Montt</option>
                 </select>
               </div>
+               <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-users mr-1"></i>Aprobadores Pendientes
+              </label>
+              <input type="hidden" th:field="*{aprobadoresPendientes}" id="aprobadoresHidden">
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            </div>
+           
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="Midrange" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">Midrange</span>
+                </label>
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="Cambio" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">Cambio</span>
+                </label>
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="DataCenter" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">DataCenter</span>
+                </label>
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="DPE" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">DPE</span>
+                </label>
+                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" value="Supervision" class="aprobador-checkbox rounded border-gray-300 text-accent focus:ring-accent">
+                  <span class="ml-2 text-sm">Supervision</span>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -126,10 +155,37 @@
             </div>
           </div>
 
+          <!-- Comentarios del Ticket -->
+          <div class="bg-purple-50 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">
+              <i class="fas fa-comments mr-2"></i>Seguimiento y Comentarios
+            </h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Comentario de Inicio</label>
+                <textarea th:field="*{comentarioInicio}" rows="2"
+                          placeholder="Comentarios al iniciar la actividad..."
+                          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Comentario Intermedio</label>
+                <textarea th:field="*{comentarioIntermedio}" rows="2"
+                          placeholder="Comentarios durante la ejecución de la actividad..."
+                          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Comentario Final</label>
+                <textarea th:field="*{comentarioFinal}" rows="2"
+                          placeholder="Comentarios al finalizar la actividad..."
+                          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+              </div>
+            </div>
+          </div>
+
           <!-- Estado y Aprobadores -->
           <div class="bg-yellow-50 p-4 rounded-lg mb-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-3">
-              <i class="fas fa-users mr-2"></i>Aprobación y Estado
+              <i class="fas fa-users mr-2"></i>Estado de Gestión de Acceso
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -143,22 +199,23 @@
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700">Gestión Realizada</label>
-                <div class="mt-3">
+                <label class="block text-sm font-medium text-gray-700">Cierre de Gestion de Acceso</label>
+                <div class="mt-3 space-y-2">
                   <label class="inline-flex items-center">
-                    <input type="checkbox" th:field="*{gestionRealizada}" 
+                    <input type="checkbox" th:field="*{gestionRealizada}" id="gestionRealizadaCheckbox"
                            class="rounded border-gray-300 text-accent focus:ring-accent">
                     <span class="ml-2 text-sm text-gray-700">La gestión ha sido realizada</span>
                   </label>
+                  <input type="hidden" th:field="*{fechaCierreGestion}" id="fechaCierreGestion">
+                  <input type="hidden" th:field="*{horaCierreGestion}" id="horaCierreGestion">
+                  <br>
+                  <label class="inline-flex items-center">
+                    <input type="checkbox" th:field="*{ticketCerrado}" 
+                           class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                    <span class="ml-2 text-sm text-gray-700 font-semibold">Ticket Cerrado</span>
+                  </label>
                 </div>
               </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Aprobadores Pendientes</label>
-              <textarea th:field="*{aprobadoresPendientes}" rows="2"
-                        placeholder="Ej: Paulo Hernandez, Rodrigo Aguilera, Facilities"
-                        class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
-              <small class="text-gray-500 text-xs">Separe los nombres con comas</small>
             </div>
           </div>
 
@@ -178,5 +235,61 @@
     </div>
 
     <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <script>
+      // Capturar fecha y hora cuando se marca gestión realizada
+      document.addEventListener('DOMContentLoaded', function() {
+        const gestionCheckbox = document.getElementById('gestionRealizadaCheckbox');
+        const fechaCierre = document.getElementById('fechaCierreGestion');
+        const horaCierre = document.getElementById('horaCierreGestion');
+        
+        if (gestionCheckbox) {
+          gestionCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+              const ahora = new Date();
+              // Formato YYYY-MM-DD para fecha
+              const fecha = ahora.getFullYear() + '-' + 
+                          String(ahora.getMonth() + 1).padStart(2, '0') + '-' + 
+                          String(ahora.getDate()).padStart(2, '0');
+              // Formato HH:mm:ss para hora
+              const hora = String(ahora.getHours()).padStart(2, '0') + ':' + 
+                         String(ahora.getMinutes()).padStart(2, '0') + ':' + 
+                         String(ahora.getSeconds()).padStart(2, '0');
+              fechaCierre.value = fecha;
+              horaCierre.value = hora;
+              console.log('Gestión marcada como realizada:', fecha, hora);
+            } else {
+              // Si se desmarca, limpiar los valores
+              fechaCierre.value = '';
+              horaCierre.value = '';
+            }
+          });
+        }
+        
+        // Sincronizar checkboxes con campo hidden de aprobadores
+        const checkboxes = document.querySelectorAll('.aprobador-checkbox');
+        const hiddenInput = document.getElementById('aprobadoresHidden');
+        
+        // Cargar valores existentes si los hay
+        if (hiddenInput.value) {
+          const aprobadores = hiddenInput.value.split(', ');
+          checkboxes.forEach(cb => {
+            if (aprobadores.includes(cb.value)) {
+              cb.checked = true;
+            }
+          });
+        }
+        
+        // Actualizar hidden input cuando cambian los checkboxes
+        checkboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', function() {
+            const selected = Array.from(checkboxes)
+              .filter(cb => cb.checked)
+              .map(cb => cb.value);
+            hiddenInput.value = selected.join(', ');
+          });
+        });
+      });
+    </script>
   </body>
 </html>

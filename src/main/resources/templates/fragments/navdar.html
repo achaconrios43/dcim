@@ -43,7 +43,11 @@
             </button>
             <div class="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
               <a th:href="@{/login}" class="block px-4 py-2 text-[#003DA5] hover:bg-blue-50 rounded-t-lg">🔐 Acceso Usuarios</a>
-              <a th:href="@{/user/create}" class="block px-4 py-2 text-[#003DA5] hover:bg-blue-50">➕ Registrar Usuario</a>
+              <a th:if="${session.usuarioLogueado != null and session.usuarioRol == 'ADMIN'}" 
+                 th:href="@{/user/create}" 
+                 class="block px-4 py-2 text-[#003DA5] hover:bg-blue-50">
+                ➕ Registrar Usuario <span class="text-xs text-red-600">(ADMIN)</span>
+              </a>
             </div>
           </div>
 

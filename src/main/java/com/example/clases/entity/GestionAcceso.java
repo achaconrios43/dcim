@@ -1,60 +1,141 @@
 package com.example.clases.entity;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+/**
+ * Entidad JPA que representa una Gestión de Acceso
+ * 
+ * Gestiona el ciclo completo de tickets de acceso a datacenters y minicenters:
+ * - Registro de solicitudes de acceso
+ * - Proceso de aprobación por múltiples niveles
+ * - Seguimiento del estado de ejecución de actividades
+ * - Cierre y documentación de gestiones realizadas
+ * 
+ * Estados posibles:
+ * - Aprobada: Autorizada para ejecución
+ * - Pendiente: En espera de aprobación
+ * - Rechazada por NXT: No autorizada
+ * - Devuelta al cliente por falta de Datos: Requiere más información
+ * 
+ * @author Arturo Chacón
+ */
 @Entity
 @Table(name = "gestion_acceso")
 public class GestionAcceso {
 
+    // ==================== IDENTIFICACIÓN ====================
+    
+    /** ID único generado automáticamente por la base de datos */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ==================== DATOS DE REGISTRO ====================
+    
+    /** Fecha en que se registró la solicitud en el sistema */
     @Column(name = "fecha_registro")
     private LocalDate fechaRegistro;
 
+    /** Hora en que se registró la solicitud */
     @Column(name = "hora_registro")
     private LocalTime horaRegistro;
 
+    /** Nombre del usuario que registra la gestión (responsable) */
     @Column(name = "usuario_ingresa")
     private String usuarioIngresa;
 
+    /** Número identificador del ticket (CRQ0012345, INC0008765, etc.) */
     @Column(name = "numero_ticket")
     private String numeroTicket;
 
+    // ==================== PROGRAMACIÓN DE ACTIVIDAD ====================
+    
+    /** Fecha planificada para iniciar la actividad en el sitio */
     @Column(name = "fecha_inicio_actividad")
     private LocalDate fechaInicioActividad;
 
+    /** Hora planificada de inicio de la actividad */
     @Column(name = "hora_inicio_actividad")
     private LocalTime horaInicioActividad;
 
+    /** Descripción detallada de la actividad a realizar */
     @Column(name = "nombre_actividad", columnDefinition = "TEXT")
     private String nombreActividad;
 
+    /** Fecha planificada para finalizar la actividad */
     @Column(name = "fecha_termino_actividad")
     private LocalDate fechaTerminoActividad;
 
+    /** Hora planificada de término de la actividad */
     @Column(name = "hora_termino_actividad")
     private LocalTime horaTerminoActividad;
 
+    // ==================== PROCESO DE APROBACIÓN ====================
+    
+    /** Lista de aprobadores que aún deben autorizar (separados por coma) */
     @Column(name = "aprobadores_pendientes", columnDefinition = "TEXT")
     private String aprobadoresPendientes;
 
-    @Column(name = "gestion_realizada")
-    private Boolean gestionRealizada;
-
+    /** Estado de aprobación: Aprobada, Pendiente, Rechazada, Devuelta */
     @Column(name = "estado_aprobacion")
     private String estadoAprobacion; // "Aprobada", "Rechazada por NXT", "Devuelta al cliente por falta de Datos", "Pendiente"
 
+    // ==================== UBICACIÓN Y ESTADO ====================
+    
+    /** Sitio donde se realizará la actividad (DC SAN MARTIN, MC LA FLORIDA, etc.) */
     @Column(name = "sitio")
     private String sitio; // DC San Martin, DC Apoquindo, MC La Florida, etc.
 
-    // Constructores
+    /** Indica si la gestión/actividad ya fue realizada físicamente */
+    @Column(name = "gestion_realizada")
+    private Boolean gestionRealizada;
+
+    /** Indica si el ticket asociado fue cerrado en el sistema */
+    @Column(name = "ticket_cerrado")
+    private Boolean ticketCerrado;
+
+    // ==================== SEGUIMIENTO Y COMENTARIOS ====================
+    
+    /** Comentarios iniciales al registrar la gestión */
+    @Column(name = "comentario_inicio", columnDefinition = "TEXT")
+    private String comentarioInicio;
+
+    /** Comentarios durante la ejecución de la actividad */
+    @Column(name = "comentario_intermedio", columnDefinition = "TEXT")
+    private String comentarioIntermedio;
+
+    /** Comentarios finales al cerrar la gestión */
+    @Column(name = "comentario_final", columnDefinition = "TEXT")
+    private String comentarioFinal;
+
+    // ==================== CIERRE DE GESTIÓN ====================
+    
+    /** Fecha en que se cerró completamente la gestión */
+    @Column(name = "fecha_cierre_gestion")
+    private LocalDate fechaCierreGestion;
+
+    /** Hora en que se cerró completamente la gestión */
+    @Column(name = "hora_cierre_gestion")
+    private LocalTime horaCierreGestion;
+
+    // ==================== CONSTRUCTORES ====================
+    
+    /** Constructor vacío requerido por JPA */
     public GestionAcceso() {
     }
 
+    /** 
+     * Constructor con parámetros principales para crear una gestión
+     * Útil para inicializar rápidamente los campos más importantes
+     */
     public GestionAcceso(LocalDate fechaRegistro, LocalTime horaRegistro, String usuarioIngresa, 
                         String numeroTicket, LocalDate fechaInicioActividad, LocalTime horaInicioActividad,
                         String nombreActividad, LocalDate fechaTerminoActividad, LocalTime horaTerminoActividad,
@@ -74,7 +155,9 @@ public class GestionAcceso {
         this.sitio = sitio;
     }
 
-    // Getters y Setters
+    // ==================== GETTERS Y SETTERS ====================
+    
+    /** Obtiene el ID único de la gestión */
     public Long getId() {
         return id;
     }
@@ -187,6 +270,52 @@ public class GestionAcceso {
         this.sitio = sitio;
     }
 
+    public String getComentarioInicio() {
+        return comentarioInicio;
+    }
+
+    public void setComentarioInicio(String comentarioInicio) {
+        this.comentarioInicio = comentarioInicio;
+    }
+
+    public String getComentarioIntermedio() {
+        return comentarioIntermedio;
+    }
+
+    public void setComentarioIntermedio(String comentarioIntermedio) {
+        this.comentarioIntermedio = comentarioIntermedio;
+    }
+
+    public String getComentarioFinal() {
+        return comentarioFinal;
+    }
+
+    public void setComentarioFinal(String comentarioFinal) {
+        this.comentarioFinal = comentarioFinal;
+    }
+
+    public Boolean getTicketCerrado() {
+        return ticketCerrado;
+    }
+
+    public void setTicketCerrado(Boolean ticketCerrado) {
+        this.ticketCerrado = ticketCerrado;
+    }
+
+    public LocalDate getFechaCierreGestion() {
+        return fechaCierreGestion;
+    }
+
+    public void setFechaCierreGestion(LocalDate fechaCierreGestion) {
+        this.fechaCierreGestion = fechaCierreGestion;
+    }
+
+    // ==================== MÉTODOS UTILITARIOS ====================
+    
+    /**
+     * Representación en texto de la gestión con sus campos principales
+     * Útil para debugging y logging
+     */
     @Override
     public String toString() {
         return "GestionAcceso{" +

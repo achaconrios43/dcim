@@ -1,8 +1,10 @@
 package com.example.clases.controllers;
 
 import com.example.clases.entity.GestionAcceso;
+import com.example.clases.entity.Usuario;
 import com.example.clases.service.GestionAccesoService;
-import jakarta.servlet.http.HttpSession;
+import com.example.clases.dao.IUsuarioDao;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,14 +21,30 @@ public class GestionAccesoController {
 
     @Autowired
     private GestionAccesoService gestionAccesoService;
+    
+    @Autowired
+    private IUsuarioDao usuarioDao;
 
-    // Listar todas las gestiones
     @GetMapping("/list")
-    public String listarGestiones(Model model, HttpSession session) {
-        String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-        if (usuarioEmail == null) {
+    public String listarGestiones(Model model, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
+        
+        String email = authentication.getName();
+        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        // Solo ADMIN puede acceder a Gestión de Accesos
+        if ("USER".equals(usuario.getRol())) {
+            model.addAttribute("error", "Acceso denegado. No tiene permisos para acceder a Gestión de Accesos.");
+            model.addAttribute("usuarioLogueado", usuario);
+            return "redirect:/dashboard";
+        }
+        
+        model.addAttribute("usuarioLogueado", usuario);
 
         List<GestionAcceso> gestiones = gestionAccesoService.listarTodas();
         model.addAttribute("gestiones", gestiones);
@@ -34,13 +52,26 @@ public class GestionAccesoController {
         return "gestion/list";
     }
 
-    // Listar gestiones por sitio
     @GetMapping("/list/{sitio}")
-    public String listarGestionesPorSitio(@PathVariable String sitio, Model model, HttpSession session) {
-        String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-        if (usuarioEmail == null) {
+    public String listarGestionesPorSitio(@PathVariable String sitio, Model model, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
+        
+        String email = authentication.getName();
+        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        // Solo ADMIN puede acceder
+        if ("USER".equals(usuario.getRol())) {
+            model.addAttribute("error", "Acceso denegado. No tiene permisos para acceder a Gestión de Accesos.");
+            model.addAttribute("usuarioLogueado", usuario);
+            return "redirect:/dashboard";
+        }
+        
+        model.addAttribute("usuarioLogueado", usuario);
 
         List<GestionAcceso> gestiones = gestionAccesoService.listarPorSitio(sitio);
         model.addAttribute("gestiones", gestiones);
@@ -49,20 +80,31 @@ public class GestionAccesoController {
         return "gestion/list";
     }
 
-    // Mostrar formulario para crear nueva gestión
     @GetMapping("/create")
-    public String mostrarFormularioCrear(Model model, HttpSession session) {
-        String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-        if (usuarioEmail == null) {
+    public String mostrarFormularioCrear(Model model, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
-
-        String nombreUsuario = (String) session.getAttribute("usuarioNombre");
+        
+        String email = authentication.getName();
+        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        // Solo ADMIN puede acceder
+        if ("USER".equals(usuario.getRol())) {
+            model.addAttribute("error", "Acceso denegado. No tiene permisos para acceder a Gestión de Accesos.");
+            model.addAttribute("usuarioLogueado", usuario);
+            return "redirect:/dashboard";
+        }
+        
+        model.addAttribute("usuarioLogueado", usuario);
         
         GestionAcceso gestion = new GestionAcceso();
         gestion.setFechaRegistro(LocalDate.now());
         gestion.setHoraRegistro(LocalTime.now());
-        gestion.setUsuarioIngresa(nombreUsuario);
+        gestion.setUsuarioIngresa(usuario.getNombre() + " " + usuario.getApellido());
         gestion.setGestionRealizada(false);
         gestion.setEstadoAprobacion("Pendiente");
         
@@ -71,18 +113,28 @@ public class GestionAccesoController {
         return "gestion/create";
     }
 
-    // Procesar formulario de creación
     @PostMapping("/save")
     public String guardarGestion(@ModelAttribute GestionAcceso gestion, 
                                  RedirectAttributes flash,
-                                 HttpSession session) {
-        String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-        if (usuarioEmail == null) {
+                                 Authentication authentication,
+                                 Model model) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
+        }
+        
+        String email = authentication.getName();
+        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        // Solo ADMIN puede acceder
+        if ("USER".equals(usuario.getRol())) {
+            flash.addAttribute("error", "Acceso denegado. No tiene permisos para acceder a Gestión de Accesos.");
+            return "redirect:/dashboard";
         }
 
         try {
-            // Establecer fecha y hora de registro si no vienen del formulario
             if (gestion.getFechaRegistro() == null) {
                 gestion.setFechaRegistro(LocalDate.now());
             }
@@ -99,13 +151,26 @@ public class GestionAccesoController {
         }
     }
 
-    // Mostrar formulario para editar
     @GetMapping("/edit/{id}")
-    public String mostrarFormularioEditar(@PathVariable Long id, Model model, HttpSession session) {
-        String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-        if (usuarioEmail == null) {
+    public String mostrarFormularioEditar(@PathVariable Long id, Model model, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
+        
+        String email = authentication.getName();
+        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        // Solo ADMIN puede acceder
+        if ("USER".equals(usuario.getRol())) {
+            model.addAttribute("error", "Acceso denegado. No tiene permisos para acceder a Gestión de Accesos.");
+            model.addAttribute("usuarioLogueado", usuario);
+            return "redirect:/dashboard";
+        }
+        
+        model.addAttribute("usuarioLogueado", usuario);
 
         GestionAcceso gestion = gestionAccesoService.buscarPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Gestión no encontrada: " + id));
@@ -115,15 +180,25 @@ public class GestionAccesoController {
         return "gestion/edit";
     }
 
-    // Procesar actualización
     @PostMapping("/update/{id}")
     public String actualizarGestion(@PathVariable Long id,
                                     @ModelAttribute GestionAcceso gestion,
                                     RedirectAttributes flash,
-                                    HttpSession session) {
-        String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-        if (usuarioEmail == null) {
+                                    Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
+        }
+        
+        String email = authentication.getName();
+        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        // Solo ADMIN puede acceder
+        if ("USER".equals(usuario.getRol())) {
+            flash.addAttribute("error", "Acceso denegado. No tiene permisos para acceder a Gestión de Accesos.");
+            return "redirect:/dashboard";
         }
 
         try {
@@ -137,12 +212,22 @@ public class GestionAccesoController {
         }
     }
 
-    // Eliminar gestión
     @GetMapping("/delete/{id}")
-    public String eliminarGestion(@PathVariable Long id, RedirectAttributes flash, HttpSession session) {
-        String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-        if (usuarioEmail == null) {
+    public String eliminarGestion(@PathVariable Long id, RedirectAttributes flash, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
+        }
+        
+        String email = authentication.getName();
+        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        // Solo ADMIN puede acceder
+        if ("USER".equals(usuario.getRol())) {
+            flash.addAttribute("error", "Acceso denegado. No tiene permisos para acceder a Gestión de Accesos.");
+            return "redirect:/dashboard";
         }
 
         try {
@@ -154,13 +239,26 @@ public class GestionAccesoController {
         return "redirect:/gestion/list";
     }
 
-    // Ver detalle de gestión
     @GetMapping("/view/{id}")
-    public String verDetalle(@PathVariable Long id, Model model, HttpSession session) {
-        String usuarioEmail = (String) session.getAttribute("usuarioEmail");
-        if (usuarioEmail == null) {
+    public String verDetalle(@PathVariable Long id, Model model, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
+        
+        String email = authentication.getName();
+        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+        
+        // Solo ADMIN puede acceder
+        if ("USER".equals(usuario.getRol())) {
+            model.addAttribute("error", "Acceso denegado. No tiene permisos para acceder a Gestión de Accesos.");
+            model.addAttribute("usuarioLogueado", usuario);
+            return "redirect:/dashboard";
+        }
+        
+        model.addAttribute("usuarioLogueado", usuario);
 
         GestionAcceso gestion = gestionAccesoService.buscarPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Gestión no encontrada: " + id));

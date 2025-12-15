@@ -28,7 +28,6 @@ public interface UsuarioService {
     Optional<Usuario> obtenerUsuarioPorEmail(String email);
     Optional<Usuario> obtenerUsuarioPorRut(String rut);
     List<Usuario> obtenerUsuariosPorRol(String rol);
-    List<Usuario> obtenerUsuariosPorUbicacion(String ubicacion);
     
     // Validaciones de existencia
     boolean existeEmail(String email);

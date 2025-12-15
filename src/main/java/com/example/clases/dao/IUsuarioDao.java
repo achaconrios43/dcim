@@ -18,7 +18,6 @@ public interface IUsuarioDao extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByRut(String rut);
     List<Usuario> findByRol(String rol);
     List<Usuario> findByRolOrderByNombre(String rol);
-    List<Usuario> findByUbicacion(String ubicacion);
     boolean existsByEmail(String email);
     boolean existsByRut(String rut);
     

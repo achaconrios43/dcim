@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
+    <title>Dashboard Cliente Diario - Sistema de Control</title>
+    <style>
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Título y navegación -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">📅 Dashboard Cliente - Vista Diaria</h1>
+                <nav class="text-sm text-gray-600 mt-2">
+                    <a href="/dashboard" class="hover:text-blue-600">Dashboard</a> > 
+                    <span class="text-blue-600">Operaciones del Día</span>
+                </nav>
+                <p class="text-gray-600 mt-2">
+                    <i class="fas fa-calendar mr-2"></i>
+                    <span class="font-semibold" th:text="${#temporals.format(fechaActual, 'dd/MM/yyyy')}">Fecha</span>
+                    <span class="ml-2 text-sm" th:text="${diaSemana}">Día</span>
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <a href="/dashboard/cliente/mensual" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Vista Mensual
+                </a>
+                <a href="/dashboard" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Volver
+                </a>
+            </div>
+        </div>
+
+        <!-- Selector de Sitio -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>
+                Seleccionar Sitio
+            </h2>
+            <form method="get" action="/dashboard/cliente/diario" class="flex flex-wrap gap-4 items-end">
+                <div class="flex-1 min-w-[300px]">
+                    <label for="sitio" class="block text-sm font-medium text-gray-700 mb-2">Sitio de Ingreso</label>
+                    <select id="sitio" name="sitio" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Seleccione un sitio</option>
+                        <option value="DC APOQUINDO" th:selected="${sitioSeleccionado == 'DC APOQUINDO'}">DC APOQUINDO</option>
+                        <option value="DC SAN MARTIN" th:selected="${sitioSeleccionado == 'DC SAN MARTIN'}">DC SAN MARTIN</option>
+                        <option value="MC CHILOE" th:selected="${sitioSeleccionado == 'MC CHILOE'}">MC CHILOE</option>
+                        <option value="MC INDEPENDENCIA" th:selected="${sitioSeleccionado == 'MC INDEPENDENCIA'}">MC INDEPENDENCIA</option>
+                        <option value="MC LA FLORIDA" th:selected="${sitioSeleccionado == 'MC LA FLORIDA'}">MC LA FLORIDA</option>
+                        <option value="MC MANUEL MONTT" th:selected="${sitioSeleccionado == 'MC MANUEL MONTT'}">MC MANUEL MONTT</option>
+                        <option value="MC PEDRO DE VALDIVIA" th:selected="${sitioSeleccionado == 'MC PEDRO DE VALDIVIA'}">MC PEDRO DE VALDIVIA</option>
+                        <option value="MC PROVIDENCIA" th:selected="${sitioSeleccionado == 'MC PROVIDENCIA'}">MC PROVIDENCIA</option>
+                    </select>
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                    <i class="fas fa-sync-alt mr-2"></i>
+                    Ver Estadísticas
+                </button>
+            </form>
+            <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}" class="mt-4">
+                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Mostrando estadísticas para: <strong class="ml-1" th:text="${sitioSeleccionado}">Sitio</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- Contenedor de estadísticas -->
+        <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}">
+
+        <!-- Sección: INGRESOS DE TÉCNICOS -->
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 mb-6 text-white">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fas fa-hard-hat mr-3"></i>
+                Ingresos de Técnicos - Hoy
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Ingresos Totales</div>
+                        <i class="fas fa-users text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ingresosHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">registros hoy</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Tickets Únicos</div>
+                        <i class="fas fa-ticket-alt text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsUnicosHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">tickets diferentes</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">CRQ</div>
+                        <i class="fas fa-cogs text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${cantidadCRQHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">cambios</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">INC</div>
+                        <i class="fas fa-exclamation-triangle text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${cantidadINCHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">incidencias</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Inspección/Ronda</div>
+                        <i class="fas fa-clipboard-check text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${cantidadInspeccionHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">visitas/rondas</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Salas TI</div>
+                        <i class="fas fa-server text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${salasTIHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">ingresos a TI</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Salas RED</div>
+                        <i class="fas fa-network-wired text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${salasREDHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">ingresos a RED</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: GESTIÓN DE ACCESOS -->
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 mb-6 text-white">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fas fa-clipboard-list mr-3"></i>
+                Gestión de Accesos - Hoy
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Tickets Gestionados</div>
+                        <i class="fas fa-clipboard-check text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${gestionesDelDia}">0</div>
+                    <div class="text-xs opacity-90 mt-1">registrados hoy</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Aprobados Hoy</div>
+                        <i class="fas fa-check-circle text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsAprobadosHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">aprobados</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Pendientes Aprobación</div>
+                        <i class="fas fa-clock text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsPendientesAprobacion}">0</div>
+                    <div class="text-xs opacity-90 mt-1">esperando</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Rechazados Hoy</div>
+                        <i class="fas fa-times-circle text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsRechazadosHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">rechazados</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Devueltos Hoy</div>
+                        <i class="fas fa-undo text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsDevueltosHoy}">0</div>
+                    <div class="text-xs opacity-90 mt-1">devueltos</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm font-medium">Pendientes Cierre</div>
+                        <i class="fas fa-hourglass-half text-2xl opacity-80"></i>
+                    </div>
+                    <div class="text-3xl font-bold" th:text="${ticketsPendientesCierre}">0</div>
+                    <div class="text-xs opacity-90 mt-1">por cerrar</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: REGISTROS ACTIVOS HOY -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-list text-green-600 mr-3"></i>
+                Registros Activos Hoy
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ticket</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Técnico</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Empresa</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sala</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hora Inicio</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:if="${#lists.isEmpty(registrosActivosHoy)}">
+                            <td colspan="6" class="px-4 py-4 text-center text-gray-500">
+                                <i class="fas fa-inbox text-4xl mb-2"></i>
+                                <p>No hay registros activos para hoy</p>
+                            </td>
+                        </tr>
+                        <tr th:each="registro : ${registrosActivosHoy}" class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm font-medium text-blue-600" th:text="${registro.numeroTicket}">-</td>
+                            <td class="px-4 py-3 text-sm" th:text="${registro.nombreTecnico}">-</td>
+                            <td class="px-4 py-3 text-sm" th:text="${registro.empresaContratista}">-</td>
+                            <td class="px-4 py-3 text-sm" th:text="${registro.salaIngresa}">-</td>
+                            <td class="px-4 py-3 text-sm" th:text="${registro.horaInicio}">-</td>
+                            <td class="px-4 py-3 text-sm">
+                                <span class="px-2 py-1 text-xs rounded-full"
+                                      th:classappend="${registro.tipoTicket == 'CRQ'} ? 'bg-blue-100 text-blue-800' : (${registro.tipoTicket == 'INC'} ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')"
+                                      th:text="${registro.tipoTicket}">-</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        </div>
+    </div>
+
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>

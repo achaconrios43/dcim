@@ -25,9 +25,6 @@ public class Usuario {
   @Column(nullable = false)
   private String password;
   
-  @Column(length = 100)
-  private String ubicacion;
-  
   @Column(nullable = false, length = 20)
   private String rol;
   
@@ -43,13 +40,12 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(String rut, String nombre, String apellido, String email, String password, String ubicacion, String rol) {
+    public Usuario(String rut, String nombre, String apellido, String email, String password, String rol) {
         this.rut = rut;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
         this.password = password;
-        this.ubicacion = ubicacion;
         this.rol = rol;
         this.creatAt = new Date();
         this.updateAt = new Date();
@@ -108,14 +104,6 @@ public String getRut() {
         this.password = password;
         this.updateAt = new Date();
     }
-    public String getUbicacion() {
-        return ubicacion;
-    }
-
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
-        this.updateAt = new Date();
-    }
 
     public String getRol() {
         return rol;
@@ -140,7 +128,6 @@ public String getRut() {
                 "nombre='" + nombre + '\'' +
                 ", apellido='" + apellido + '\'' +
                 ", email='" + email + '\'' +
-                ", ubicacion='" + ubicacion + '\'' +
                 ", rol='" + rol + '\'' +
                 '}';
     }

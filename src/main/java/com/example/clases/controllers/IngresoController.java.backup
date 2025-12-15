@@ -1,47 +1,33 @@
 package com.example.clases.controllers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.example.clases.dao.IUsuarioDao;
 import com.example.clases.entity.IngresoAP;
 import com.example.clases.entity.Usuario;
 import com.example.clases.service.IngresoAPService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
+import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * Controlador para gestión de ingresos al Centro de Datos
@@ -52,9 +38,6 @@ public class IngresoController {
 
     @Autowired
     private IngresoAPService ingresoAPService;
-    
-    @Autowired
-    private IUsuarioDao usuarioDao;
 
     @GetMapping(value = {"/", ""})
     public String redirigirAForm() {
@@ -64,16 +47,10 @@ public class IngresoController {
     @GetMapping("/ap")
     public String mostrarFormularioIngreso(@RequestParam(name="nombre", required=false) String nombre,
                                           @RequestParam(name="rut", required=false) String rut,
-                                          Authentication authentication,
-                                          Model model) {        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
+                                          HttpSession session,
+                                          Model model) {
         
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -114,16 +91,10 @@ public class IngresoController {
                                 @RequestParam(name="salaIngresa", required=false) String salaIngresa,
                                 @RequestParam(name="rackIngresa", required=false) String rackIngresa,
                                 @RequestParam(name="actividadRemedy", required=false) String actividadRemedy,
-                                Authentication authentication,
-                                Model model){        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
+                                HttpSession session,
+                                Model model){
         
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -270,15 +241,8 @@ public class IngresoController {
     public String listarIngresos(@RequestParam(required = false) String fechaInicio,
                                  @RequestParam(required = false) String fechaFin,
                                  @RequestParam(required = false, defaultValue = "false") boolean soloActivos,
-                                 Authentication authentication, Model model) {        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
-        
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+                                 HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -325,15 +289,8 @@ public class IngresoController {
 
     // READ - Ver detalle de un ingreso específico
     @GetMapping("/ap/read/{id}")
-    public String verIngreso(@PathVariable Long id, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
-        
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+    public String verIngreso(@PathVariable Long id, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -356,15 +313,8 @@ public class IngresoController {
 
     // UPDATE - Mostrar formulario de edición
     @GetMapping("/ap/update/{id}")
-    public String mostrarFormularioEdicion(@PathVariable Long id, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
-        
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+    public String mostrarFormularioEdicion(@PathVariable Long id, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -390,16 +340,9 @@ public class IngresoController {
     public String actualizarIngreso(@PathVariable Long id, 
                                   @ModelAttribute IngresoAP ingresoForm,
                                   BindingResult bindingResult,
-                                  Authentication authentication,
-                                  RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
-        
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -484,16 +427,9 @@ public class IngresoController {
     // ACCIÓN - Marcar segunda supervisión realizada
     @PostMapping("/ap/marcar-segunda-supervision/{id}")
     public String marcarSegundaSupervision(@PathVariable Long id, 
-                                          Authentication authentication, 
-                                          RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
-        
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+                                          HttpSession session, 
+                                          RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -534,16 +470,9 @@ public class IngresoController {
     // ACCIÓN - Cerrar registro (finalizar ingreso)
     @PostMapping("/ap/cerrar/{id}")
     public String cerrarIngreso(@PathVariable Long id, 
-                               Authentication authentication, 
-                               RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
-        
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+                               HttpSession session, 
+                               RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -583,15 +512,8 @@ public class IngresoController {
 
     // DELETE - Mostrar confirmación de eliminación
     @GetMapping("/ap/delete/{id}")
-    public String mostrarConfirmacionEliminacion(@PathVariable Long id, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
-        
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+    public String mostrarConfirmacionEliminacion(@PathVariable Long id, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -620,16 +542,9 @@ public class IngresoController {
     @PostMapping("/ap/delete/{id}")
     public String eliminarIngreso(@PathVariable Long id, 
                                 @RequestParam(required = false) String razonEliminacion,
-                                Authentication authentication, 
-                                RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaci�n con Spring Security
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
-        
-        // Obtener usuario autenticado desde la base de datos
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+                                HttpSession session, 
+                                RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return "redirect:/login";
         }
@@ -665,16 +580,9 @@ public class IngresoController {
     // Buscar técnico por RUT para reutilizar información
     @GetMapping("/ap/buscar-tecnico")
     @ResponseBody
-    public Map<String, Object> buscarTecnicoPorRut(@RequestParam String rut, Authentication authentication) {
+    public Map<String, Object> buscarTecnicoPorRut(@RequestParam String rut, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
-        
-        if (authentication == null || !authentication.isAuthenticated()) {
-            response.put("error", "Sesión expirada");
-            return response;
-        }
-        
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             response.put("error", "Sesión expirada");
             return response;
@@ -707,14 +615,8 @@ public class IngresoController {
     public ResponseEntity<byte[]> exportarIngresos(@RequestParam(required = false) String fechaInicio,
                                                   @RequestParam(required = false) String fechaFin,
                                                   @RequestParam(required = false, defaultValue = "false") boolean soloActivos,
-                                                  Authentication authentication) {
-        
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).build();
-        }
-        
-        String email = authentication.getName();
-        Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
+                                                  HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) {
             return ResponseEntity.status(401).build();
         }

@@ -26,4 +26,11 @@ public interface GestionAccesoService {
     Long contarGestionesVigentes(LocalDate fecha, String sitio);
     Long contarTicketsUnicosDelDia(LocalDate fecha, String sitio);
     List<GestionAcceso> listarGestionesVigentes(LocalDate fecha, String sitio);
+    
+    // Nuevas estadísticas para dashboard cliente
+    Long contarTicketsPorEstadoYFecha(String estadoAprobacion, LocalDate fecha, String sitio);
+    Long contarTicketsPorEstado(String estadoAprobacion, String sitio);
+    Long contarTicketsRechazadosHoy(LocalDate fecha, String sitio);
+    Long contarTicketsDevueltosHoy(LocalDate fecha, String sitio);
+    Long contarTicketsPendientesCierre(String sitio);
 }
