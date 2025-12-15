@@ -1,0 +1,63 @@
+# Archivos y directorios a ignorar en el build de Docker
+
+# Directorios de build
+target/
+build/
+out/
+
+# Archivos de configuración de IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales
+*.log
+*.tmp
+*.swp
+*.bak
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Node modules (si hay frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Archivos de documentación
+README.md
+HELP.md
+*.md
+docs/
+
+# Archivos de test
+src/test/
+coverage/
+
+# Scripts locales
+*.ps1
+*.sh
+!mvnw
+
+# Archivos de configuración local
+.env
+.env.local
+application-local.properties
+
+# Archivos de base de datos local
+*.db
+*.h2.db
+data/
