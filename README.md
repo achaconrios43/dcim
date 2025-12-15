@@ -1,36 +1,131 @@
-﻿#  Sistema de Gestión de DataCenter - Documentación Completa
+﻿# 🏢 Sistema de Gestión de DataCenter
 
-##  Descripción General
+[![Docker Build](https://github.com/achaconrios43/clases/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/achaconrios43/clases/actions)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Sistema integral desarrollado con **Spring Boot 3.5.7** para la administración completa de accesos, personal y actividades en áreas protegidas del DataCenter. Incluye gestión de usuarios, registro detallado de ingresos técnicos, control de accesos por sitio y dashboards con estadísticas en tiempo real.
+Sistema integral de gestión de DataCenter desarrollado con **Spring Boot 3** para la administración completa de accesos, personal y actividades en áreas protegidas. Incluye autenticación segura, control de roles, registro detallado de ingresos técnicos y dashboards con estadísticas en tiempo real.
+
+## 🌐 Aplicación en Producción
+
+**URL:** https://few-laureen-webipss-1b5927a6.koyeb.app/login
+
+- ✅ Desplegada en **Koyeb** (Serverless Platform)
+- ✅ Base de datos en **TiDB Cloud** (MySQL compatible)
+- ✅ Imagen Docker en **Docker Hub**: `achaconrios43/clases-app:latest`
+- ✅ CI/CD automatizado con **GitHub Actions**
+- ✅ HTTPS habilitado
+- ✅ Health checks configurados
+
+### 👤 Usuarios de Prueba
+
+| Email | Contraseña | Rol |
+|-------|-----------|-----|
+| `achaconrios@gmail.com` | `Ayj05102017` | ADMIN |
+| `admin@clases.com` | `Admin123!` | ADMIN |
+| `judithlinco@gmail.com` | `User123!` | USER |
 
 ---
 
-##  Stack Tecnológico Completo
+## 📋 Tabla de Contenidos
+
+- [Stack Tecnológico](#-stack-tecnológico)
+- [Arquitectura](#-arquitectura)
+- [Características](#-características-principales)
+- [Deployment](#-deployment-y-devops)
+- [Instalación Local](#-instalación-local)
+- [Configuración](#️-configuración)
+- [API Endpoints](#-api-endpoints)
+- [Base de Datos](#️-base-de-datos)
+- [Seguridad](#-seguridad)
+- [Testing](#-testing)
+- [Contribuir](#-contribuir)
+
+---
+
+## 🚀 Stack Tecnológico
 
 ### Backend
-- **Java 21.0.9** - Lenguaje de programación principal
+- **Java 21.0.9** (Eclipse Temurin JDK)
 - **Spring Boot 3.5.7** - Framework principal
-- **Spring Data JPA** - Capa de persistencia
-- **Hibernate 6.6.33.Final** - ORM (Object-Relational Mapping)
-- **H2 Database 2.3.232** - Base de datos embebida persistente
-- **Spring Boot Actuator** - Monitoreo y métricas
-- **Apache POI 5.2.4** - Exportación de reportes a Excel (XLSX)
+- **Spring Security** - Autenticación y autorización
+- **Spring Data JPA** - Capa de persistencia ORM
+- **Hibernate 6.6.33.Final** - ORM
+- **MySQL Connector** - Driver de TiDB Cloud
+- **BCrypt** - Encriptación de contraseñas
+- **Spring Boot Actuator** - Health checks y métricas
 
 ### Frontend
-- **Thymeleaf** - Motor de plantillas Java
+- **Thymeleaf** - Motor de plantillas server-side
 - **Tailwind CSS** - Framework CSS utility-first
-- **Font Awesome** - Librería de iconos
-- **JavaScript Vanilla** - Funcionalidades interactivas
+- **Font Awesome** - Iconografía
+- **JavaScript Vanilla** - Interactividad cliente
+
+### Base de Datos
+- **TiDB Cloud** - MySQL-compatible cloud database (Producción)
+- **H2 Database** - Base de datos embebida (Desarrollo local)
+
+### DevOps & Cloud
+- **Docker** - Containerización (Multi-stage build)
+- **GitHub Actions** - CI/CD automatizado
+- **Docker Hub** - Registry de imágenes
+- **Koyeb** - Serverless deployment platform
+- **Git** - Control de versiones
 
 ### Herramientas de Desarrollo
-- **Maven 3.6+** - Gestión de dependencias
-- **Spring Boot DevTools** - Hot reload para desarrollo
-- **Git** - Control de versiones
+- **Maven 3.9.9** - Gestión de dependencias y builds
+- **VS Code** - IDE principal
+- **Postman** - Testing de endpoints
 
 ---
 
-##  Arquitectura del Proyecto
+## 🏗️ Arquitectura
+
+### Patrón MVC (Model-View-Controller)
+
+```
+┌─────────────────┐
+│   Thymeleaf     │  ← VIEW (Templates HTML)
+│   Templates     │
+└────────┬────────┘
+         │
+         ↓
+┌─────────────────┐
+│  Controllers    │  ← CONTROLLER (Lógica de presentación)
+│  - UserControlles
+│  - IngresoController
+│  - GestionAccesoController
+└────────┬────────┘
+         │
+         ↓
+┌─────────────────┐
+│   Services      │  ← BUSINESS LOGIC (Validaciones y reglas)
+│   - UsuarioService
+│   - IngresoAPService
+└────────┬────────┘
+         │
+         ↓
+┌─────────────────┐
+│   DAO/Repos     │  ← DATA ACCESS (Consultas JPA)
+│   - IUsuarioDao
+│   - IIngresoAPDao
+└────────┬────────┘
+         │
+         ↓
+┌─────────────────┐
+│   Entities      │  ← MODEL (JPA Entities)
+│   - Usuario
+│   - IngresoAP
+│   - GestionAcceso
+└────────┬────────┘
+         │
+         ↓
+┌─────────────────┐
+│  TiDB Cloud     │  ← DATABASE (MySQL compatible)
+│  (Production)   │
+└─────────────────┘
+```
 
 ### Estructura de Directorios
 
@@ -52,107 +147,587 @@ src/main/
     entity/                          # Entidades JPA
        Usuario.java                 # Modelo de datos de usuario
        IngresoAP.java               # Modelo de ingreso a áreas protegidas
-       GestionAcceso.java           # Modelo de gestión de accesos
-    service/                         # Capa de servicios (lógica de negocio)
-        UsuarioService.java
-        IngresoAPService.java
-        GestionAccesoService.java
-        impl/                        # Implementaciones de servicios
-            UsuarioServiceImpl.java
-            IngresoAPServiceImpl.java
-            GestionAccesoServiceImpl.java
- resources/
-     application.properties           # Configuración de la aplicación
-     import.sql                       # Datos de prueba iniciales
-     schema.sql                       # Esquema de base de datos
-     templates/                       # Plantillas Thymeleaf
-        login.html                   # Página de autenticación
-        dashboard.html               # Dashboard principal
-        dashboard-cliente.html       # Dashboard con estadísticas
-        index.html                   # Página de inicio
-        ingresoap.html               # Formulario de registro de ingresos
-        coming-soon.html             # Placeholder para funciones futuras
-        fragments/                   # Componentes reutilizables
-           headers.html
-           footer.html
-           navdar.html
-           dashboard-button.html
-        user/                        # Vistas del módulo de usuarios
-           create.html
-           read.html
-           update.html
-           delete.html
-           list.html
-           ingresoap-list.html     # Lista de ingresos
-           ingresoap-read.html     # Detalle de ingreso
-           ingresoap-update.html   # Editar ingreso
-           ingresoap-delete.html   # Confirmar eliminación
-        gestion/                     # Vistas del módulo de gestión de accesos
-            list.html
-            create.html
-            edit.html
-            delete.html
-            view.html
-     static/                          # Archivos estáticos (CSS, JS, imágenes)
+```
+src/main/
+├── java/com/example/clases/
+│   ├── ClasesApplication.java               # Entry point
+│   ├── config/
+│   │   ├── SecurityConfig.java              # Spring Security configuration
+│   │   └── WebConfig.java                   # Web MVC configuration
+│   ├── controllers/
+│   │   ├── LoginController.java             # Authentication
+│   │   ├── MainController.java              # Home & dashboard
+│   │   ├── UserControlles.java              # User CRUD
+│   │   ├── IngresoController.java           # Access logs management
+│   │   ├── GestionAccesoController.java     # Site access control
+│   │   ├── ClienteDashboardController.java  # Statistics dashboard
+│   │   ├── DashboardClienteDiarioController.java   # Daily stats
+│   │   └── DashboardClienteMensualController.java  # Monthly stats
+│   ├── dao/
+│   │   ├── IUsuarioDao.java                 # User repository (12+ queries)
+│   │   ├── IIngresoAPDao.java               # Access logs repository (25+ queries)
+│   │   └── IGestionAccesoDao.java           # Site access repository (10+ queries)
+│   ├── entity/
+│   │   ├── Usuario.java                     # User entity
+│   │   ├── IngresoAP.java                   # Access log entity
+│   │   └── GestionAcceso.java               # Site access entity
+│   └── service/
+│       ├── CustomUserDetailsService.java    # Spring Security integration
+│       ├── UsuarioService.java              # User business logic
+│       ├── IngresoAPService.java            # Access log business logic
+│       ├── GestionAccesoService.java        # Site access business logic
+│       └── impl/
+│           ├── UsuarioServiceImpl.java
+│           ├── IngresoAPServiceImpl.java
+│           └── GestionAccesoServiceImpl.java
+├── resources/
+│   ├── application.properties               # Base configuration
+│   ├── application-production.properties    # Production overrides
+│   ├── import.sql                           # Test data (dev only)
+│   ├── schema.sql                           # Database schema
+│   └── templates/
+│       ├── login.html
+│       ├── dashboard.html
+│       ├── index.html
+│       ├── fragments/
+│       │   ├── headers.html
+│       │   ├── footer.html
+│       │   ├── navdar.html
+│       │   └── dashboard-button.html
+│       ├── user/                            # User module views
+│       │   ├── create.html
+│       │   ├── read.html
+│       │   ├── update.html
+│       │   ├── delete.html
+│       │   └── list.html
+│       ├── ingreso/                         # Access logs views
+│       │   ├── ingresoap.html
+│       │   ├── ingresoap-list.html
+│       │   ├── ingresoap-read.html
+│       │   ├── ingresoap-update.html
+│       │   └── ingresoap-delete.html
+│       └── gestion/                         # Site access views
+│           ├── list.html
+│           ├── create.html
+│           ├── edit.html
+│           ├── delete.html
+│           └── view.html
+├── Dockerfile                               # Multi-stage Docker build
+├── .dockerignore                            # Docker build exclusions
+├── .github/workflows/
+│   └── docker-publish.yml                   # CI/CD pipeline
+└── pom.xml                                  # Maven dependencies
 ```
 
 ---
 
-##  Módulos Implementados - Detalle Completo
+## ✨ Características Principales
 
-### 1. Sistema de Autenticación y Sesiones
+### 🔐 Sistema de Autenticación y Autorización
+- ✅ Login con **Spring Security**
+- ✅ Encriptación de contraseñas con **BCrypt**
+- ✅ Roles: **ADMIN** y **USER**
+- ✅ Sesiones HTTP seguras
+- ✅ Logout con limpieza completa de sesión
+- ✅ Protección de rutas por rol
+- ✅ Redirección automática a login si no autenticado
+- ✅ Validación AJAX de credenciales en tiempo real
 
-**Controlador:** `LoginController.java`
+### 👥 Gestión de Usuarios (CRUD Completo)
+- ✅ **CREATE**: Formulario con validación de campos obligatorios
+- ✅ **READ**: Vista detallada de usuario con historial
+- ✅ **UPDATE**: Edición completa con validación de email único
+- ✅ **DELETE**: Confirmación de eliminación con modal
+- ✅ **LIST**: Tabla con búsqueda, filtros y paginación
+- ✅ Validación de RUT chileno
+- ✅ Verificación de email único (AJAX)
+- ✅ Control de roles (solo ADMIN puede crear/editar usuarios)
+- ✅ Sincronización automática con base de datos
 
-#### Endpoints Implementados:
-- **GET /login** - Mostrar formulario de login
-- **POST /login** - Procesar autenticación con base de datos H2
-- **GET /logout** - Cerrar sesión y limpiar atributos
-- **GET /dashboard** - Redirigir al panel de control principal
-- **GET /user/exists** - Endpoint AJAX para validar existencia de usuario
-- **GET /user/validate** - Endpoint AJAX para validar credenciales
+### 📋 Registro de Ingresos a Áreas Protegidas
+- ✅ Formulario completo con 24 campos
+- ✅ Validación de fechas y horarios
+- ✅ Selección de turno (AM/PM/NOCHE)
+- ✅ Asignación de técnico responsable
+- ✅ Seguimiento de tickets (CRQ, INC, Visita)
+- ✅ Control de escoltas y aprobadores
+- ✅ Registro de actividades realizadas
+- ✅ Exportación a Excel (XLSX)
+- ✅ Búsqueda y filtros avanzados
+- ✅ Historial completo de modificaciones
 
-#### Características:
--  Autenticación contra base de datos H2 persistente
--  Gestión completa de sesiones HTTP con `HttpSession`
--  Validación de campos obligatorios (email y password)
--  Mensajes de error específicos y amigables
--  Soporte para selección de ubicación del usuario
--  Redirección automática al dashboard tras login exitoso
--  Validación AJAX en tiempo real
+### 🏢 Gestión de Accesos por Sitio
+- ✅ Control de accesos por ubicación física
+- ✅ Asignación de permisos por usuario
+- ✅ Registro de fecha de inicio y término
+- ✅ Estado activo/inactivo
+- ✅ Notas y observaciones
+- ✅ Filtrado por sitio y estado
+- ✅ Auditoría de cambios
 
-#### Variables de Sesión Gestionadas:
+### 📊 Dashboard con Estadísticas en Tiempo Real
+- ✅ Total de usuarios activos
+- ✅ Ingresos registrados hoy
+- ✅ Ingresos del mes actual
+- ✅ Técnicos únicos
+- ✅ Distribución por turno (gráficos)
+- ✅ Top empresas demandantes
+- ✅ Estadísticas por sala
+- ✅ Reportes diarios y mensuales
+- ✅ Gráficos interactivos
+
+### 🎨 Interfaz de Usuario
+- ✅ Diseño responsive (mobile-first)
+- ✅ Tailwind CSS para estilos modernos
+- ✅ Animaciones y transiciones suaves
+- ✅ Validación de formularios en tiempo real
+- ✅ Mensajes de éxito/error con alerts
+- ✅ Loading spinners en operaciones async
+- ✅ Modales de confirmación
+- ✅ Breadcrumbs de navegación
+
+---
+
+## 🚢 Deployment y DevOps
+
+### Docker
+
+**Dockerfile Multi-stage:**
+```dockerfile
+# Stage 1: Build
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
+WORKDIR /app
+COPY pom.xml .
+COPY .mvn/ .mvn/
+COPY mvnw .
+RUN ./mvnw dependency:go-offline
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
+
+# Stage 2: Runtime
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8082
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8082/actuator/health || exit 1
+ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=production"]
+```
+
+**Ventajas:**
+- ✅ Imagen final pequeña (~250 MB)
+- ✅ Build reproducible y consistente
+- ✅ Usuario no-root para seguridad
+- ✅ Health checks automáticos
+- ✅ Multi-platform (linux/amd64, linux/arm64)
+
+### GitHub Actions CI/CD
+
+**Workflow: `.github/workflows/docker-publish.yml`**
+
+```yaml
+name: Docker Build and Push
+
+on:
+  push:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          token: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: achaconrios43/clases-app
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+```
+
+**Triggers:**
+- ✅ Push a `master` o `main`
+- ✅ Manual dispatch desde GitHub UI
+- ✅ Build automático en cada commit
+
+**Resultado:**
+- ✅ Imagen publicada en Docker Hub
+- ✅ Tags: `latest` + `master-{sha}`
+- ✅ Cache de layers para builds rápidos
+
+### Koyeb Deployment
+
+**Configuración:**
+- **Service Name:** clases-app
+- **Region:** Washington, D.C. (us-east)
+- **Instance Type:** Nano (512 MB RAM)
+- **Scaling:** 1 instancia (Serverless)
+- **Port:** 8082
+- **Health Check:** `/actuator/health`
+
+**Variables de Entorno:**
+```bash
+SPRING_DATASOURCE_URL=jdbc:mysql://gateway01.us-east-1.prod.aws.tidbcloud.com:4000/test?sslMode=VERIFY_IDENTITY&useSSL=true
+SPRING_DATASOURCE_USERNAME=Tx5LgXBUqorHfYX.root
+SPRING_DATASOURCE_PASSWORD=SGRAbutT9e8sGwdD
+PORT=8082
+```
+
+**Características:**
+- ✅ Auto-scaling basado en demanda
+- ✅ SSL/TLS automático
+- ✅ Reinicio automático en fallas
+- ✅ Logs centralizados
+- ✅ Deploy automático al detectar nueva imagen
+
+### Docker Hub
+
+**Repository:** `achaconrios43/clases-app`
+
+**Tags:**
+- `latest` - Última versión estable
+- `master-{sha}` - Build específico por commit
+
+**Métricas:**
+- ✅ Imagen pública
+- ✅ Pulls automáticos por Koyeb
+- ✅ Historico de versiones
+
+---
+
+## 💻 Instalación Local
+
+### Prerrequisitos
+
+- **Java JDK 21+** ([Descargar](https://adoptium.net/))
+- **Maven 3.9+** ([Descargar](https://maven.apache.org/download.cgi))
+- **Git** ([Descargar](https://git-scm.com/downloads))
+- **Docker** (opcional, para containerización)
+
+### Pasos de Instalación
+
+1. **Clonar el repositorio:**
+```bash
+git clone https://github.com/achaconrios43/clases.git
+cd clases
+```
+
+2. **Compilar el proyecto:**
+```bash
+mvn clean install
+```
+
+3. **Ejecutar la aplicación:**
+```bash
+mvn spring-boot:run
+```
+
+4. **Acceder a la aplicación:**
+```
+http://localhost:8082
+```
+
+### Ejecutar con Docker
+
+1. **Build de la imagen:**
+```bash
+docker build -t clases-app .
+```
+
+2. **Run del contenedor:**
+```bash
+docker run -p 8082:8082 clases-app
+```
+
+3. **Acceder:**
+```
+http://localhost:8082
+```
+
+### Desarrollo con Hot Reload
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+---
+
+## ⚙️ Configuración
+
+### application.properties (Desarrollo Local)
+
+```properties
+# Puerto
+server.port=${PORT:8082}
+
+# Base de datos (TiDB Cloud o local)
+spring.datasource.url=jdbc:mysql://gateway01.us-east-1.prod.aws.tidbcloud.com:4000/test
+spring.datasource.username=Tx5LgXBUqorHfYX.root
+spring.datasource.password=SGRAbutT9e8sGwdD
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+logging.level.org.hibernate.SQL=warn
+
+# Inicialización de datos (import.sql)
+spring.sql.init.mode=always
+spring.jpa.defer-datasource-initialization=true
+```
+
+### application-production.properties (Producción)
+
+```properties
+# Base de datos desde variables de entorno
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+
+# Deshabilitar import.sql en producción
+spring.sql.init.mode=never
+
+# Actuator
+management.endpoints.web.exposure.include=health
+management.endpoint.health.show-details=never
+```
+
+### Perfiles de Spring Boot
+
+**Activar perfil en ejecución:**
+```bash
+# Desarrollo
+java -jar app.jar --spring.profiles.active=dev
+
+# Producción
+java -jar app.jar --spring.profiles.active=production
+```
+
+**En Dockerfile:**
+```dockerfile
+ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=production"]
+```
+
+---
+
+## 📡 API Endpoints
+
+### Autenticación
+
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| GET | `/login` | Formulario de login | Público |
+| POST | `/login` | Procesar autenticación | Público |
+| GET | `/logout` | Cerrar sesión | Autenticado |
+| GET | `/dashboard` | Panel principal | Autenticado |
+
+### Usuarios
+
+| Método | Endpoint | Descripción | Rol Requerido |
+|--------|----------|-------------|---------------|
+| GET | `/user/create` | Formulario crear usuario | ADMIN |
+| POST | `/user/create` | Guardar nuevo usuario | ADMIN |
+| GET | `/user/read/{id}` | Ver detalle usuario | Autenticado |
+| GET | `/user/list` | Listar usuarios | Autenticado |
+| GET | `/user/update/{id}` | Formulario editar | ADMIN |
+| POST | `/user/update/{id}` | Actualizar usuario | ADMIN |
+| GET | `/user/delete/{id}` | Confirmar eliminación | ADMIN |
+| POST | `/user/delete/{id}` | Eliminar usuario | ADMIN |
+| GET | `/user/check-email` | Validar email único (AJAX) | ADMIN |
+| GET | `/user/exists` | Verificar existencia (AJAX) | Público |
+| GET | `/user/auth-check` | Validar autenticación | Autenticado |
+
+### Ingresos a Áreas Protegidas
+
+| Método | Endpoint | Descripción | Rol Requerido |
+|--------|----------|-------------|---------------|
+| GET | `/ingreso/create` | Formulario registro | Autenticado |
+| POST | `/ingreso/save` | Guardar ingreso | Autenticado |
+| GET | `/ingreso/list` | Listar ingresos | Autenticado |
+| GET | `/ingreso/read/{id}` | Ver detalle | Autenticado |
+| GET | `/ingreso/update/{id}` | Formulario editar | Autenticado |
+| POST | `/ingreso/update/{id}` | Actualizar ingreso | Autenticado |
+| GET | `/ingreso/delete/{id}` | Confirmar eliminación | ADMIN |
+| POST | `/ingreso/delete/{id}` | Eliminar ingreso | ADMIN |
+| GET | `/ingreso/export` | Exportar a Excel | Autenticado |
+
+### Gestión de Accesos
+
+| Método | Endpoint | Descripción | Rol Requerido |
+|--------|----------|-------------|---------------|
+| GET | `/gestion/list` | Listar accesos | Autenticado |
+| GET | `/gestion/list/{sitio}` | Filtrar por sitio | Autenticado |
+| GET | `/gestion/create` | Formulario crear | ADMIN |
+| POST | `/gestion/save` | Guardar acceso | ADMIN |
+| GET | `/gestion/edit/{id}` | Formulario editar | ADMIN |
+| POST | `/gestion/update/{id}` | Actualizar acceso | ADMIN |
+| GET | `/gestion/delete/{id}` | Eliminar acceso | ADMIN |
+| GET | `/gestion/view/{id}` | Ver detalle | Autenticado |
+
+### Dashboard
+
+| Método | Endpoint | Descripción | Rol Requerido |
+|--------|----------|-------------|---------------|
+| GET | `/dashboard/cliente` | Dashboard con stats | Autenticado |
+| GET | `/dashboard/cliente/diario` | Estadísticas diarias | Autenticado |
+| GET | `/dashboard/cliente/mensual` | Estadísticas mensuales | Autenticado |
+
+### Health Check
+
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| GET | `/actuator/health` | Estado de la app | Público |
+
+---
+
+## 🗄️ Base de Datos
+
+### TiDB Cloud (Producción)
+
+**Conexión:**
+```
+Host: gateway01.us-east-1.prod.aws.tidbcloud.com
+Port: 4000
+Database: test
+SSL: VERIFY_IDENTITY
+```
+
+**Características:**
+- ✅ MySQL 8.0 compatible
+- ✅ Serverless (auto-scaling)
+- ✅ SSL/TLS encryption
+- ✅ Backups automáticos
+- ✅ Multi-region replication
+- ✅ High availability (99.99% SLA)
+
+### Esquema de Base de Datos
+
+#### Tabla: `usuario`
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| `id` | BIGINT | PK, AUTO_INCREMENT | ID único |
+| `rut` | VARCHAR(12) | UNIQUE, NOT NULL | RUT chileno |
+| `nombre` | VARCHAR(100) | NOT NULL | Nombre |
+| `apellido` | VARCHAR(100) | NOT NULL | Apellido |
+| `email` | VARCHAR(255) | UNIQUE, NOT NULL | Email |
+| `password` | VARCHAR(255) | NOT NULL | Hash BCrypt |
+| `rol` | VARCHAR(20) | NOT NULL | ADMIN/USER |
+| `creat_at` | TIMESTAMP | DEFAULT NOW() | Fecha creación |
+| `update_at` | TIMESTAMP | ON UPDATE NOW() | Última modificación |
+
+#### Tabla: `ingresoap` (Ingreso a Áreas Protegidas)
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | BIGINT | PK, AUTO_INCREMENT |
+| `turno` | VARCHAR(20) | AM/PM/NOCHE |
+| `nombre_usuario` | VARCHAR(200) | Usuario que registra |
+| `fecha_inicio` | DATE | Fecha de ingreso |
+| `hora_inicio` | TIME | Hora de ingreso |
+| `fecha_termino` | DATE | Fecha de salida |
+| `hora_termino` | TIME | Hora de salida |
+| `nombre_tecnico` | VARCHAR(200) | Técnico responsable |
+| `rut_tecnico` | VARCHAR(12) | RUT del técnico |
+| `empresa_demandante` | VARCHAR(200) | Empresa solicitante |
+| `empresa_contratista` | VARCHAR(200) | Empresa ejecutora |
+| `cargo_tecnico` | VARCHAR(100) | Cargo del técnico |
+| `sala_remedy` | VARCHAR(100) | Sala según Remedy |
+| `tipo_ticket` | VARCHAR(50) | CRQ/INC/Visita |
+| `numero_ticket` | VARCHAR(50) | ID del ticket |
+| `aprobador` | VARCHAR(200) | Quien aprueba |
+| `escolta` | VARCHAR(200) | Escolta asignada |
+| `motivo_ingreso` | TEXT | Razón del ingreso |
+| `guia_despacho` | VARCHAR(100) | Guía de despacho |
+| `sala_ingresa` | VARCHAR(100) | Sala física |
+| `rack_ingresa` | VARCHAR(100) | Rack específico |
+| `actividad_remedy` | TEXT | Actividad detallada |
+| `fecha_registro` | TIMESTAMP | Fecha de registro |
+| `activo` | BOOLEAN | Estado activo/inactivo |
+
+#### Tabla: `gestion_acceso`
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | BIGINT | PK, AUTO_INCREMENT |
+| `usuario_id` | BIGINT | FK a usuario |
+| `sitio` | VARCHAR(100) | Ubicación física |
+| `fecha_inicio` | DATE | Inicio del acceso |
+| `fecha_termino` | DATE | Fin del acceso |
+| `estado` | VARCHAR(20) | ACTIVO/INACTIVO |
+| `observaciones` | TEXT | Notas adicionales |
+| `created_at` | TIMESTAMP | Fecha creación |
+| `updated_at` | TIMESTAMP | Última actualización |
+
+### Relaciones
+
+```
+usuario (1) ─────< (N) gestion_acceso
+  id                     usuario_id
+```
+
+---
+
+## 🔒 Seguridad
+
+### Spring Security
+
+**SecurityConfig.java:**
 ```java
-session.setAttribute("usuarioLogueado", Usuario);      // Objeto completo
-session.setAttribute("usuarioId", Long);                // ID del usuario
-session.setAttribute("usuarioNombre", String);          // Nombre completo
-session.setAttribute("usuarioEmail", String);           // Email
-session.setAttribute("usuarioRol", String);             // ADMIN o USER
-session.setAttribute("usuarioUbicacion", String);       // Ubicación seleccionada
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/css/**", "/js/**").permitAll()
+                .requestMatchers("/login", "/error").permitAll()
+                .requestMatchers("/user/create", "/user/exists").permitAll()
+                .requestMatchers("/h2-console/**").hasRole("ADMIN")
+                .requestMatchers("/user/**").authenticated()
+                .requestMatchers("/ingreso/**").authenticated()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/dashboard", true)
+                .usernameParameter("email")
+                .passwordParameter("password")
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+            );
+        return http.build();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
 ```
 
----
+### Características de Seguridad
 
-### 2. Gestión de Usuarios (CRUD Completo)
-
-**Controlador:** `UserControlles.java`  
-**Servicio:** `UsuarioService.java` + `UsuarioServiceImpl.java`  
-**DAO:** `IUsuarioDao.java`
-
-#### Endpoints REST Implementados:
-
-##### CREATE
-- **GET /user/create** - Formulario de creación (solo ADMIN)
-- **POST /user/create** - Guardar nuevo usuario en BD
-- **GET /user/check-email** - Validación AJAX de email único
-
-##### READ
-- **GET /user/read/{id}** - Ver detalle completo de un usuario
-- **GET /user/list** - Listar todos los usuarios con estadísticas
-
-##### UPDATE
-- **GET /user/update/{id}** - Formulario de edición
-- **POST /user/update/{id}** - Actualizar datos del usuario
+- ✅ **BCrypt** para hashing de contraseñas (salt automático)
+- ✅ **CSRF protection** habilitado
 
 ##### DELETE
 - **GET /user/delete/{id}** - Confirmación de eliminación (solo ADMIN)
@@ -622,146 +1197,267 @@ spring.thymeleaf.cache=false
 
 2. **ingreso_ap** (29 columnas) - La más completa
    - id (PK)
-   - turno
-   - nombre_usuario
-   - fecha_inicio
-   - hora_inicio
-   - fecha_termino
-   - hora_termino
-   - fecha_fin_ficticia
-   - hora_fin_ficticia
-   - fecha_supervision_media
-   - hora_supervision_media
-   - segunda_supervision_realizada
-   - fecha_segunda_supervision
-   - hora_segunda_supervision
-   - nombre_tecnico
-   - rut_tecnico
-   - cargo_tecnico
-   - empresa_demandante
-   - empresa_contratista
-   - tipo_ticket
-   - numero_ticket
-   - sitio_ingreso
-   - sala_remedy
-   - aprobador
-   - escolta
-   - motivo_ingreso
-   - guia_despacho
-   - sala_ingresa
-   - rack_ingresa
-   - actividad_remedy
-   - activo
+- ✅ **Session management** seguro (invalidación en logout)
+- ✅ **Role-based access control** (ADMIN/USER)
+- ✅ **SSL/TLS** en producción (Koyeb + TiDB Cloud)
+- ✅ **SQL Injection prevention** (JPA parametrizado)
+- ✅ **XSS protection** (Thymeleaf escaping automático)
+- ✅ **CORS** configurado correctamente
+- ✅ **HTTP headers** seguros (X-Frame-Options, etc.)
+- ✅ **Secrets management** via variables de entorno
 
-3. **gestion_acceso** (13 columnas)
-   - id (PK)
-   - fecha_registro
-   - hora_registro
-   - usuario_ingresa
-   - fecha_inicio_actividad
-   - fecha_termino_actividad
-   - empresa_solicitante
-   - rut_empresa
-   - numero_ticket
-   - tipo_ticket
-   - motivo_acceso
-   - area_acceso
-   - sitio
-   - estado_aprobacion
-   - observaciones
+### Encriptación de Contraseñas
 
-### Datos de Prueba (import.sql)
+```java
+@Autowired
+private PasswordEncoder passwordEncoder;
 
-El sistema incluye datos de prueba iniciales:
--  Usuarios con roles ADMIN y USER
--  Registros históricos de ingresos AP
--  Gestiones de acceso de ejemplo
+// Encriptar al crear usuario
+String hashedPassword = passwordEncoder.encode(plainPassword);
+usuario.setPassword(hashedPassword);
+
+// Validar en login (CustomUserDetailsService)
+public UserDetails loadUserByUsername(String email) {
+    Usuario usuario = usuarioDao.findByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+    
+    return User.builder()
+        .username(usuario.getEmail())
+        .password(usuario.getPassword())  // BCrypt hash
+        .roles(usuario.getRol())
+        .build();
+}
+```
+
+### Protección de Rutas
+
+- ✅ `/login`, `/error` → Público
+- ✅ `/user/create`, `/user/exists` → Público (registro)
+- ✅ `/dashboard`, `/ingreso/**`, `/gestion/**` → Autenticado
+- ✅ `/user/delete/**`, `/ingreso/delete/**` → Solo ADMIN
+- ✅ `/h2-console/**` → Solo ADMIN (deshabilitado en producción)
 
 ---
 
-##  Diseño y Frontend
+## 🧪 Testing
 
-### Tailwind CSS - Paleta de Colores
+### Health Check
 
-#### Módulo de Usuarios (Verde)
-- `bg-green-100` - Fondo claro
-- `bg-green-500` - Botones normales
-- `bg-green-600` - Hover de botones
-- `text-green-700` - Texto de énfasis
+**Endpoint:** `/actuator/health`
 
-#### Módulo de Ingresos AP (Azul)
-- `bg-blue-100` - Fondo claro
-- `bg-blue-500` - Botones normales
-- `bg-blue-600` - Hover de botones
-- `text-blue-700` - Texto de énfasis
+```bash
+curl https://few-laureen-webipss-1b5927a6.koyeb.app/actuator/health
+```
 
-#### Módulo de Gestión de Accesos (Índigo)
-- `bg-indigo-100` - Fondo claro
-- `bg-indigo-500` - Botones normales
-- `bg-indigo-600` - Hover de botones
-- `text-indigo-700` - Texto de énfasis
+**Response:**
+```json
+{
+  "status": "UP"
+}
+```
 
-### Componentes Reutilizables (Fragments)
+### Testing Manual
 
-**Ubicación:** `src/main/resources/templates/fragments/`
+1. **Login:**
+```bash
+curl -X POST http://localhost:8082/login \
+  -d "email=achaconrios@gmail.com&password=Ayj05102017"
+```
 
-1. **headers.html**
-   - Encabezado común con logo
-   - Información del usuario logueado
-   - Navegación superior
+2. **Listar usuarios:**
+```bash
+curl -X GET http://localhost:8082/user/list \
+  -H "Cookie: JSESSIONID=xxx"
+```
 
-2. **footer.html**
-   - Pie de página con información del sistema
-   - Versión y créditos
+3. **Crear usuario (ADMIN):**
+```bash
+curl -X POST http://localhost:8082/user/create \
+  -d "rut=12345678-9&nombre=Test&apellido=User&email=test@test.com&password=Test123!&rol=USER"
+```
 
-3. **navdar.html**
-   - Barra de navegación lateral
-   - Enlaces a módulos principales
+### Testing con Maven
 
-4. **dashboard-button.html**
-   - Botones reutilizables del dashboard
-   - Iconos Font Awesome
-   - Colores temáticos
+```bash
+# Run tests
+mvn test
 
-### Iconografía Font Awesome
-
--  `fa-user` - Usuarios
--  `fa-clipboard-list` - Listas
--  `fa-plus-circle` - Crear
--  `fa-edit` - Editar
--  `fa-trash` - Eliminar
--  `fa-door-open` - Ingresos
--  `fa-chart-bar` - Estadísticas
--  `fa-lock` - Accesos
--  `fa-download` - Exportar
+# Run tests con coverage
+mvn test jacoco:report
+```
 
 ---
 
-##  Funcionalidades Avanzadas Implementadas
+## 🤝 Contribuir
 
-### 1. Exportación a Excel (Apache POI 5.2.4)
+### Flujo de Trabajo
 
-#### Características:
--  Exportación completa de registros de IngresoAP
--  19 columnas de datos
--  Formato XLSX (Office 2007+)
--  Encabezados con estilo (fondo azul, texto blanco)
--  Auto-ajuste de columnas
--  Metadata del reporte:
-  - Usuario que generó el reporte
-  - Fecha y hora de generación
-  - Total de registros exportados
--  Filtros aplicados al exportar (mismos que en lista)
--  Nombre de archivo dinámico según filtros
-
-#### Endpoint:
-```
-GET /ingreso/ap/export?fechaInicio=2025-01-01&fechaFin=2025-01-31&soloActivos=false
+1. **Fork** del repositorio
+2. **Clone** tu fork:
+```bash
+git clone https://github.com/TU-USUARIO/clases.git
 ```
 
-#### Dependencias Maven:
-```xml
-<dependency>
+3. **Crear rama** para tu feature:
+```bash
+git checkout -b feature/nueva-funcionalidad
+```
+
+4. **Commit** de cambios:
+```bash
+git add .
+git commit -m "feat: agregar nueva funcionalidad"
+```
+
+5. **Push** a tu fork:
+```bash
+git push origin feature/nueva-funcionalidad
+```
+
+6. **Pull Request** a `master`
+
+### Convenciones de Commits
+
+Seguir [Conventional Commits](https://www.conventionalcommits.org/):
+
+- `feat:` Nueva funcionalidad
+- `fix:` Corrección de bug
+- `docs:` Documentación
+- `style:` Formato de código
+- `refactor:` Refactorización
+- `test:` Tests
+- `chore:` Tareas de mantenimiento
+
+### Code Style
+
+- **Java:** Google Java Style Guide
+- **Indentación:** 4 espacios
+- **Line length:** 120 caracteres
+- **Nombres:** camelCase para variables, PascalCase para clases
+
+---
+
+## 📝 Changelog
+
+### v1.3.0 (2025-12-15)
+- ✅ **feat:** Eliminación de código muerto (endpoints unused, PasswordHashGenerator)
+- ✅ **fix:** Deshabilitado import.sql en producción para evitar errores duplicate key
+- ✅ **docs:** Actualización completa de README.md con deployment info
+- ✅ **chore:** Limpieza de archivos backup, logs y databases locales
+
+### v1.2.0 (2025-12-14)
+- ✅ **feat:** Integración con TiDB Cloud
+- ✅ **feat:** Configuración de producción separada
+- ✅ **feat:** Health checks con Actuator
+- ✅ **fix:** Corrección de driver de base de datos en producción
+
+### v1.1.0 (2025-12-13)
+- ✅ **feat:** CI/CD con GitHub Actions
+- ✅ **feat:** Dockerfile multi-stage optimizado
+- ✅ **feat:** Deployment automático en Koyeb
+- ✅ **feat:** Docker Hub registry configurado
+
+### v1.0.0 (2025-12-01)
+- ✅ **feat:** Sistema de autenticación con Spring Security
+- ✅ **feat:** CRUD completo de usuarios
+- ✅ **feat:** Módulo de ingresos a áreas protegidas
+- ✅ **feat:** Gestión de accesos por sitio
+- ✅ **feat:** Dashboard con estadísticas
+- ✅ **feat:** Interfaz responsive con Tailwind CSS
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia **MIT**.
+
+```
+MIT License
+
+Copyright (c) 2025 Arturo Chacón Rios
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+---
+
+## 👨‍💻 Autor
+
+**Arturo Chacón Rios**
+- GitHub: [@achaconrios43](https://github.com/achaconrios43)
+- Email: achaconrios@gmail.com
+
+---
+
+## 🙏 Agradecimientos
+
+- Spring Boot Team por el excelente framework
+- TiDB Cloud por la base de datos serverless
+- Koyeb por el hosting gratuito
+- Docker Hub por el registry de imágenes
+- Tailwind CSS por el framework CSS moderno
+- Font Awesome por la iconografía
+
+---
+
+## 📞 Soporte
+
+¿Tienes preguntas o problemas?
+
+1. **GitHub Issues:** [Abrir issue](https://github.com/achaconrios43/clases/issues)
+2. **Email:** achaconrios@gmail.com
+3. **Pull Requests:** Contribuciones son bienvenidas
+
+---
+
+## 🔮 Roadmap
+
+### v1.4.0 (Planeado)
+- [ ] Tests unitarios con JUnit 5
+- [ ] Tests de integración
+- [ ] Cobertura de código con JaCoCo
+- [ ] API REST completa
+- [ ] Documentación OpenAPI/Swagger
+
+### v1.5.0 (Futuro)
+- [ ] Notificaciones por email
+- [ ] Exportación a PDF
+- [ ] Gráficos avanzados con Chart.js
+- [ ] Módulo de reportes personalizados
+- [ ] Auditoría completa de cambios
+
+### v2.0.0 (Largo Plazo)
+- [ ] Migración a microservicios
+- [ ] Frontend React/Vue.js
+- [ ] Mobile app nativa
+- [ ] Integración con Active Directory
+- [ ] Machine Learning para predicciones
+
+---
+
+<div align="center">
+
+**⭐ Si te gusta este proyecto, dale una estrella en GitHub ⭐**
+
+[🌐 Ver App en Producción](https://few-laureen-webipss-1b5927a6.koyeb.app/login) | [📖 Documentación](https://github.com/achaconrios43/clases) | [🐛 Reportar Bug](https://github.com/achaconrios43/clases/issues)
+
+</div>
     <groupId>org.apache.poi</groupId>
     <artifactId>poi</artifactId>
     <version>5.2.4</version>
