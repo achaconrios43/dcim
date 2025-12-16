@@ -741,7 +741,6 @@ public class SecurityConfig {
                 .requestMatchers("/css/**", "/js/**").permitAll()
                 .requestMatchers("/login", "/error").permitAll()
                 .requestMatchers("/user/create", "/user/exists").permitAll()
-                .requestMatchers("/h2-console/**").hasRole("ADMIN")
                 .requestMatchers("/user/**").authenticated()
                 .requestMatchers("/ingreso/**").authenticated()
                 .anyRequest().authenticated()
@@ -1211,19 +1210,9 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 
-# Consola H2 habilitada
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2-console
-
 # Thymeleaf (sin caché en desarrollo)
 spring.thymeleaf.cache=false
 ```
-
-### Acceso a H2 Console:
-- **URL:** http://localhost:8082/h2-console
-- **JDBC URL:** `jdbc:h2:file:./data/datacenterdb`
-- **Usuario:** `sa`
-- **Password:** (vacío)
 
 ### Tablas Creadas Automáticamente por JPA:
 
@@ -1278,7 +1267,6 @@ public UserDetails loadUserByUsername(String email) {
 - ✅ `/user/create`, `/user/exists` → Público (registro)
 - ✅ `/dashboard`, `/ingreso/**`, `/gestion/**` → Autenticado
 - ✅ `/user/delete/**`, `/ingreso/delete/**` → Solo ADMIN
-- ✅ `/h2-console/**` → Solo ADMIN (deshabilitado en producción)
 
 ---
 
@@ -1620,7 +1608,6 @@ java -jar target/clases-0.0.1-SNAPSHOT.jar
 
 #### 4. Acceder a la Aplicación
 - **Aplicación Web:** http://localhost:8082
-- **H2 Console:** http://localhost:8082/h2-console
 - **Actuator Health:** http://localhost:8082/actuator/health
 
 ### Scripts PowerShell Incluidos
@@ -1922,13 +1909,13 @@ Proyecto de uso educativo y desarrollo interno.
 - Protección de rutas (requiere autenticación)
 - Logout con limpieza de sesión
 
-####  Base de Datos H2
-- Base de datos persistente en archivo (./data/datacenterdb)
-- 3 tablas principales (usuarios, ingreso_ap, gestion_acceso)
-- Consola H2 habilitada (/h2-console)
+####  Base de Datos
+- **Producción:** TiDB Cloud (MySQL compatible, serverless)
+- **Desarrollo:** MySQL local o TiDB Cloud
+- 3 tablas principales (usuario, ingresoap, gestion_acceso)
 - 60+ consultas JPA personalizadas
 - Índices automáticos en campos unique
-- Datos de prueba incluidos (import.sql)
+- Datos de prueba incluidos (import.sql solo en desarrollo)
 
 ####  Diseño y Frontend
 - Tailwind CSS con paleta de colores por módulo
