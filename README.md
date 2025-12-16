@@ -9,7 +9,10 @@ Sistema integral de gestión de DataCenter desarrollado con **Spring Boot 3** pa
 
 ## 🌐 Aplicación en Producción
 
-**🔗 URL:** https://few-laureen-webipss-1b5927a6.koyeb.app/login
+**🔗 URL:** https://few-laureen-webipss-1b5927a6.koyeb.app
+
+**📄 Página de Inicio:** [https://few-laureen-webipss-1b5927a6.koyeb.app](https://few-laureen-webipss-1b5927a6.koyeb.app)  
+**🔐 Login:** [https://few-laureen-webipss-1b5927a6.koyeb.app/login](https://few-laureen-webipss-1b5927a6.koyeb.app/login)
 
 **📦 Stack de Producción:**
 - ✅ **Hosting:** Koyeb Serverless (Washington DC)
@@ -1194,25 +1197,7 @@ Long contarTicketsUnicosDelDia(@Param("fecha") LocalDate fecha, @Param("sitio") 
 
 ### Configuración (application.properties)
 
-```properties
-# Puerto del servidor
-server.port=8082
 
-# Configuración de H2 Database
-spring.datasource.url=jdbc:h2:file:./data/datacenterdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-
-# Hibernate
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
-
-# Thymeleaf (sin caché en desarrollo)
-spring.thymeleaf.cache=false
-```
 
 ### Tablas Creadas Automáticamente por JPA:
 
@@ -1263,6 +1248,7 @@ public UserDetails loadUserByUsername(String email) {
 
 ### Protección de Rutas
 
+- ✅ `/`, `/index`, `/home` → Público (página de inicio)
 - ✅ `/login`, `/error` → Público
 - ✅ `/user/create`, `/user/exists` → Público (registro)
 - ✅ `/dashboard`, `/ingreso/**`, `/gestion/**` → Autenticado

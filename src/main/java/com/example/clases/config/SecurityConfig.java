@@ -33,6 +33,9 @@ public class SecurityConfig {
                 // Recursos estáticos (CSS, JS, imágenes) - Acceso público
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                 
+                // Página de inicio pública
+                .requestMatchers("/", "/index", "/home").permitAll()
+                
                 // Login y páginas públicas - Acceso sin autenticación
                 .requestMatchers("/login", "/error").permitAll()
                 
@@ -41,7 +44,7 @@ public class SecurityConfig {
                 
                 // TODAS LAS DEMÁS RUTAS: Permitir autenticados y validar en controlador
                 // Esto permite mostrar mensajes personalizados en vez de 403 Forbidden
-                .requestMatchers("/dashboard", "/").authenticated()
+                .requestMatchers("/dashboard").authenticated()
                 .requestMatchers("/user/**").authenticated()
                 .requestMatchers("/ingreso/**").authenticated()
                 .requestMatchers("/gestion/**").authenticated()
