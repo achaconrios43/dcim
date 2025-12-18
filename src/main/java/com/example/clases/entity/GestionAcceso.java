@@ -126,6 +126,50 @@ public class GestionAcceso {
     @Column(name = "hora_cierre_gestion")
     private LocalTime horaCierreGestion;
 
+    // ==================== HORARIOS DE REMEDY ====================
+    
+    /** Fecha de inicio registrada en Remedy */
+    @Column(name = "fecha_inicio_remedy")
+    private LocalDate fechaInicioRemedy;
+
+    /** Hora de inicio registrada en Remedy */
+    @Column(name = "hora_inicio_remedy")
+    private LocalTime horaInicioRemedy;
+
+    /** Fecha de fin registrada en Remedy */
+    @Column(name = "fecha_fin_remedy")
+    private LocalDate fechaFinRemedy;
+
+    /** Hora de fin registrada en Remedy */
+    @Column(name = "hora_fin_remedy")
+    private LocalTime horaFinRemedy;
+
+    // ==================== CHECKPOINTS DE PROCESO ====================
+    
+    /** Indica si la gestión fue enviada a Procesos */
+    @Column(name = "enviado_a_procesos")
+    private Boolean enviadoAProcesos;
+
+    /** Fecha en que se envió a Procesos */
+    @Column(name = "fecha_envio_procesos")
+    private LocalDate fechaEnvioProcesos;
+
+    /** Hora en que se envió a Procesos */
+    @Column(name = "hora_envio_procesos")
+    private LocalTime horaEnvioProcesos;
+
+    /** Indica si se dio respuesta al cliente */
+    @Column(name = "respuesta_cliente")
+    private Boolean respuestaCliente;
+
+    /** Fecha en que se dio respuesta al cliente */
+    @Column(name = "fecha_respuesta_cliente")
+    private LocalDate fechaRespuestaCliente;
+
+    /** Hora en que se dio respuesta al cliente */
+    @Column(name = "hora_respuesta_cliente")
+    private LocalTime horaRespuestaCliente;
+
     // ==================== CONSTRUCTORES ====================
     
     /** Constructor vacío requerido por JPA */
@@ -308,6 +352,96 @@ public class GestionAcceso {
 
     public void setFechaCierreGestion(LocalDate fechaCierreGestion) {
         this.fechaCierreGestion = fechaCierreGestion;
+    }
+
+    public LocalTime getHoraCierreGestion() {
+        return horaCierreGestion;
+    }
+
+    public void setHoraCierreGestion(LocalTime horaCierreGestion) {
+        this.horaCierreGestion = horaCierreGestion;
+    }
+
+    // Horarios de Remedy
+    public LocalDate getFechaInicioRemedy() {
+        return fechaInicioRemedy;
+    }
+
+    public void setFechaInicioRemedy(LocalDate fechaInicioRemedy) {
+        this.fechaInicioRemedy = fechaInicioRemedy;
+    }
+
+    public LocalTime getHoraInicioRemedy() {
+        return horaInicioRemedy;
+    }
+
+    public void setHoraInicioRemedy(LocalTime horaInicioRemedy) {
+        this.horaInicioRemedy = horaInicioRemedy;
+    }
+
+    public LocalDate getFechaFinRemedy() {
+        return fechaFinRemedy;
+    }
+
+    public void setFechaFinRemedy(LocalDate fechaFinRemedy) {
+        this.fechaFinRemedy = fechaFinRemedy;
+    }
+
+    public LocalTime getHoraFinRemedy() {
+        return horaFinRemedy;
+    }
+
+    public void setHoraFinRemedy(LocalTime horaFinRemedy) {
+        this.horaFinRemedy = horaFinRemedy;
+    }
+
+    // Checkpoints de Proceso
+    public Boolean getEnviadoAProcesos() {
+        return enviadoAProcesos;
+    }
+
+    public void setEnviadoAProcesos(Boolean enviadoAProcesos) {
+        this.enviadoAProcesos = enviadoAProcesos;
+    }
+
+    public LocalDate getFechaEnvioProcesos() {
+        return fechaEnvioProcesos;
+    }
+
+    public void setFechaEnvioProcesos(LocalDate fechaEnvioProcesos) {
+        this.fechaEnvioProcesos = fechaEnvioProcesos;
+    }
+
+    public LocalTime getHoraEnvioProcesos() {
+        return horaEnvioProcesos;
+    }
+
+    public void setHoraEnvioProcesos(LocalTime horaEnvioProcesos) {
+        this.horaEnvioProcesos = horaEnvioProcesos;
+    }
+
+    public Boolean getRespuestaCliente() {
+        return respuestaCliente;
+    }
+
+    public void setRespuestaCliente(Boolean respuestaCliente) {
+        this.respuestaCliente = respuestaCliente;
+    }
+
+    public LocalDate getFechaRespuestaCliente() {
+        return fechaRespuestaCliente;
+    }
+
+    public void setFechaRespuestaCliente(LocalDate fechaRespuestaCliente) {
+        this.fechaRespuestaCliente = fechaRespuestaCliente;
+    }
+
+    public LocalTime getHoraRespuestaCliente() {
+        return horaRespuestaCliente;
+    }
+
+    public void setHoraRespuestaCliente(LocalTime horaRespuestaCliente) {
+        this.horaRespuestaCliente = horaRespuestaCliente;
     }
 
     // ==================== MÉTODOS UTILITARIOS ====================

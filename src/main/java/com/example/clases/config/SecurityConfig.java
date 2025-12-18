@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 /**
  * Configuración de Spring Security
@@ -42,6 +43,10 @@ public class SecurityConfig {
                 // Permitir acceso público a registro de usuarios
                 .requestMatchers("/user/create", "/user/exists").permitAll()
                 
+                // API REST para aplicaciones móviles - Acceso sin autenticación web
+                // Nota: En producción implementar JWT o token-based authentication
+                .requestMatchers("/api/**").permitAll()
+                
                 // TODAS LAS DEMÁS RUTAS: Permitir autenticados y validar en controlador
                 // Esto permite mostrar mensajes personalizados en vez de 403 Forbidden
                 .requestMatchers("/dashboard").authenticated()
@@ -52,6 +57,14 @@ public class SecurityConfig {
                 
                 // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
+            )
+            
+            // Configuración de CSRF
+            // Deshabilitar CSRF para rutas API (REST APIs no necesitan CSRF)
+            // Mantener CSRF para rutas web (protección contra ataques CSRF)
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/**")  // Deshabilitar CSRF para API
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             )
             
             // Configuración del formulario de login

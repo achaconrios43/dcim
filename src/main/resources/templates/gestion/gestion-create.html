@@ -155,6 +155,35 @@
             </div>
           </div>
 
+          <!-- Horarios de Remedy -->
+          <div class="bg-orange-50 p-4 rounded-lg mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">
+              <i class="fas fa-clock mr-2"></i>Horarios de Remedy
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Fecha Inicio Remedy</label>
+                <input type="date" th:field="*{fechaInicioRemedy}" 
+                       class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Hora Inicio Remedy</label>
+                <input type="time" th:field="*{horaInicioRemedy}" 
+                       class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Fecha Fin Remedy</label>
+                <input type="date" th:field="*{fechaFinRemedy}" 
+                       class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Hora Fin Remedy</label>
+                <input type="time" th:field="*{horaFinRemedy}" 
+                       class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
+              </div>
+            </div>
+          </div>
+
           <!-- Comentarios del Ticket -->
           <div class="bg-purple-50 p-4 rounded-lg mb-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-3">
@@ -217,6 +246,33 @@
                 </div>
               </div>
             </div>
+            
+            <!-- Checkpoints de Proceso -->
+            <div class="mt-4 pt-4 border-t border-yellow-200">
+              <h4 class="text-md font-semibold text-gray-700 mb-3">
+                <i class="fas fa-check-circle mr-2"></i>Checkpoints de Proceso
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="inline-flex items-center p-3 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                    <input type="checkbox" th:field="*{enviadoAProcesos}" id="enviadoProcesosCheckbox"
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-gray-700 font-medium">Enviado a Procesos</span>
+                  </label>
+                  <input type="hidden" th:field="*{fechaEnvioProcesos}" id="fechaEnvioProcesos">
+                  <input type="hidden" th:field="*{horaEnvioProcesos}" id="horaEnvioProcesos">
+                </div>
+                <div>
+                  <label class="inline-flex items-center p-3 bg-white rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                    <input type="checkbox" th:field="*{respuestaCliente}" id="respuestaClienteCheckbox"
+                           class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                    <span class="ml-2 text-sm text-gray-700 font-medium">Respuesta al Cliente</span>
+                  </label>
+                  <input type="hidden" th:field="*{fechaRespuestaCliente}" id="fechaRespuestaCliente">
+                  <input type="hidden" th:field="*{horaRespuestaCliente}" id="horaRespuestaCliente">
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Botones -->
@@ -247,11 +303,9 @@
           gestionCheckbox.addEventListener('change', function() {
             if (this.checked) {
               const ahora = new Date();
-              // Formato YYYY-MM-DD para fecha
               const fecha = ahora.getFullYear() + '-' + 
                           String(ahora.getMonth() + 1).padStart(2, '0') + '-' + 
                           String(ahora.getDate()).padStart(2, '0');
-              // Formato HH:mm:ss para hora
               const hora = String(ahora.getHours()).padStart(2, '0') + ':' + 
                          String(ahora.getMinutes()).padStart(2, '0') + ':' + 
                          String(ahora.getSeconds()).padStart(2, '0');
@@ -259,9 +313,58 @@
               horaCierre.value = hora;
               console.log('Gestión marcada como realizada:', fecha, hora);
             } else {
-              // Si se desmarca, limpiar los valores
               fechaCierre.value = '';
               horaCierre.value = '';
+            }
+          });
+        }
+        
+        // Capturar fecha y hora cuando se marca "Enviado a Procesos"
+        const enviadoProcesosCheckbox = document.getElementById('enviadoProcesosCheckbox');
+        const fechaEnvioProcesos = document.getElementById('fechaEnvioProcesos');
+        const horaEnvioProcesos = document.getElementById('horaEnvioProcesos');
+        
+        if (enviadoProcesosCheckbox) {
+          enviadoProcesosCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+              const ahora = new Date();
+              const fecha = ahora.getFullYear() + '-' + 
+                          String(ahora.getMonth() + 1).padStart(2, '0') + '-' + 
+                          String(ahora.getDate()).padStart(2, '0');
+              const hora = String(ahora.getHours()).padStart(2, '0') + ':' + 
+                         String(ahora.getMinutes()).padStart(2, '0') + ':' + 
+                         String(ahora.getSeconds()).padStart(2, '0');
+              fechaEnvioProcesos.value = fecha;
+              horaEnvioProcesos.value = hora;
+              console.log('Enviado a Procesos:', fecha, hora);
+            } else {
+              fechaEnvioProcesos.value = '';
+              horaEnvioProcesos.value = '';
+            }
+          });
+        }
+        
+        // Capturar fecha y hora cuando se marca "Respuesta al Cliente"
+        const respuestaClienteCheckbox = document.getElementById('respuestaClienteCheckbox');
+        const fechaRespuestaCliente = document.getElementById('fechaRespuestaCliente');
+        const horaRespuestaCliente = document.getElementById('horaRespuestaCliente');
+        
+        if (respuestaClienteCheckbox) {
+          respuestaClienteCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+              const ahora = new Date();
+              const fecha = ahora.getFullYear() + '-' + 
+                          String(ahora.getMonth() + 1).padStart(2, '0') + '-' + 
+                          String(ahora.getDate()).padStart(2, '0');
+              const hora = String(ahora.getHours()).padStart(2, '0') + ':' + 
+                         String(ahora.getMinutes()).padStart(2, '0') + ':' + 
+                         String(ahora.getSeconds()).padStart(2, '0');
+              fechaRespuestaCliente.value = fecha;
+              horaRespuestaCliente.value = hora;
+              console.log('Respuesta al Cliente:', fecha, hora);
+            } else {
+              fechaRespuestaCliente.value = '';
+              horaRespuestaCliente.value = '';
             }
           });
         }

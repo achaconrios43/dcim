@@ -31,7 +31,7 @@ public class IngresoAP {
     @Column(name = "hora_termino")
     private LocalTime horaTermino;
     
-    // Campos para supervisión programada
+    // Campos para supervisiÃ³n programada
     @Column(name = "fecha_fin_ficticia")
     private LocalDate fechaFinFicticia;
     
@@ -78,13 +78,13 @@ public class IngresoAP {
     private String numeroTicket;
     
     @Column(name = "aprobador", nullable = false, length = 100)
-    private String aprobador; // Paulo Hernandez - Arturo Chacón - Marcelo Robles - Facilities - Rodrigo Aguilera - Operador Turno - No Autorizado
+    private String aprobador; // Paulo Hernandez - Arturo ChacÃ³n - Marcelo Robles - Facilities - Rodrigo Aguilera - Operador Turno - No Autorizado
     
     @Column(name = "escolta", nullable = false, length = 50)
     private String escolta; // Operador de Turno - Guardia - Personal de Facilities
     
     @Column(name = "motivo_ingreso", nullable = false, length = 100)
-    private String motivoIngreso; // Inspectiva - Actividad Rutinaria - Instalación - Mediciones - Sin ticket - ticket de Empresa - ticket de Otro Sitio
+    private String motivoIngreso; // Inspectiva - Actividad Rutinaria - InstalaciÃ³n - Mediciones - Sin ticket - ticket de Empresa - ticket de Otro Sitio
     
     @Column(name = "guia_despacho", length = 50)
     private String guiaDespacho;
@@ -93,7 +93,7 @@ public class IngresoAP {
     private String sitioIngreso; // DC San Martin, DC Apoquindo, MC La Florida, etc.
     
     @Column(name = "sala_ingresa", nullable = false, columnDefinition = "TEXT")
-    private String salaIngresa; // Ahora acepta múltiples salas separadas por comas
+    private String salaIngresa; // Ahora acepta mÃºltiples salas separadas por comas
     
     @Column(name = "rack_ingresa", length = 50)
     private String rackIngresa;
@@ -397,6 +397,27 @@ public class IngresoAP {
     
     public void setHoraSegundaSupervision(LocalTime horaSegundaSupervision) {
         this.horaSegundaSupervision = horaSegundaSupervision;
+    }
+    @Column(name = "foto_tecnico", columnDefinition = "LONGTEXT")
+    private String fotoTecnico;
+
+    @Column(name = "coordenadas_gps", columnDefinition = "TEXT")
+    private String coordenadasGps;
+
+    public String getFotoTecnico() {
+        return fotoTecnico;
+    }
+
+    public void setFotoTecnico(String fotoTecnico) {
+        this.fotoTecnico = fotoTecnico;
+    }
+
+    public String getCoordenadasGps() {
+        return coordenadasGps;
+    }
+
+    public void setCoordenadasGps(String coordenadasGps) {
+        this.coordenadasGps = coordenadasGps;
     }
     
     @Override

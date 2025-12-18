@@ -1,19 +1,24 @@
 package com.example.clases.controllers;
 
-import com.example.clases.entity.GestionAcceso;
-import com.example.clases.entity.Usuario;
-import com.example.clases.service.GestionAccesoService;
-import com.example.clases.dao.IUsuarioDao;
-import org.springframework.security.core.Authentication;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.example.clases.dao.IUsuarioDao;
+import com.example.clases.entity.GestionAcceso;
+import com.example.clases.entity.Usuario;
+import com.example.clases.service.GestionAccesoService;
 
 @Controller
 @RequestMapping("/gestion")
@@ -49,7 +54,7 @@ public class GestionAccesoController {
         List<GestionAcceso> gestiones = gestionAccesoService.listarTodas();
         model.addAttribute("gestiones", gestiones);
         model.addAttribute("titulo", "Gestión de Accesos - Listado Completo");
-        return "gestion/list";
+        return "gestion/gestion-list";
     }
 
     @GetMapping("/list/{sitio}")
@@ -77,7 +82,7 @@ public class GestionAccesoController {
         model.addAttribute("gestiones", gestiones);
         model.addAttribute("sitio", sitio);
         model.addAttribute("titulo", "Gestión de Accesos - " + sitio);
-        return "gestion/list";
+        return "gestion/gestion-list";
     }
 
     @GetMapping("/create")
@@ -110,7 +115,7 @@ public class GestionAccesoController {
         
         model.addAttribute("gestion", gestion);
         model.addAttribute("titulo", "Nueva Gestión de Acceso");
-        return "gestion/create";
+        return "gestion/gestion-create";
     }
 
     @PostMapping("/save")
@@ -177,7 +182,7 @@ public class GestionAccesoController {
         
         model.addAttribute("gestion", gestion);
         model.addAttribute("titulo", "Editar Gestión de Acceso");
-        return "gestion/edit";
+        return "gestion/gestion-edit";
     }
 
     @PostMapping("/update/{id}")
@@ -265,6 +270,6 @@ public class GestionAccesoController {
         
         model.addAttribute("gestion", gestion);
         model.addAttribute("titulo", "Detalle de Gestión");
-        return "gestion/view";
+        return "gestion/gestion-view";
     }
 }
