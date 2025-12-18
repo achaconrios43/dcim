@@ -28,12 +28,12 @@ public class AuthApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            String username = loginRequest.get("username"); // RUT
+            String username = loginRequest.get("username"); // RUT o EMAIL
             String password = loginRequest.get("password");
 
             if (username == null || username.trim().isEmpty()) {
                 response.put("success", false);
-                response.put("message", "El RUT es requerido");
+                response.put("message", "El usuario es requerido");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
@@ -43,12 +43,19 @@ public class AuthApiController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
-            // Buscar usuario por RUT
-            Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorRut(username);
+            // Buscar usuario por RUT o EMAIL
+            Optional<Usuario> usuarioOpt;
+            if (username.contains("@")) {
+                // Si contiene @, buscar por email
+                usuarioOpt = usuarioService.obtenerUsuarioPorEmail(username);
+            } else {
+                // Si no, buscar por RUT
+                usuarioOpt = usuarioService.obtenerUsuarioPorRut(username);
+            }
 
             if (usuarioOpt.isEmpty()) {
                 response.put("success", false);
-                response.put("message", "RUT o contraseÃ±a incorrectos");
+                response.put("message", "Usuario o contraseÃ±a incorrectos");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
@@ -57,7 +64,7 @@ public class AuthApiController {
             // Verificar contraseÃ±a con BCrypt
             if (!passwordEncoder.matches(password, usuario.getPassword())) {
                 response.put("success", false);
-                response.put("message", "RUT o contraseÃ±a incorrectos");
+                response.put("message", "Usuario o contraseÃ±a incorrectos");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
@@ -73,6 +80,7 @@ public class AuthApiController {
             response.put("success", true);
             response.put("message", "Login exitoso");
             response.put("usuario", userData);
+            response.put("user", userData);
             response.put("token", "jwt-token-" + usuario.getId() + "-" + System.currentTimeMillis());
 
             return ResponseEntity.ok(response);
