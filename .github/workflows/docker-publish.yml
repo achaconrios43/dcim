@@ -7,6 +7,9 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  DOCKER_IMAGE: achaconrios43/clases-app
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -28,13 +31,15 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: achaconrios43/clases-app
+          images: ${{ env.DOCKER_IMAGE }}
           tags: |
             type=raw,value=latest
             type=sha,prefix={{branch}}-
+            type=ref,event=branch
+            type=semver,pattern={{version}}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -43,6 +48,14 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
 
       - name: Image digest
         run: echo "Image pushed successfully - ${{ steps.meta.outputs.tags }}"
+
+      - name: Update Kubernetes manifests (optional)
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        run: |
+          echo "Docker image built and pushed: ${{ env.DOCKER_IMAGE }}:latest"
+          echo "To deploy to Kubernetes, run:"
+          echo "kubectl apply -f k8s/"

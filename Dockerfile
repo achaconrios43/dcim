@@ -23,15 +23,16 @@ RUN mvn clean package -DskipTests
 # ========================================
 # ETAPA 2: RUNTIME - Imagen final optimizada
 # ========================================
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine AS runtime
 
 # Metadatos de la imagen
 LABEL maintainer="achaconrios@gmail.com"
 LABEL description="Sistema de Control de Acceso - Spring Boot Application"
 LABEL version="1.0"
 
-# Crear usuario no-root para seguridad
-RUN addgroup -S spring && adduser -S spring -G spring
+# Instalar wget para healthcheck y crear usuario no-root
+RUN apk add --no-cache wget && \
+    addgroup -S spring && adduser -S spring -G spring
 
 # Establecer directorio de trabajo
 WORKDIR /app

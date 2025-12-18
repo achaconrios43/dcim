@@ -1,0 +1,55 @@
+name: clases-app
+
+services:
+  - name: clases-spring-boot
+    type: web
+    
+    # Configuración de Docker
+    docker:
+      dockerfile: ./Dockerfile
+    
+    # Puerto de la aplicación
+    ports:
+      - port: 8082
+        protocol: http
+    
+    # Escalado automático
+    scaling:
+      min: 1
+      max: 3
+    
+    # Tamaño de la instancia
+    instance_type: nano  # nano, micro, small, medium, large
+    
+    # Región de despliegue
+    regions:
+      - was  # Washington (usa también: fra, par, sin)
+    
+    # Variables de entorno
+    env:
+      - name: SPRING_PROFILES_ACTIVE
+        value: production
+      - name: JAVA_OPTS
+        value: "-Xmx512m -Xms256m"
+      - name: PORT
+        value: "8082"
+      - name: SPRING_DATASOURCE_URL
+        secret: DATABASE_URL
+      - name: SPRING_DATASOURCE_USERNAME
+        secret: DATABASE_USERNAME
+      - name: SPRING_DATASOURCE_PASSWORD
+        secret: DATABASE_PASSWORD
+    
+    # Health checks
+    health_checks:
+      - type: http
+        path: /actuator/health
+        port: 8082
+        interval: 30
+        timeout: 5
+        grace_period: 60
+    
+    # Configuración de recursos
+    resources:
+      memory: 512Mi
+      cpu: 0.5

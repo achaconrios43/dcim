@@ -1,0 +1,61 @@
+name: Deploy to Koyeb
+
+on:
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
+  workflow_dispatch:
+
+env:
+  KOYEB_SERVICE_NAME: clases-spring-boot
+  DOCKER_IMAGE: achaconrios43/clases-app:latest
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Koyeb CLI
+        run: |
+          curl -fsSL https://www.koyeb.com/download/cli/install.sh | sh
+          echo "$HOME/.koyeb/bin" >> $GITHUB_PATH
+
+      - name: Deploy to Koyeb
+        env:
+          KOYEB_TOKEN: ${{ secrets.KOYEB_TOKEN }}
+        run: |
+          # Verificar si el servicio existe
+          if koyeb service get ${{ env.KOYEB_SERVICE_NAME }} >/dev/null 2>&1; then
+            echo "Service exists, redeploying..."
+            koyeb service redeploy ${{ env.KOYEB_SERVICE_NAME }}
+          else
+            echo "Service does not exist, creating new service..."
+            koyeb service create ${{ env.KOYEB_SERVICE_NAME }} \
+              --app clases-app \
+              --docker ${{ env.DOCKER_IMAGE }} \
+              --ports 8082:http \
+              --routes /:8082 \
+              --env SPRING_PROFILES_ACTIVE=production \
+              --env JAVA_OPTS="-Xmx512m -Xms256m" \
+              --env PORT=8082 \
+              --instance-type nano \
+              --regions was \
+              --health-checks http:8082:/actuator/health
+          fi
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for deployment to complete..."
+          sleep 30
+          koyeb service describe ${{ env.KOYEB_SERVICE_NAME }}
+
+      - name: Get Service URL
+        run: |
+          SERVICE_URL=$(koyeb service get ${{ env.KOYEB_SERVICE_NAME }} -o json | jq -r '.urls[0]')
+          echo "Service deployed successfully!"
+          echo "URL: https://$SERVICE_URL"
