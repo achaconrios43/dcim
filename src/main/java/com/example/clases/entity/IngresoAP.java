@@ -3,6 +3,9 @@ package com.example.clases.entity;
 import jakarta.persistence.*;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "ingresoap")
@@ -21,48 +24,58 @@ public class IngresoAP {
     private String nombreUsuario;
 
     @JsonProperty("fecha_inicio")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "fecha_inicio", nullable = false)
-    private String fechaInicio;
+    private LocalDate fechaInicio;
 
     @JsonProperty("hora_inicio")
+    @JsonFormat(pattern = "HH:mm:ss")
     @Column(name = "hora_inicio", nullable = false)
-    private String horaInicio;
+    private LocalTime horaInicio;
 
     @JsonProperty("fecha_termino")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "fecha_termino")
-    private String fechaTermino;
+    private LocalDate fechaTermino;
 
     @JsonProperty("hora_termino")
+    @JsonFormat(pattern = "HH:mm:ss")
     @Column(name = "hora_termino")
-    private String horaTermino;
+    private LocalTime horaTermino;
 
     @JsonProperty("fecha_fin_ficticia")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "fecha_fin_ficticia")
-    private String fechaFinFicticia;
+    private LocalDate fechaFinFicticia;
 
     @JsonProperty("hora_fin_ficticia")
+    @JsonFormat(pattern = "HH:mm:ss")
     @Column(name = "hora_fin_ficticia")
-    private String horaFinFicticia;
+    private LocalTime horaFinFicticia;
 
     @JsonProperty("hora_supervision_media")
+    @JsonFormat(pattern = "HH:mm:ss")
     @Column(name = "hora_supervision_media")
-    private String horaSupervisionMedia;
+    private LocalTime horaSupervisionMedia;
 
     @JsonProperty("fecha_supervision_media")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "fecha_supervision_media")
-    private String fechaSupervisionMedia;
+    private LocalDate fechaSupervisionMedia;
 
     @JsonProperty("segunda_supervision_realizada")
     @Column(name = "segunda_supervision_realizada")
     private Boolean segundaSupervisionRealizada = false;
 
     @JsonProperty("fecha_segunda_supervision")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "fecha_segunda_supervision")
-    private String fechaSegundaSupervision;
+    private LocalDate fechaSegundaSupervision;
 
     @JsonProperty("hora_segunda_supervision")
+    @JsonFormat(pattern = "HH:mm:ss")
     @Column(name = "hora_segunda_supervision")
-    private String horaSegundaSupervision;
+    private LocalTime horaSegundaSupervision;
 
     @JsonProperty("nombre_tecnico")
     @Column(name = "nombre_tecnico", nullable = false, length = 100)
@@ -161,38 +174,38 @@ public class IngresoAP {
     public String getNombreUsuario() { return nombreUsuario; }
     public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
 
-    public String getFechaInicio() { return fechaInicio; }
-    public void setFechaInicio(String fechaInicio) { this.fechaInicio = fechaInicio; }
+    public LocalDate getFechaInicio() { return fechaInicio; }
+    public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
 
-    public String getHoraInicio() { return horaInicio; }
-    public void setHoraInicio(String horaInicio) { this.horaInicio = horaInicio; }
+    public LocalTime getHoraInicio() { return horaInicio; }
+    public void setHoraInicio(LocalTime horaInicio) { this.horaInicio = horaInicio; }
 
-    public String getFechaTermino() { return fechaTermino; }
-    public void setFechaTermino(String fechaTermino) { this.fechaTermino = fechaTermino; }
+    public LocalDate getFechaTermino() { return fechaTermino; }
+    public void setFechaTermino(LocalDate fechaTermino) { this.fechaTermino = fechaTermino; }
 
-    public String getHoraTermino() { return horaTermino; }
-    public void setHoraTermino(String horaTermino) { this.horaTermino = horaTermino; }
+    public LocalTime getHoraTermino() { return horaTermino; }
+    public void setHoraTermino(LocalTime horaTermino) { this.horaTermino = horaTermino; }
 
-    public String getFechaFinFicticia() { return fechaFinFicticia; }
-    public void setFechaFinFicticia(String fechaFinFicticia) { this.fechaFinFicticia = fechaFinFicticia; }
+    public LocalDate getFechaFinFicticia() { return fechaFinFicticia; }
+    public void setFechaFinFicticia(LocalDate fechaFinFicticia) { this.fechaFinFicticia = fechaFinFicticia; }
 
-    public String getHoraFinFicticia() { return horaFinFicticia; }
-    public void setHoraFinFicticia(String horaFinFicticia) { this.horaFinFicticia = horaFinFicticia; }
+    public LocalTime getHoraFinFicticia() { return horaFinFicticia; }
+    public void setHoraFinFicticia(LocalTime horaFinFicticia) { this.horaFinFicticia = horaFinFicticia; }
 
-    public String getHoraSupervisionMedia() { return horaSupervisionMedia; }
-    public void setHoraSupervisionMedia(String horaSupervisionMedia) { this.horaSupervisionMedia = horaSupervisionMedia; }
+    public LocalTime getHoraSupervisionMedia() { return horaSupervisionMedia; }
+    public void setHoraSupervisionMedia(LocalTime horaSupervisionMedia) { this.horaSupervisionMedia = horaSupervisionMedia; }
 
-    public String getFechaSupervisionMedia() { return fechaSupervisionMedia; }
-    public void setFechaSupervisionMedia(String fechaSupervisionMedia) { this.fechaSupervisionMedia = fechaSupervisionMedia; }
+    public LocalDate getFechaSupervisionMedia() { return fechaSupervisionMedia; }
+    public void setFechaSupervisionMedia(LocalDate fechaSupervisionMedia) { this.fechaSupervisionMedia = fechaSupervisionMedia; }
 
     public Boolean getSegundaSupervisionRealizada() { return segundaSupervisionRealizada; }
     public void setSegundaSupervisionRealizada(Boolean segundaSupervisionRealizada) { this.segundaSupervisionRealizada = segundaSupervisionRealizada; }
 
-    public String getFechaSegundaSupervision() { return fechaSegundaSupervision; }
-    public void setFechaSegundaSupervision(String fechaSegundaSupervision) { this.fechaSegundaSupervision = fechaSegundaSupervision; }
+    public LocalDate getFechaSegundaSupervision() { return fechaSegundaSupervision; }
+    public void setFechaSegundaSupervision(LocalDate fechaSegundaSupervision) { this.fechaSegundaSupervision = fechaSegundaSupervision; }
 
-    public String getHoraSegundaSupervision() { return horaSegundaSupervision; }
-    public void setHoraSegundaSupervision(String horaSegundaSupervision) { this.horaSegundaSupervision = horaSegundaSupervision; }
+    public LocalTime getHoraSegundaSupervision() { return horaSegundaSupervision; }
+    public void setHoraSegundaSupervision(LocalTime horaSegundaSupervision) { this.horaSegundaSupervision = horaSegundaSupervision; }
 
     public String getNombreTecnico() { return nombreTecnico; }
     public void setNombreTecnico(String nombreTecnico) { this.nombreTecnico = nombreTecnico; }

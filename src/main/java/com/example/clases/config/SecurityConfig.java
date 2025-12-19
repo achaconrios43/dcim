@@ -68,6 +68,9 @@ public class SecurityConfig {
                 // Permitir acceso público a registro de usuarios
                 .requestMatchers("/user/create", "/user/exists").permitAll()
 
+                // Permitir acceso al health check de Actuator (para Koyeb)
+                .requestMatchers("/actuator/health/**", "/actuator/health").permitAll()
+
                 // TODAS LAS DEMÁS RUTAS: Permitir autenticados y validar en controlador
                 // Esto permite mostrar mensajes personalizados en vez de 403 Forbidden
                 .requestMatchers("/dashboard").authenticated()

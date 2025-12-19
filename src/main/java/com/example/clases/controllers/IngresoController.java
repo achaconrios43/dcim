@@ -44,7 +44,7 @@ import com.example.clases.entity.Usuario;
 import com.example.clases.service.IngresoAPService;
 
 /**
- * Controlador para gestiÃƒÆ’Ã‚Â³n de ingresos al Centro de Datos
+ * Controlador para gestiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de ingresos al Centro de Datos
  */
 @Controller
 @RequestMapping("/ingreso")
@@ -66,7 +66,7 @@ public class IngresoController {
                                           @RequestParam(name="rut", required=false) String rut,
                                           Authentication authentication,
                                           Model model) {        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -116,7 +116,7 @@ public class IngresoController {
                                 @RequestParam(name="actividadRemedy", required=false) String actividadRemedy,
                                 Authentication authentication,
                                 Model model){        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -130,7 +130,7 @@ public class IngresoController {
         
         model.addAttribute("usuario", usuario);
         
-        // Si nombreUsuario estÃƒÆ’Ã‚Â¡ vacÃƒÆ’Ã‚Â­o, usar el nombre del usuario logueado
+        // Si nombreUsuario estÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ vacÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­o, usar el nombre del usuario logueado
         if (nombreUsuario == null || nombreUsuario.trim().isEmpty()) {
             nombreUsuario = usuario.getNombre();
         }
@@ -139,9 +139,9 @@ public class IngresoController {
         String[] campos = {turno, nombreUsuario, fechaInicio, horaInicio, fechaFinFicticia, horaFinFicticia, nombreTecnico, rutTecnico,
                           empresaDemandante, empresaContratista, cargoTecnico, sitioIngreso, salaRemedy, tipoTicket,
                           numeroTicket, aprobador, escolta, motivoIngreso, salaIngresa, rackIngresa, actividadRemedy};
-        String[] nombres = {"Turno", "Nombre Usuario", "Fecha Inicio", "Hora Inicio", "Fecha Final Estimada", "Hora Final Estimada", "Nombre TÃƒÆ’Ã‚Â©cnico", "RUT TÃƒÆ’Ã‚Â©cnico",
-                           "Empresa Demandante", "Empresa Contratista", "Cargo TÃƒÆ’Ã‚Â©cnico", "Sitio de Ingreso", "Tipo de Sala REMEDY", "Tipo Ticket",
-                           "NÃƒÆ’Ã‚Âºmero Ticket", "Aprobador", "Escolta", "Motivo Ingreso", "Sala Ingresa", "Rack Ingresa", "Actividad Remedy"};
+        String[] nombres = {"Turno", "Nombre Usuario", "Fecha Inicio", "Hora Inicio", "Fecha Final Estimada", "Hora Final Estimada", "Nombre TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico", "RUT TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico",
+                           "Empresa Demandante", "Empresa Contratista", "Cargo TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico", "Sitio de Ingreso", "Tipo de Sala REMEDY", "Tipo Ticket",
+                           "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero Ticket", "Aprobador", "Escolta", "Motivo Ingreso", "Sala Ingresa", "Rack Ingresa", "Actividad Remedy"};
         
         for (int i = 0; i < campos.length; i++) {
             if (campos[i] == null || campos[i].trim().isEmpty()) {
@@ -154,10 +154,10 @@ public class IngresoController {
             }
         }
         
-        // Validar formato RUT (misma validaciÃƒÆ’Ã‚Â³n que formulario de usuario)
+        // Validar formato RUT (misma validaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n que formulario de usuario)
         String rutLimpio = rutTecnico.replaceAll("\\s+","");
         if (!rutLimpio.matches("^[\\d]{1,2}\\.?[\\d]{3}\\.?[\\d]{3}-?[\\dkK]$")){
-            model.addAttribute("errorMessage", "Por favor ingrese un RUT vÃƒÆ’Ã‚Â¡lido (formato: 12.345.678-9)");
+            model.addAttribute("errorMessage", "Por favor ingrese un RUT vÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lido (formato: 12.345.678-9)");
             addAllValuesToModel(model, turno, nombreUsuario, fechaInicio, horaInicio, fechaTermino, horaTermino,
                               nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico, sitioIngreso,
                               salaRemedy, tipoTicket, numeroTicket, aprobador, escolta, motivoIngreso,
@@ -165,20 +165,20 @@ public class IngresoController {
             return "ingresoap";
         }
         
-        // VALIDACIÃƒÆ’Ã¢â‚¬Å“N CRÃƒÆ’Ã‚ÂTICA: Verificar si el tÃƒÆ’Ã‚Â©cnico ya tiene un ingreso activo
+        // VALIDACIÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œN CRÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂTICA: Verificar si el tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico ya tiene un ingreso activo
         if (ingresoAPService.tieneIngresoActivo(rutLimpio)) {
             Optional<IngresoAP> ingresoActivo = ingresoAPService.obtenerIngresoActivoPorRut(rutLimpio);
             if (ingresoActivo.isPresent()) {
                 IngresoAP ingreso = ingresoActivo.get();
                 model.addAttribute("errorMessage", 
-                    "ATENCIÃƒÆ’Ã¢â‚¬Å“N: El tÃƒÆ’Ã‚Â©cnico " + ingreso.getNombreTecnico() + " (RUT: " + ingreso.getRutTecnico() + 
+                    "ATENCIÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œN: El tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico " + ingreso.getNombreTecnico() + " (RUT: " + ingreso.getRutTecnico() + 
                     ") ya tiene un ingreso activo desde el " + ingreso.getFechaInicio() + " a las " + ingreso.getHoraInicio() + 
-                    ". Debe cerrar el ingreso anterior para poder volver a ingresar al tÃƒÆ’Ã‚Â©cnico. " +
-                    "Vaya a la secciÃƒÆ’Ã‚Â³n de 'Actualizar Ingreso' para registrar la salida.");
+                    ". Debe cerrar el ingreso anterior para poder volver a ingresar al tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico. " +
+                    "Vaya a la secciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de 'Actualizar Ingreso' para registrar la salida.");
             } else {
                 model.addAttribute("errorMessage", 
-                    "ATENCIÃƒÆ’Ã¢â‚¬Å“N: El tÃƒÆ’Ã‚Â©cnico con RUT " + rutLimpio + " ya tiene un ingreso activo. " +
-                    "Debe cerrar el ingreso anterior para poder volver a ingresar al tÃƒÆ’Ã‚Â©cnico.");
+                    "ATENCIÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œN: El tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico con RUT " + rutLimpio + " ya tiene un ingreso activo. " +
+                    "Debe cerrar el ingreso anterior para poder volver a ingresar al tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico.");
             }
             addAllValuesToModel(model, turno, nombreUsuario, fechaInicio, horaInicio, fechaTermino, horaTermino,
                               nombreTecnico, rutTecnico, empresaDemandante, empresaContratista, cargoTecnico, sitioIngreso,
@@ -192,37 +192,37 @@ public class IngresoController {
             
             ingreso.setTurno(turno.trim());
             ingreso.setNombreUsuario(nombreUsuario.trim());
-            ingreso.setFechaInicio(fechaInicio);
-            ingreso.setHoraInicio(horaInicio);
+            ingreso.setFechaInicio(LocalDate.parse(fechaInicio));
+            ingreso.setHoraInicio(LocalTime.parse(horaInicio));
             
             // Procesar fecha y hora final ficticia (estimada)
-            ingreso.setFechaFinFicticia(fechaFinFicticia);
-            ingreso.setHoraFinFicticia(horaFinFicticia);
+            ingreso.setFechaFinFicticia(LocalDate.parse(fechaFinFicticia));
+            ingreso.setHoraFinFicticia(LocalTime.parse(horaFinFicticia));
             
-            // Calcular hora media de supervisiÃƒÆ’Ã‚Â³n
-            LocalDateTime inicioDateTime = LocalDateTime.of(LocalDate.parse(ingreso.getFechaInicio()), LocalTime.parse(ingreso.getHoraInicio()));
-            LocalDateTime finFicticioDateTime = LocalDateTime.of(LocalDate.parse(ingreso.getFechaFinFicticia()), LocalTime.parse(ingreso.getHoraFinFicticia()));
+            // Calcular hora media de supervisiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
+            LocalDateTime inicioDateTime = LocalDateTime.of(ingreso.getFechaInicio(), ingreso.getHoraInicio());
+            LocalDateTime finFicticioDateTime = LocalDateTime.of(ingreso.getFechaFinFicticia(), ingreso.getHoraFinFicticia());
             
             long minutosTotal = java.time.Duration.between(inicioDateTime, finFicticioDateTime).toMinutes();
             LocalDateTime supervisionMediaDateTime = inicioDateTime.plusMinutes(minutosTotal / 2);
             
-            ingreso.setFechaSupervisionMedia(supervisionMediaDateTime.toLocalDate().toString());
-            ingreso.setHoraSupervisionMedia(supervisionMediaDateTime.toLocalTime().toString());
+            ingreso.setFechaSupervisionMedia(supervisionMediaDateTime.toLocalDate());
+            ingreso.setHoraSupervisionMedia(supervisionMediaDateTime.toLocalTime());
             ingreso.setSegundaSupervisionRealizada(false);
             
-            // Manejo de fecha/hora de tÃƒÆ’Ã‚Â©rmino y auto-inactivaciÃƒÆ’Ã‚Â³n
+            // Manejo de fecha/hora de tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rmino y auto-inactivaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
             if (fechaTermino != null && !fechaTermino.trim().isEmpty()) {
-                ingreso.setFechaTermino(fechaTermino);
-                // Auto-inactivar cuando se registra fecha de tÃƒÆ’Ã‚Â©rmino
+                ingreso.setFechaTermino(LocalDate.parse(fechaTermino));
+                // Auto-inactivar cuando se registra fecha de tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rmino
                 ingreso.setActivo(false);
             }
             if (horaTermino != null && !horaTermino.trim().isEmpty()) {
-                ingreso.setHoraTermino(horaTermino);
-                // Auto-inactivar cuando se registra hora de tÃƒÆ’Ã‚Â©rmino
+                ingreso.setHoraTermino(LocalTime.parse(horaTermino));
+                // Auto-inactivar cuando se registra hora de tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rmino
                 ingreso.setActivo(false);
             }
             
-            // Si no se especifica fecha/hora de tÃƒÆ’Ã‚Â©rmino, el registro permanece activo
+            // Si no se especifica fecha/hora de tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rmino, el registro permanece activo
             if (ingreso.getFechaTermino() == null && ingreso.getHoraTermino() == null) {
                 ingreso.setActivo(true);
             }
@@ -251,7 +251,7 @@ public class IngresoController {
             
             model.addAttribute("successMessage", 
                 "Ingreso registrado exitosamente. ID: " + ingresoGuardado.getId() + 
-                " - TÃƒÆ’Ã‚Â©cnico: " + ingresoGuardado.getNombreTecnico() + 
+                " - TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico: " + ingresoGuardado.getNombreTecnico() + 
                 " - Ticket: " + ingresoGuardado.getNumeroTicket());
             
             return "ingresoap";
@@ -271,7 +271,7 @@ public class IngresoController {
                                  @RequestParam(required = false) String fechaFin,
                                  @RequestParam(required = false, defaultValue = "false") boolean soloActivos,
                                  Authentication authentication, Model model) {        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -301,7 +301,7 @@ public class IngresoController {
                     model.addAttribute("filtroAplicado", "Ingresos del " + inicio + " al " + fin);
                 } catch (Exception e) {
                     ingresos = ingresoAPService.obtenerIngresosOrdenadosPorFecha();
-                    model.addAttribute("errorFechas", "Formato de fecha invÃƒÆ’Ã‚Â¡lido. Mostrando todos los ingresos.");
+                    model.addAttribute("errorFechas", "Formato de fecha invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lido. Mostrando todos los ingresos.");
                 }
             }
             // Sin filtros, mostrar todos ordenados
@@ -323,10 +323,10 @@ public class IngresoController {
         }
     }
 
-    // READ - Ver detalle de un ingreso especÃƒÆ’Ã‚Â­fico
+    // READ - Ver detalle de un ingreso especÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­fico
     @GetMapping("/ap/read/{id}")
     public String verIngreso(@PathVariable Long id, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -354,10 +354,10 @@ public class IngresoController {
         }
     }
 
-    // UPDATE - Mostrar formulario de ediciÃƒÆ’Ã‚Â³n
+    // UPDATE - Mostrar formulario de ediciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
     @GetMapping("/ap/update/{id}")
     public String mostrarFormularioEdicion(@PathVariable Long id, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -385,14 +385,14 @@ public class IngresoController {
         }
     }
 
-    // UPDATE - Procesar formulario de ediciÃƒÆ’Ã‚Â³n
+    // UPDATE - Procesar formulario de ediciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
     @PostMapping("/ap/update/{id}")
     public String actualizarIngreso(@PathVariable Long id, 
                                   @ModelAttribute IngresoAP ingresoForm,
                                   BindingResult bindingResult,
                                   Authentication authentication,
                                   RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -406,10 +406,10 @@ public class IngresoController {
         
         System.out.println("=== DEBUG: Actualizando ingreso ID: " + id + " ===");
         System.out.println("Turno: " + ingresoForm.getTurno());
-        System.out.println("Nombre TÃƒÆ’Ã‚Â©cnico: " + ingresoForm.getNombreTecnico());
-        System.out.println("RUT TÃƒÆ’Ã‚Â©cnico: " + ingresoForm.getRutTecnico());
-        System.out.println("Fecha TÃƒÆ’Ã‚Â©rmino: " + ingresoForm.getFechaTermino());
-        System.out.println("Hora TÃƒÆ’Ã‚Â©rmino: " + ingresoForm.getHoraTermino());
+        System.out.println("Nombre TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico: " + ingresoForm.getNombreTecnico());
+        System.out.println("RUT TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico: " + ingresoForm.getRutTecnico());
+        System.out.println("Fecha TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rmino: " + ingresoForm.getFechaTermino());
+        System.out.println("Hora TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rmino: " + ingresoForm.getHoraTermino());
         
         try {
             Optional<IngresoAP> ingresoExistente = ingresoAPService.buscarPorId(id);
@@ -421,14 +421,14 @@ public class IngresoController {
             // Validaciones
             if (ingresoForm.getNombreTecnico() == null || ingresoForm.getNombreTecnico().trim().isEmpty() || 
                 ingresoForm.getRutTecnico() == null || ingresoForm.getRutTecnico().trim().isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "Nombre y RUT del tÃƒÆ’Ã‚Â©cnico son obligatorios");
+                redirectAttributes.addFlashAttribute("error", "Nombre y RUT del tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico son obligatorios");
                 return "redirect:/ingreso/ap/update/" + id;
             }
 
             // Validar formato RUT
             String rutLimpio = ingresoForm.getRutTecnico().replaceAll("\\s+","");
             if (!rutLimpio.matches("^[\\d]{1,2}\\.?[\\d]{3}\\.?[\\d]{3}-?[\\dkK]$")){
-                redirectAttributes.addFlashAttribute("error", "Por favor ingrese un RUT vÃƒÆ’Ã‚Â¡lido (formato: 12.345.678-9)");
+                redirectAttributes.addFlashAttribute("error", "Por favor ingrese un RUT vÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lido (formato: 12.345.678-9)");
                 return "redirect:/ingreso/ap/update/" + id;
             }
 
@@ -454,7 +454,7 @@ public class IngresoController {
             ingreso.setRackIngresa(ingresoForm.getRackIngresa() != null ? ingresoForm.getRackIngresa().trim() : ingreso.getRackIngresa());
             ingreso.setActividadRemedy(ingresoForm.getActividadRemedy() != null ? ingresoForm.getActividadRemedy().trim() : ingreso.getActividadRemedy());
 
-            // LÃƒÆ’Ã‚Â³gica de salida: cuando se completan fecha Y hora de tÃƒÆ’Ã‚Â©rmino, el tÃƒÆ’Ã‚Â©cnico sale
+            // LÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³gica de salida: cuando se completan fecha Y hora de tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rmino, el tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico sale
             if (ingresoForm.getFechaTermino() != null) {
                 ingreso.setFechaTermino(ingresoForm.getFechaTermino());
             }
@@ -463,11 +463,11 @@ public class IngresoController {
                 ingreso.setHoraTermino(ingresoForm.getHoraTermino());
             }
             
-            // Auto-inactivaciÃƒÆ’Ã‚Â³n: solo cuando AMBOS campos de tÃƒÆ’Ã‚Â©rmino estÃƒÆ’Ã‚Â¡n completos
+            // Auto-inactivaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n: solo cuando AMBOS campos de tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rmino estÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡n completos
             if (ingreso.getFechaTermino() != null && ingreso.getHoraTermino() != null) {
-                ingreso.setActivo(false); // TÃƒÆ’Ã‚Â©cnico ha salido
+                ingreso.setActivo(false); // TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico ha salido
             } else {
-                ingreso.setActivo(true); // TÃƒÆ’Ã‚Â©cnico sigue activo
+                ingreso.setActivo(true); // TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico sigue activo
             }
 
             ingresoAPService.guardar(ingreso);
@@ -481,12 +481,12 @@ public class IngresoController {
         }
     }
 
-    // ACCIÃƒÆ’Ã¢â‚¬Å“N - Marcar segunda supervisiÃƒÆ’Ã‚Â³n realizada
+    // ACCIÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œN - Marcar segunda supervisiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n realizada
     @PostMapping("/ap/marcar-segunda-supervision/{id}")
     public String marcarSegundaSupervision(@PathVariable Long id, 
                                           Authentication authentication, 
                                           RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -507,36 +507,36 @@ public class IngresoController {
             
             IngresoAP ingreso = ingresoOpt.get();
             
-            // Verificar que el ingreso estÃƒÆ’Ã‚Â© activo
+            // Verificar que el ingreso estÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© activo
             if (!ingreso.getActivo()) {
-                redirectAttributes.addFlashAttribute("error", "No se puede marcar supervisiÃƒÆ’Ã‚Â³n en un registro cerrado");
+                redirectAttributes.addFlashAttribute("error", "No se puede marcar supervisiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n en un registro cerrado");
                 return "redirect:/ingreso/ap/read/" + id;
             }
             
             // Marcar como realizada
             ingreso.setSegundaSupervisionRealizada(true);
-            ingreso.setFechaSegundaSupervision(LocalDate.now().toString());
-            ingreso.setHoraSegundaSupervision(LocalTime.now().toString());
+            ingreso.setFechaSegundaSupervision(LocalDate.now());
+            ingreso.setHoraSegundaSupervision(LocalTime.now());
             
             ingresoAPService.guardar(ingreso);
             
             redirectAttributes.addFlashAttribute("success", 
-                "ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Segunda supervisiÃƒÆ’Ã‚Â³n marcada como realizada exitosamente a las " + 
+                "ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Segunda supervisiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n marcada como realizada exitosamente a las " + 
                 LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
             return "redirect:/ingreso/ap/read/" + id;
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al marcar supervisiÃƒÆ’Ã‚Â³n: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al marcar supervisiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n: " + e.getMessage());
             return "redirect:/ingreso/ap/read/" + id;
         }
     }
     
-    // ACCIÃƒÆ’Ã¢â‚¬Å“N - Cerrar registro (finalizar ingreso)
+    // ACCIÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œN - Cerrar registro (finalizar ingreso)
     @PostMapping("/ap/cerrar/{id}")
     public String cerrarIngreso(@PathVariable Long id, 
                                Authentication authentication, 
                                RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -557,21 +557,21 @@ public class IngresoController {
             
             IngresoAP ingreso = ingresoOpt.get();
             
-            // Verificar que el ingreso estÃƒÆ’Ã‚Â© activo
+            // Verificar que el ingreso estÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© activo
             if (!ingreso.getActivo()) {
-                redirectAttributes.addFlashAttribute("error", "Este registro ya estÃƒÆ’Ã‚Â¡ cerrado");
+                redirectAttributes.addFlashAttribute("error", "Este registro ya estÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ cerrado");
                 return "redirect:/ingreso/ap/read/" + id;
             }
             
             // Cerrar el ingreso con fecha y hora actual
-            ingreso.setFechaTermino(LocalDate.now().toString());
-            ingreso.setHoraTermino(LocalTime.now().toString());
+            ingreso.setFechaTermino(LocalDate.now());
+            ingreso.setHoraTermino(LocalTime.now());
             ingreso.setActivo(false);
             
             ingresoAPService.guardar(ingreso);
             
             redirectAttributes.addFlashAttribute("success", 
-                "ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â„¢ Registro cerrado exitosamente. TÃƒÆ’Ã‚Â©cnico " + ingreso.getNombreTecnico() + 
+                "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Registro cerrado exitosamente. TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico " + ingreso.getNombreTecnico() + 
                 " marcado como inactivo a las " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
             return "redirect:/ingreso/ap/read/" + id;
             
@@ -581,10 +581,10 @@ public class IngresoController {
         }
     }
 
-    // DELETE - Mostrar confirmaciÃƒÆ’Ã‚Â³n de eliminaciÃƒÆ’Ã‚Â³n
+    // DELETE - Mostrar confirmaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de eliminaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
     @GetMapping("/ap/delete/{id}")
     public String mostrarConfirmacionEliminacion(@PathVariable Long id, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -597,7 +597,7 @@ public class IngresoController {
         }
         
         // TODOS los usuarios autenticados pueden eliminar registros (para corregir errores)
-        // No hay restricciÃƒÆ’Ã‚Â³n por rol - tanto ADMIN como USER pueden eliminar
+        // No hay restricciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n por rol - tanto ADMIN como USER pueden eliminar
         
         try {
             Optional<IngresoAP> ingreso = ingresoAPService.buscarPorId(id);
@@ -622,7 +622,7 @@ public class IngresoController {
                                 @RequestParam(required = false) String razonEliminacion,
                                 Authentication authentication, 
                                 RedirectAttributes redirectAttributes) {        
-        // Verificar autenticaciÃƒÂ¯Ã‚Â¿Ã‚Â½n con Spring Security
+        // Verificar autenticaciÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¿Ãƒâ€šÃ‚Â½n con Spring Security
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -639,8 +639,8 @@ public class IngresoController {
             if (ingreso.isPresent()) {
                 IngresoAP registroEliminado = ingreso.get();
                 
-                // Logging para auditorÃƒÆ’Ã‚Â­a
-                System.out.printf("[AUDIT] ELIMINACIÃƒÆ’Ã¢â‚¬Å“N - Usuario: %s | Registro ID: %d | TÃƒÆ’Ã‚Â©cnico: %s (%s) | Fecha: %s | RazÃƒÆ’Ã‚Â³n: %s%n",
+                // Logging para auditorÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­a
+                System.out.printf("[AUDIT] ELIMINACIÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œN - Usuario: %s | Registro ID: %d | TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico: %s (%s) | Fecha: %s | RazÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n: %s%n",
                     usuario.getNombre(),
                     registroEliminado.getId(),
                     registroEliminado.getNombreTecnico(),
@@ -651,7 +651,7 @@ public class IngresoController {
                 
                 ingresoAPService.eliminar(id);
                 redirectAttributes.addFlashAttribute("success", 
-                    "Registro eliminado exitosamente. TÃƒÆ’Ã‚Â©cnico: " + registroEliminado.getNombreTecnico() + 
+                    "Registro eliminado exitosamente. TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico: " + registroEliminado.getNombreTecnico() + 
                     " | ID: " + registroEliminado.getId());
             } else {
                 redirectAttributes.addFlashAttribute("error", "Registro no encontrado");
@@ -662,28 +662,28 @@ public class IngresoController {
         return "redirect:/ingreso/ap/list";
     }
 
-    // Buscar tÃƒÆ’Ã‚Â©cnico por RUT para reutilizar informaciÃƒÆ’Ã‚Â³n
+    // Buscar tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico por RUT para reutilizar informaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
     @GetMapping("/ap/buscar-tecnico")
     @ResponseBody
     public Map<String, Object> buscarTecnicoPorRut(@RequestParam String rut, Authentication authentication) {
         Map<String, Object> response = new HashMap<>();
         
         if (authentication == null || !authentication.isAuthenticated()) {
-            response.put("error", "SesiÃƒÆ’Ã‚Â³n expirada");
+            response.put("error", "SesiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n expirada");
             return response;
         }
         
         String email = authentication.getName();
         Usuario usuario = usuarioDao.findByEmail(email).orElse(null);
         if (usuario == null) {
-            response.put("error", "SesiÃƒÆ’Ã‚Â³n expirada");
+            response.put("error", "SesiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n expirada");
             return response;
         }
         
         try {
             List<IngresoAP> ingresosPrevios = ingresoAPService.buscarPorRutTecnico(rut);
             if (!ingresosPrevios.isEmpty()) {
-                // Obtener el ingreso mÃƒÆ’Ã‚Â¡s reciente
+                // Obtener el ingreso mÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡s reciente
                 IngresoAP ultimoIngreso = ingresosPrevios.get(0);
                 
                 response.put("existe", true);
@@ -697,7 +697,7 @@ public class IngresoController {
                 response.put("existe", false);
             }
         } catch (Exception e) {
-            response.put("error", "Error al buscar tÃƒÆ’Ã‚Â©cnico: " + e.getMessage());
+            response.put("error", "Error al buscar tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico: " + e.getMessage());
         }
         return response;
     }
@@ -785,7 +785,7 @@ public class IngresoController {
             Row headerRow = sheet.createRow(0);
             String[] headers = {
                 "ID", "Fecha Ingreso", "Hora Ingreso", "Fecha Salida", "Hora Salida",
-                "TÃƒÆ’Ã‚Â©cnico", "RUT", "Empresa Demandante", "Empresa Contratista",
+                "TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©cnico", "RUT", "Empresa Demandante", "Empresa Contratista",
                 "Cargo", "Ticket", "Tipo Ticket", "Sala", "Motivo", "Estado",
                 "Turno", "Aprobador", "Escolta", "Actividad"
             };
@@ -827,13 +827,13 @@ public class IngresoController {
                 }
             }
             
-            // Agregar informaciÃƒÆ’Ã‚Â³n del reporte
+            // Agregar informaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n del reporte
             Row infoRow1 = sheet.createRow(rowNum + 2);
             infoRow1.createCell(0).setCellValue("Reporte generado por:");
             infoRow1.createCell(1).setCellValue(usuario.getNombre() + " " + usuario.getApellido());
             
             Row infoRow2 = sheet.createRow(rowNum + 3);
-            infoRow2.createCell(0).setCellValue("Fecha de generaciÃƒÆ’Ã‚Â³n:");
+            infoRow2.createCell(0).setCellValue("Fecha de generaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n:");
             infoRow2.createCell(1).setCellValue(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + 
                                               " " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
             
