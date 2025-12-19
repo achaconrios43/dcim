@@ -1,4 +1,4 @@
-﻿package com.example.clases.service.impl;
+package com.example.clases.service.impl;
 
 import com.example.clases.dao.IIngresoAPDao;
 import com.example.clases.entity.IngresoAP;
@@ -14,8 +14,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * ImplementaciÃƒÂ³n del servicio para lÃƒÂ³gica de negocio de IngresoAP
- * Maneja toda la lÃƒÂ³gica de negocio y validaciones para control de acceso al Centro de Datos
+ * Implementaci????n del servicio para l????gica de negocio de IngresoAP
+ * Maneja toda la l????gica de negocio y validaciones para control de acceso al Centro de Datos
  */
 @Service
 public class IngresoAPServiceImpl implements IngresoAPService {
@@ -34,13 +34,13 @@ public class IngresoAPServiceImpl implements IngresoAPService {
         
         validarDatosIngreso(ingresoAP);
         
-        // PERMITIR MÃƒÅ¡LTIPLES INGRESOS - Los tÃƒÂ©cnicos pueden ingresar varias veces al dÃƒÂ­a
-        // Se ha removido la restricciÃƒÂ³n de duplicados para permitir mÃƒÂºltiples registros del mismo tÃƒÂ©cnico
+        // PERMITIR M????LTIPLES INGRESOS - Los t????cnicos pueden ingresar varias veces al d????a
+        // Se ha removido la restricci????n de duplicados para permitir m????ltiples registros del mismo t????cnico
         
         // Acceso 24/7 - Sin restricciones de horario
-        // La validaciÃƒÂ³n de horario se ha removido para permitir acceso las 24 horas
+        // La validaci????n de horario se ha removido para permitir acceso las 24 horas
         
-        // Generar ticket ÃƒÂºnico si no se proporcionÃƒÂ³
+        // Generar ticket ????nico si no se proporcion????
         if (ingresoAP.getNumeroTicket() == null || ingresoAP.getNumeroTicket().trim().isEmpty()) {
             ingresoAP.setNumeroTicket(generarTicketUnico());
         }
@@ -71,16 +71,16 @@ public class IngresoAPServiceImpl implements IngresoAPService {
         
         Optional<IngresoAP> ingresoOpt = ingresoAPRepository.findById(id);
         if (!ingresoOpt.isPresent()) {
-            throw new Exception("No se encontrÃƒÂ³ el registro de ingreso");
+            throw new Exception("No se encontr???? el registro de ingreso");
         }
         
         IngresoAP ingreso = ingresoOpt.get();
         
         if (ingreso.getHoraTermino() != null) {
-            throw new Exception("Ya se registrÃƒÂ³ la salida para este ingreso");
+            throw new Exception("Ya se registr???? la salida para este ingreso");
         }
         
-        // Registrar salida automÃƒÂ¡tica
+        // Registrar salida autom????tica
         ingreso.setHoraTermino(LocalTime.now());
         ingreso.setFechaTermino(LocalDate.now());
         ingreso.setActivo(false); // Auto-inactivar al registrar salida
@@ -236,8 +236,8 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     }
     
     /**
-     * Verifica si un tÃƒÂ©cnico tiene ingresos activos (sin fecha/hora de tÃƒÂ©rmino)
-     * @param rut RUT del tÃƒÂ©cnico a verificar
+     * Verifica si un t????cnico tiene ingresos activos (sin fecha/hora de t????rmino)
+     * @param rut RUT del t????cnico a verificar
      * @return true si tiene ingresos activos, false si no
      */
     @Override
@@ -251,8 +251,8 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     }
     
     /**
-     * Obtiene el ingreso activo de un tÃƒÂ©cnico (sin fecha/hora de tÃƒÂ©rmino)
-     * @param rut RUT del tÃƒÂ©cnico
+     * Obtiene el ingreso activo de un t????cnico (sin fecha/hora de t????rmino)
+     * @param rut RUT del t????cnico
      * @return Optional con el ingreso activo si existe
      */
     @Override
@@ -304,11 +304,11 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     @Override
     public void validarDatosIngreso(IngresoAP ingresoAP) throws Exception {
         if (ingresoAP.getNombreTecnico() == null || ingresoAP.getNombreTecnico().trim().isEmpty()) {
-            throw new Exception("El nombre del tÃƒÂ©cnico es obligatorio");
+            throw new Exception("El nombre del t????cnico es obligatorio");
         }
         
         if (ingresoAP.getRutTecnico() == null || ingresoAP.getRutTecnico().trim().isEmpty()) {
-            throw new Exception("El RUT del tÃƒÂ©cnico es obligatorio");
+            throw new Exception("El RUT del t????cnico es obligatorio");
         }
         
         if (ingresoAP.getEmpresaDemandante() == null || ingresoAP.getEmpresaDemandante().trim().isEmpty()) {
@@ -327,14 +327,14 @@ public class IngresoAPServiceImpl implements IngresoAPService {
             throw new Exception("La actividad REMEDY es obligatoria");
         }
         
-        // Validar formato de RUT (misma validaciÃƒÂ³n que el controlador)
+        // Validar formato de RUT (misma validaci????n que el controlador)
         String rutLimpio = ingresoAP.getRutTecnico().replaceAll("\\s+","");
         if (!rutLimpio.matches("^[\\d]{1,2}\\.?[\\d]{3}\\.?[\\d]{3}-?[\\dkK]$")) {
-            throw new Exception("Por favor ingrese un RUT vÃƒÂ¡lido (formato: 12.345.678-9)");
+            throw new Exception("Por favor ingrese un RUT v????lido (formato: 12.345.678-9)");
         }
     }
     
-    // MÃƒÂ©todos adicionales para CRUD
+    // M????todos adicionales para CRUD
     @Override
     public Optional<IngresoAP> buscarPorId(Long id) {
         return obtenerIngresoPorId(id);
@@ -361,7 +361,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     }
     
     /**
-     * Obtiene todos los ingresos ordenados por fecha (mÃƒÂ¡s recientes primero)
+     * Obtiene todos los ingresos ordenados por fecha (m????s recientes primero)
      */
     public List<IngresoAP> obtenerIngresosOrdenadosPorFecha() {
         return ingresoAPRepository.findAllOrdenadosPorFecha();
@@ -396,7 +396,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     }
     
     /**
-     * Cuenta tickets ÃƒÂºnicos (no repetidos) en un rango de fechas
+     * Cuenta tickets ????nicos (no repetidos) en un rango de fechas
      */
     @Override
     public Long contarTicketsUnicos(LocalDate fechaInicio, LocalDate fechaFin) {
@@ -420,7 +420,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     }
     
     /**
-     * Obtiene los registros activos mÃƒÂ¡s recientes limitados
+     * Obtiene los registros activos m????s recientes limitados
      */
     @Override
     public List<IngresoAP> obtenerRegistrosActivosRecientes(int limite) {
@@ -436,7 +436,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
         return ingresoAPRepository.countDistinctNumeroTicketByTipoTicketAndFechaInicioBetween(tipoTicket, fechaInicio, fechaFin);
     }
     
-    // ImplementaciÃƒÂ³n de mÃƒÂ©todos para filtrar por sitio
+    // Implementaci????n de m????todos para filtrar por sitio
     @Override
     public Long contarIngresosPorSitio(String sitio, LocalDate fechaInicio, LocalDate fechaFin) {
         return ingresoAPRepository.countBySitioIngresoAndFechaInicioBetween(sitio, fechaInicio, fechaFin);
