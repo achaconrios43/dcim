@@ -1,51 +1,30 @@
 package com.example.clases.controllers;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
 
-import com.example.clases.entity.Usuario;
-import com.example.clases.service.UsuarioService;
-
-import org.springframework.security.core.Authentication;
-
-/**
- * Controlador de Login
- * 
- * NOTA IMPORTANTE: Spring Security maneja automáticamente:
- * - GET /login → Muestra formulario de login
- * - POST /login → Procesa autenticación (CustomUserDetailsService + BCryptPasswordEncoder)
- * - Redirección tras login exitoso → /dashboard
- * - Redirección tras login fallido → /login?error=true
- * 
- * No es necesario código manual para login/logout, Spring Security lo gestiona todo.
- */
 @Controller
 public class LoginController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    @GetMapping({"/", "/login"})
+    public String login() {
+        return "login";
+    }
 
-    /**
-     * Endpoint AJAX para validar si el usuario existe
-     * Usado en el formulario de registro para validación en tiempo real
-     */
-    @GetMapping("/user/exists")
-    @ResponseBody
-    public ResponseEntity<Boolean> verificarUsuarioExiste(@RequestParam String email) {
-        try {
-            boolean existe = usuarioService.existeEmail(email) || 
-                           usuarioService.obtenerUsuarioPorEmail(email).isPresent();
-            return ResponseEntity.ok(existe);
-        } catch (Exception e) {
-            return ResponseEntity.ok(false);
-        }
+    @PostMapping("/login")
+    public String procesarLogin(@RequestParam(name = "username", required = false) String username,
+                                @RequestParam(name = "password", required = false) String password,
+                                @RequestParam(name = "ubicacion", required = false) String ubicacion,
+                                Model model) {
+        // Procesamiento simple para pruebas; reemplaza con autenticación real si se desea
+        System.out.println("[LoginController] Usuario: " + username);
+        System.out.println("[LoginController] Contraseña: " + password);
+        System.out.println("[LoginController] Ubicación: " + ubicacion);
+        model.addAttribute("mensaje", "Login recibido para " + (username != null ? username : "(sin usuario)") +
+                (ubicacion != null ? " en " + ubicacion : ""));
+        return "login";
     }
 }
-

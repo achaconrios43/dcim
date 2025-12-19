@@ -11,51 +11,19 @@
             </svg>
           </div>
           <div class="leading-tight">
-            <div style="font-weight:700; color:#003DA5; font-size:1rem;">DATA CENTER COMMODITIES</div>
-            <div style="font-size:0.85rem; color:#004a99;">SISTEMA DE GESTIÓN TÉCNICA</div>
+            <div style="font-weight:700; color:#003DA5; font-size:1rem;">SERVICIO COMMODITIES</div>
+            <div style="font-size:0.85rem; color:#004a99;">DATA CENTER & MEGA CENTRALES</div>
           </div>
         </a>
       </div>
 
       <div class="flex items-center gap-6">
         <div class="hidden md:flex items-center gap-6">
-          <a th:href="@{/}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Inicio</a>
-          
-          <!-- Dropdown de Data Center -->
-          <div class="relative group">
-            <button class="text-[#003DA5] hover:underline px-3 py-2 rounded flex items-center gap-1">
-              Data Center 
-              <span class="text-xs">▼</span>
-            </button>
-            <div class="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-              <a th:href="@{/login}" class="block px-4 py-2 text-[#003DA5] hover:bg-blue-50 rounded-t-lg">🏢 Inventario Racks</a>
-              <a th:href="@{/login}" class="block px-4 py-2 text-[#003DA5] hover:bg-blue-50">🌡️ Temperatura</a>
-              <a th:href="@{/login}" class="block px-4 py-2 text-[#003DA5] hover:bg-blue-50">🗺️ Layout Salas</a>
-              <a th:href="@{/login}" class="block px-4 py-2 text-[#003DA5] hover:bg-blue-50 rounded-b-lg">📊 Estadísticas</a>
-            </div>
-          </div>
-          
-          <!-- Dropdown de Técnicos -->
-          <div class="relative group">
-            <button class="text-[#003DA5] hover:underline px-3 py-2 rounded flex items-center gap-1">
-              Usuarios 
-              <span class="text-xs">▼</span>
-            </button>
-            <div class="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-              <a th:href="@{/login}" class="block px-4 py-2 text-[#003DA5] hover:bg-blue-50 rounded-t-lg">🔐 Acceso Usuarios</a>
-              <a th:if="${session.usuarioLogueado != null and session.usuarioRol == 'ADMIN'}" 
-                 th:href="@{/user/create}" 
-                 class="block px-4 py-2 text-[#003DA5] hover:bg-blue-50">
-                ➕ Registrar Usuario <span class="text-xs text-red-600">(ADMIN)</span>
-              </a>
-            </div>
-          </div>
-
-          <span th:if="${session.usuarioLogueado}" class="text-[#004a99] font-semibold px-3">
-            Usuario: <span th:text="${session.usuarioNombre}"></span>
-            <span class="text-xs" th:text="'(' + ${session.usuarioRol} + ')'"></span>
-          </span>
-          <a th:href="@{/logout}" th:if="${session.usuarioLogueado}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Logout</a>
+          <a th:href="@{/}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Servicio</a>
+          <a th:href="@{/login}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Login</a>
+          <a th:href="@{/user/create}" class="text-[#003DA5] hover:underline px-3 py-2 rounded" th:unless="${#authentication?.name}">Register</a>
+          <span th:if="${#authentication?.name}" class="text-[#004a99] font-semibold px-3">Usuario: <span th:text="${#authentication.name}"></span></span>
+          <a th:href="@{/logout}" th:if="${#authentication?.name}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Logout</a>
         </div>
 
         

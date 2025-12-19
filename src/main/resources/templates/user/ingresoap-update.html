@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:insert="fragments/headers :: headers"></th:block>
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
     <title>Editar Registro de Acceso</title>
     <style>
         .field-error {
@@ -11,8 +11,6 @@
     </style>
 </head>
 <body class="bg-gray-100">
-    <!-- Header -->
-    <th:block th:insert="fragments/headers :: headers"></th:block>
 
     <div class="container mx-auto px-4 py-8">
         <!-- Botones de navegación -->

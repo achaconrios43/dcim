@@ -4,22 +4,6 @@
 # Log file
 *.log
 
-# Backup files
-*.backup
-
-# Local scripts
-run-app.ps1
-setup-java21.ps1
-
-# Local database files
-data/
-*.db
-*.trace.db
-
-# Temporary files
-desktop.ini
-last-login.html
-
 # BlueJ files
 *.ctxt
 
@@ -81,11 +65,6 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# H2 Database files (mantener estructura pero no datos)
-data/*.db
-data/*.mv.db
-data/*.trace.db
-
 # Application logs
 app.log
 server.log
@@ -93,10 +72,3 @@ server.log
 # Temporary files
 *.tmp
 *.temp
-
-# Spring Boot DevTools
-*.original
-
-# Backup files
-*.bak
-*~
