@@ -50,12 +50,12 @@ USER spring:spring
 EXPOSE 8082
 
 # Variables de entorno por defecto (se pueden sobrescribir en runtime)
-ENV JAVA_OPTS="-Xmx384m -Xms192m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+OptimizeStringConcat" \
+ENV JAVA_OPTS="-Xmx450m -Xms256m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0" \
     SPRING_PROFILES_ACTIVE=production \
     PORT=8082
 
-# Health check para monitoreo - más tiempo para arrancar
-HEALTHCHECK --interval=60s --timeout=10s --start-period=180s --retries=5 \
+# Health check para monitoreo - MUY tolerante
+HEALTHCHECK --interval=60s --timeout=10s --start-period=240s --retries=5 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8082/actuator/health || exit 1
 
 # Ejecutar la aplicación
