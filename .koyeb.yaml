@@ -19,7 +19,7 @@ services:
       max: 3
     
     # Tamaño de la instancia
-    instance_type: nano  # nano, micro, small, medium, large
+    instance_type: micro  # nano, micro, small, medium, large
     
     # Región de despliegue
     regions:
@@ -45,11 +45,11 @@ services:
       - type: http
         path: /actuator/health
         port: 8082
-        interval: 30
-        timeout: 5
-        grace_period: 60
+        interval: 60
+        timeout: 10
+        grace_period: 120
     
     # Configuración de recursos
     resources:
-      memory: 512Mi
+      memory: 1Gi
       cpu: 0.5
