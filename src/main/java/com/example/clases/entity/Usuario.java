@@ -1,40 +1,79 @@
 package com.example.clases.entity;
-import java.util.Date;
 
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
-
+@Entity
+@Table(name = "usuario")
 public class Usuario {
-  private String rut;
-  private String nombre;
-  private String apellido;
-  private String email;
-  private String password;
-  private String ubicacion;
-  private String rol;
-  private Date creatAt;
-  private Date updateAt;
 
-    // No-arg constructor
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 12)
+    private String rut;
+
+    @Column(nullable = false, length = 100)
+    private String nombre;
+
+    @Column(nullable = false, length = 100)
+    private String apellido;
+
+    @Column(nullable = false, unique = true, length = 150)
+    private String email;
+
+    @Column(nullable = false, length = 255)
+    private String password;
+
+    @Column(nullable = false, length = 20)
+    private String rol = "USER";
+
+    @Column(name = "creat_at")
+    private LocalDateTime creatAt;
+
+    @Column(name = "update_at")
+    private LocalDateTime updateAt;
+
+    @PrePersist
+    protected void onCreate() {
+        creatAt = LocalDateTime.now();
+        updateAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updateAt = LocalDateTime.now();
+    }
+
+    // Constructors
     public Usuario() {
     }
 
-    public Usuario(String nombre, String apellido, String email, String password, String ubicacion, String rol) {
+    public Usuario(String rut, String nombre, String apellido, String email, String password, String rol) {
+        this.rut = rut;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
         this.password = password;
-        this.ubicacion = ubicacion;
         this.rol = rol;
-       
     }
 
-public String getRut() {
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getRut() {
         return rut;
     }
 
     public void setRut(String rut) {
         this.rut = rut;
-        this.updateAt = new Date();
     }
 
     public String getNombre() {
@@ -43,7 +82,6 @@ public String getRut() {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-        this.updateAt = new Date();
     }
 
     public String getApellido() {
@@ -52,7 +90,6 @@ public String getRut() {
 
     public void setApellido(String apellido) {
         this.apellido = apellido;
-        this.updateAt = new Date();
     }
 
     public String getEmail() {
@@ -61,7 +98,6 @@ public String getRut() {
 
     public void setEmail(String email) {
         this.email = email;
-        this.updateAt = new Date();
     }
 
     public String getPassword() {
@@ -70,15 +106,6 @@ public String getRut() {
 
     public void setPassword(String password) {
         this.password = password;
-        this.updateAt = new Date();
-    }
-    public String getUbicacion() {
-        return ubicacion;
-    }
-
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
-        this.updateAt = new Date();
     }
 
     public String getRol() {
@@ -87,27 +114,38 @@ public String getRut() {
 
     public void setRol(String rol) {
         this.rol = rol;
-        this.updateAt = new Date();
     }
 
-    public Date getCreatAt() {
+    public LocalDateTime getCreatAt() {
         return creatAt;
     }
 
-    public Date getUpdateAt() {
+    public void setCreatAt(LocalDateTime creatAt) {
+        this.creatAt = creatAt;
+    }
+
+    public LocalDateTime getUpdateAt() {
         return updateAt;
+    }
+
+    public void setUpdateAt(LocalDateTime updateAt) {
+        this.updateAt = updateAt;
+    }
+
+    // Utility methods
+    public String getNombreCompleto() {
+        return nombre + " " + apellido;
     }
 
     @Override
     public String toString() {
         return "Usuario{" +
-                "nombre='" + nombre + '\'' +
+                "id=" + id +
+                ", rut='" + rut + '\'' +
+                ", nombre='" + nombre + '\'' +
                 ", apellido='" + apellido + '\'' +
                 ", email='" + email + '\'' +
-                ", ubicacion='" + ubicacion + '\'' +
                 ", rol='" + rol + '\'' +
                 '}';
     }
 }
-
-
