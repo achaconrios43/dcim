@@ -1,87 +1,621 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head th:replace="fragments/headers :: headers"></head>
-  <body>
-    <nav th:replace="fragments/navdar :: nav"></nav>
-    <main class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-accent py-8">
-      <div class="w-full max-w-lg bg-white bg-opacity-80 rounded-xl shadow-xl p-8 backdrop-blur">
-        <div class="flex items-center mb-6">
-          <div class="mr-3">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#6c5ce7" opacity="0.12"/><path d="M6 12h12M6 8h12M6 16h8" stroke="#6c5ce7" stroke-opacity="0.9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-accent">Registro de Ingreso</div>
-            <div class="text-sm text-gray-500">Complete los datos de la visita</div>
-          </div>
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
+    <title>Registro de Ingreso al Data Center</title>
+    <style>
+        .field-error {
+            border-color: #f56565 !important;
+            box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Botones de navegación -->
+        <div class="mb-6">
+            <div class="flex items-center gap-3">
+                <a th:href="@{/dashboard}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    Dashboard
+                </a>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Cerrar Sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Título -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Registro de Ingreso al Data Center</h1>
+                <nav class="text-sm text-gray-600 mt-2">
+                    <a href="/dashboard" class="hover:text-blue-600">Dashboard</a> > 
+                    <span>Nuevo Registro</span>
+                </nav>
+            </div>
+            <a href="/dashboard" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Cancelar
+            </a>
         </div>
 
-        <form th:action="@{/ingreso}" action="/ingreso" method="post" class="space-y-5" id="ingresoForm">
-          <div th:if="${_csrf != null}">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-          </div>
+        <!-- Mensajes de éxito/error -->
+        <div th:if="${successMessage}" class="mb-4 p-4 rounded-lg bg-green-100 border border-green-300 text-green-800">
+          <strong>✓ Éxito:</strong> <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="mb-4 p-4 rounded-lg bg-red-100 border border-red-300 text-red-800">
+          <strong>✗ Error:</strong> <span th:text="${errorMessage}"></span>
+        </div>
 
-          <div>
-            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
-            <input type="text" id="nombre" name="nombre" th:value="${nombre}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Nombre completo" />
-          </div>
-
-          <div>
-            <label for="rut" class="block text-sm font-medium text-gray-700">RUT</label>
-            <input type="text" id="rut" name="rut" th:value="${rut}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Ej: 12.345.678-9" />
-          </div>
-
-          <div class="flex space-x-4">
-            <div class="flex-1">
-              <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
-              <input type="date" id="fecha" name="fecha" th:value="${fecha}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
+        <!-- Formulario de registro -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-blue-600 text-white px-6 py-4">
+                <h2 class="text-xl font-bold">Nuevo Registro de Ingreso</h2>
             </div>
-            <div class="flex-1">
-              <label for="hora" class="block text-sm font-medium text-gray-700">Hora ingreso</label>
-              <input type="time" id="hora" name="hora" th:value="${hora}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" />
+
+            <div class="p-6">
+
+            <div class="p-6">
+                <form th:action="@{/ingresoap}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <!-- Información Básica - AUTOMÁTICA -->
+                    <div class="mb-8 bg-blue-50 p-4 rounded-lg border-2 border-blue-300">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">🤖 Información Básica (Automática)</h3>
+                        <p class="text-xs text-blue-600 mb-4">Estos campos se completan automáticamente</p>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="turno" class="block text-sm font-medium text-gray-700 mb-1">Turno *</label>
+                                <input type="text" id="turnoDisplay" readonly
+                                       class="w-full px-3 py-2 border border-blue-300 rounded-md bg-blue-50 text-blue-900 cursor-not-allowed focus:outline-none font-semibold">
+                                <input type="hidden" name="turno" id="turno" required>
+                                <p class="text-xs text-gray-500 mt-1">Se calcula automáticamente según la hora de ingreso</p>
+                            </div>
+                            <div>
+                                <label for="nombreUsuario" class="block text-sm font-medium text-gray-700 mb-1">Usuario que Registra *</label>
+                                <input type="text" name="nombreUsuario" id="nombreUsuario" required readonly
+                                       th:value="${usuarioActual != null ? usuarioActual.nombre + ' ' + usuarioActual.apellido : ''}"
+                                       class="w-full px-3 py-2 border border-blue-300 rounded-md bg-blue-50 text-blue-900 cursor-not-allowed focus:outline-none font-semibold">
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <span th:if="${usuarioActual != null}" th:text="'Email: ' + ${usuarioActual.email}"></span>
+                                    <span th:unless="${usuarioActual != null}">Usuario actualmente autenticado</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de Ingreso -->
+                    <div class="mb-8 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <h3 class="text-lg font-semibold text-blue-900 mb-4">📅 Información de Ingreso</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="fechaInicio" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Ingreso *</label>
+                                <input type="date" name="fechaInicio" id="fechaInicio" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="horaInicio" class="block text-sm font-medium text-gray-700 mb-1">Hora de Ingreso *</label>
+                                <input type="time" name="horaInicio" id="horaInicio" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="fechaFinFicticia" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Salida Ficticia *</label>
+                                <input type="date" name="fechaFinFicticia" id="fechaFinFicticia" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="horaFinFicticia" class="block text-sm font-medium text-gray-700 mb-1">Hora de Salida Ficticia *</label>
+                                <input type="time" name="horaFinFicticia" id="horaFinFicticia" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="horarioMedioDisplay" class="block text-sm font-medium text-gray-700 mb-1">Horario Medio para Segunda Ronda</label>
+                                <input type="text" id="horarioMedioDisplay" readonly
+                                       class="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-700 font-semibold text-center"
+                                       placeholder="Se calculará automáticamente">
+                                <input type="hidden" name="fechaSupervisionMedia" id="fechaSupervisionMedia">
+                                <input type="hidden" name="horaSupervisionMedia" id="horaSupervisionMedia">
+                                <p class="text-xs text-blue-600 mt-2">💡 La segunda ronda se marcará posteriormente desde el formulario de edición</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del Técnico -->
+                    <div class="mb-8 bg-yellow-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Información del Técnico</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="nombreTecnico" class="block text-sm font-medium text-gray-700 mb-1">Nombre Técnico *</label>
+                                <input type="text" name="nombreTecnico" id="nombreTecnico" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Nombre completo del técnico">
+                            </div>
+                            <div>
+                                <label for="rutTecnico" class="block text-sm font-medium text-gray-700 mb-1">RUT Técnico *</label>
+                                <input type="text" name="rutTecnico" id="rutTecnico" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="12.345.678-9">
+                                <p class="text-xs text-gray-500 mt-1">Formato: XX.XXX.XXX-X</p>
+                            </div>
+                            <div>
+                                <label for="cargoTecnico" class="block text-sm font-medium text-gray-700 mb-1">Cargo Técnico *</label>
+                                <input type="text" name="cargoTecnico" id="cargoTecnico" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Cargo del técnico">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de Empresas -->
+                    <div class="mb-8 bg-purple-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Información de Empresas</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="empresaDemandante" class="block text-sm font-medium text-gray-700 mb-1">Empresa Demandante *</label>
+                                <input type="text" name="empresaDemandante" id="empresaDemandante" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Empresa que solicita">
+                            </div>
+                            <div>
+                                <label for="empresaContratista" class="block text-sm font-medium text-gray-700 mb-1">Empresa Contratista *</label>
+                                <input type="text" name="empresaContratista" id="empresaContratista" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Empresa contratista">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del Ticket -->
+                    <div class="mb-8 bg-red-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Información del Ticket y Ubicación</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="salaRemedy" class="block text-sm font-medium text-gray-700 mb-1">Sala REMEDY *</label>
+                                <select name="salaRemedy" id="salaRemedy" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccionar sala</option>
+                                    <option value="Salas de RED">Salas de RED</option>
+                                    <option value="Salas TI">Salas TI</option>
+                                    <option value="Salas TI & Red">Salas TI & Red</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="sitioIngreso" class="block text-sm font-medium text-gray-700 mb-1">Sitio *</label>
+                                <select name="sitioIngreso" id="sitioIngreso" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccionar sitio</option>
+                                    <option value="DC San Martin">DC San Martin</option>
+                                    <option value="DC Apoquindo">DC Apoquindo</option>
+                                    <option value="MC Chiloé">MC Chiloé</option>
+                                    <option value="MC Independencia">MC Independencia</option>
+                                    <option value="MC la Florida">MC la Florida</option>
+                                    <option value="MC Manuel Montt">MC Manuel Montt</option>
+                                    <option value="MC Pedro de Valdivia">MC Pedro de Valdivia</option>
+                                    <option value="MC Providencia">MC Providencia</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Salas específicas (checkboxes dinámicos) -->
+                        <div id="salasEspecificas" class="mt-6 hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Salas de Ingreso (seleccione una o más) *</label>
+                            <div id="checkboxesSalas" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                <!-- Los checkboxes se cargarán dinámicamente aquí -->
+                            </div>
+                            <input type="hidden" name="salaIngresa" id="salaIngresa" required>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6 mt-6">
+                            <div>
+                                <label for="tipoTicket" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Ticket *</label>
+                                <select name="tipoTicket" id="tipoTicket" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccionar tipo</option>
+                                    <option value="CRQ">CRQ</option>
+                                    <option value="INC">INC</option>
+                                    <option value="Visita Inspectiva">Visita Inspectiva</option>
+                                    <option value="Ronda Rutinaria">Ronda Rutinaria</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="numeroTicket" class="block text-sm font-medium text-gray-700 mb-1">Número de Ticket *</label>
+                                <input type="text" name="numeroTicket" id="numeroTicket" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Ej: INC123456">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aprobaciones y Seguridad -->
+                    <div class="mb-8 bg-indigo-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Aprobaciones y Seguridad</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="aprobador" class="block text-sm font-medium text-gray-700 mb-1">Aprobador *</label>
+                                <select name="aprobador" id="aprobador" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccionar aprobador</option>
+                                    <option value="Paulo Hernandez">Paulo Hernandez</option>
+                                    <option value="Arturo Chacón">Arturo Chacón</option>
+                                    <option value="Marcelo Robles">Marcelo Robles</option>
+                                    <option value="Facilities">Facilities</option>
+                                    <option value="Rodrigo Aguilera">Rodrigo Aguilera</option>
+                                    <option value="Operador Turno">Operador Turno</option>
+                                    <option value="No Autorizado">No Autorizado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="escolta" class="block text-sm font-medium text-gray-700 mb-1">Escolta *</label>
+                                <select name="escolta" id="escolta" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccionar escolta</option>
+                                    <option value="Operador de Turno">Operador de Turno</option>
+                                    <option value="Guardia">Guardia</option>
+                                    <option value="Personal de Facilities">Personal de Facilities</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Motivos y Ubicación -->
+                    <div class="mb-8 bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Motivos y Ubicación Específica</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="motivoIngreso" class="block text-sm font-medium text-gray-700 mb-1">Motivo Ingreso *</label>
+                                <select name="motivoIngreso" id="motivoIngreso" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Seleccionar motivo</option>
+                                    <option value="Inspectiva">Inspectiva</option>
+                                    <option value="Actividad Rutinaria">Actividad Rutinaria</option>
+                                    <option value="Instalación">Instalación</option>
+                                    <option value="Mediciones">Mediciones</option>
+                                    <option value="Sin ticket">Sin ticket</option>
+                                    <option value="Ticket de Empresa">Ticket de Empresa</option>
+                                    <option value="Ticket de Otro Sitio">Ticket de Otro Sitio</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="guiaDespacho" class="block text-sm font-medium text-gray-700 mb-1">Guía de Despacho (Opcional)</label>
+                                <input type="text" name="guiaDespacho" id="guiaDespacho"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Número de guía">
+                            </div>
+                            <div>
+                                <label for="rackIngresa" class="block text-sm font-medium text-gray-700 mb-1">Rack Ingresa (Opcional)</label>
+                                <input type="text" name="rackIngresa" id="rackIngresa"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Rack de trabajo">
+                            </div>
+                            <div>
+                                <label for="salasSeleccionadasDisplay" class="block text-sm font-medium text-gray-700 mb-1">Salas Seleccionadas</label>
+                                <input type="text" id="salasSeleccionadasDisplay" readonly
+                                       class="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-700"
+                                       placeholder="Las salas seleccionadas aparecerán aquí">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actividad de Remedy -->
+                    <div class="mb-8 bg-teal-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Actividad</h3>
+                        <div>
+                            <label for="actividadRemedy" class="block text-sm font-medium text-gray-700 mb-1">Actividad de Remedy *</label>
+                            <textarea name="actividadRemedy" id="actividadRemedy" required rows="4"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="Descripción detallada de la actividad a realizar"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="flex justify-end space-x-4">
+                        <a href="/dashboard" 
+                           class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            Cancelar
+                        </a>
+                        <button type="submit" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Registrar Ingreso
+                        </button>
+                    </div>
+                </form>
             </div>
-          </div>
+        </div>
+    </div>
 
-          <div>
-            <label for="empresa" class="block text-sm font-medium text-gray-700">Empresa</label>
-            <input type="text" id="empresa" name="empresa" th:value="${empresa}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Empresa" />
-          </div>
+    <!-- Footer -->
+    <th:block th:insert="fragments/footer :: footer"></th:block>
 
-          <div>
-            <label for="contratista" class="block text-sm font-medium text-gray-700">Contratista</label>
-            <input type="text" id="contratista" name="contratista" th:value="${contratista}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Contratista" />
-          </div>
+    <script>
+        // Función para calcular el turno automáticamente según la hora
+        function calcularTurno(hora) {
+            if (!hora) return '';
+            
+            const [hours, minutes] = hora.split(':').map(Number);
+            const totalMinutes = hours * 60 + minutes;
+            
+            // AM (Noche): 19:00 a 06:59 -> 1140 minutos (19*60) hasta 1439 (23:59) y 0 hasta 419 (06:59)
+            // PM (Día): 07:00 a 18:59 -> 420 minutos (7*60) hasta 1139 (18:59)
+            
+            if ((totalMinutes >= 1140) || (totalMinutes <= 419)) {
+                return 'AM';
+            } else {
+                return 'PM';
+            }
+        }
 
-          <div>
-            <label for="tipoRemedy" class="block text-sm font-medium text-gray-700">Tipo de REMEDY</label>
-            <select id="tipoRemedy" name="tipoRemedy" required class="block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900">
-              <option value="" th:selected="${tipoRemedy == null or tipoRemedy == ''}">Selecciona una opción</option>
-              <option value="CRQ" th:selected="${tipoRemedy == 'CRQ'}">CRQ</option>
-              <option value="INC" th:selected="${tipoRemedy == 'INC'}">INC</option>
-              <option value="VISITA" th:selected="${tipoRemedy == 'VISITA'}">VISITA</option>
-            </select>
-          </div>
+        function actualizarTurno() {
+            const horaInicio = document.getElementById('horaInicio').value;
+            if (horaInicio) {
+                const turno = calcularTurno(horaInicio);
+                document.getElementById('turno').value = turno;
+                
+                if (turno === 'AM') {
+                    document.getElementById('turnoDisplay').value = 'AM (Noche) - 19:00 a 06:59';
+                    document.getElementById('turnoDisplay').classList.remove('text-blue-900');
+                    document.getElementById('turnoDisplay').classList.add('text-purple-900');
+                } else if (turno === 'PM') {
+                    document.getElementById('turnoDisplay').value = 'PM (Día) - 07:00 a 18:59';
+                    document.getElementById('turnoDisplay').classList.remove('text-purple-900');
+                    document.getElementById('turnoDisplay').classList.add('text-blue-900');
+                }
+            } else {
+                document.getElementById('turno').value = '';
+                document.getElementById('turnoDisplay').value = 'Ingrese la hora para calcular el turno';
+            }
+        }
 
-          <div>
-            <label for="ticket" class="block text-sm font-medium text-gray-700">Número de ticket</label>
-            <input type="text" id="ticket" name="ticket" th:value="${ticket}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Ej: INC123456" />
-          </div>
+        // Establecer la hora actual al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const ahora = new Date();
+            const fechaHoy = ahora.toISOString().split('T')[0];
+            const horaActual = String(ahora.getHours()).padStart(2, '0') + ':' + String(ahora.getMinutes()).padStart(2, '0');
+            
+            // Auto-completar fecha y hora actual
+            document.getElementById('fechaInicio').value = fechaHoy;
+            document.getElementById('horaInicio').value = horaActual;
+            
+            // Calcular turno inicial
+            actualizarTurno();
+        });
 
-          <div>
-            <label for="aprobador" class="block text-sm font-medium text-gray-700">Aprobador</label>
-            <input type="text" id="aprobador" name="aprobador" th:value="${aprobador}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Nombre del aprobador" />
-          </div>
+        // Actualizar turno cuando cambie la hora
+        document.getElementById('horaInicio').addEventListener('change', actualizarTurno);
+        document.getElementById('horaInicio').addEventListener('input', actualizarTurno);
 
-          <div>
-            <label for="motivo" class="block text-sm font-medium text-gray-700">Motivo visita</label>
-            <textarea id="motivo" name="motivo" th:text="${motivo}" required rows="2" class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Motivo de la visita"></textarea>
-          </div>
+        // ========== GESTIÓN DE SEGUNDA RONDA Y HORARIO MEDIO ==========
+        
+        // Función para calcular el horario medio entre hora inicio y hora fin
+        function calcularHorarioMedio() {
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            const horaInicio = document.getElementById('horaInicio').value;
+            const fechaFin = document.getElementById('fechaFinFicticia').value;
+            const horaFin = document.getElementById('horaFinFicticia').value;
 
-          <div>
-            <button type="submit" class="w-full py-3 rounded-lg bg-accent text-white font-bold text-lg shadow hover:bg-indigo-700 transition mt-2">Registrar ingreso</button>
-          </div>
-        </form>
-      </div>
-    </main>
+            if (!fechaInicio || !horaInicio || !fechaFin || !horaFin) {
+                document.getElementById('horarioMedioDisplay').value = 'Complete todos los campos de fecha/hora';
+                return;
+            }
+
+            // Crear objetos Date
+            const inicio = new Date(`${fechaInicio}T${horaInicio}`);
+            const fin = new Date(`${fechaFin}T${horaFin}`);
+
+            // Calcular punto medio
+            const tiempoMedio = new Date((inicio.getTime() + fin.getTime()) / 2);
+
+            // Formatear fecha y hora
+            const fechaMedio = tiempoMedio.toISOString().split('T')[0];
+            const horaMedio = tiempoMedio.toTimeString().split(' ')[0].substring(0, 5);
+
+            // Guardar en campos ocultos
+            document.getElementById('fechaSupervisionMedia').value = fechaMedio;
+            document.getElementById('horaSupervisionMedia').value = horaMedio + ':00';
+
+            // Mostrar en campo de visualización
+            const fechaFormateada = new Date(fechaMedio).toLocaleDateString('es-CL');
+            document.getElementById('horarioMedioDisplay').value = `${fechaFormateada} a las ${horaMedio}`;
+            
+            // Iniciar verificación de alertas
+            iniciarVerificacionAlertas();
+        }
+
+        // Función para verificar si estamos cerca de la hora media (10 minutos antes)
+        function verificarAlertaSegundaRonda() {
+            const horaMedio = document.getElementById('horaSupervisionMedia').value;
+            const fechaMedio = document.getElementById('fechaSupervisionMedia').value;
+            const segundaRondaRealizada = document.getElementById('segundaSupervisionRealizada').checked;
+
+            if (!horaMedio || !fechaMedio || segundaRondaRealizada) {
+                return;
+            }
+
+            // Crear objeto Date para la hora media
+            const horaMediaDate = new Date(`${fechaMedio}T${horaMedio}`);
+            const ahora = new Date();
+
+            // Calcular diferencia en minutos
+            const diferenciaMs = horaMediaDate - ahora;
+            const diferenciaMinutos = Math.floor(diferenciaMs / 60000);
+
+            const displayField = document.getElementById('horarioMedioDisplay');
+
+            // Si faltan 10 minutos o menos (y es positivo), mostrar alerta
+            if (diferenciaMinutos <= 10 && diferenciaMinutos >= -30) {
+                displayField.classList.add('bg-red-100', 'border-red-500', 'text-red-900', 'font-bold');
+                displayField.classList.remove('bg-gray-100');
+                
+                if (diferenciaMinutos > 0) {
+                    displayField.value = `⚠️ ATENCIÓN: Segunda ronda en ${diferenciaMinutos} minutos - ${displayField.value.split(' - ')[1] || displayField.value}`;
+                    
+                    // Mostrar alerta de navegador
+                    if (diferenciaMinutos === 10) {
+                        mostrarAlertaSegundaRonda();
+                    }
+                } else {
+                    displayField.value = `🔴 URGENTE: Hora de segunda ronda VENCIDA (hace ${Math.abs(diferenciaMinutos)} min)`;
+                }
+            } else {
+                displayField.classList.remove('bg-red-100', 'border-red-500', 'text-red-900', 'font-bold');
+                displayField.classList.add('bg-gray-100');
+            }
+        }
+
+        // Función para mostrar alerta de navegador
+        function mostrarAlertaSegundaRonda() {
+            const horaMedio = document.getElementById('horarioMedioDisplay').value;
+            alert(`⚠️ ATENCIÓN: Es hora de realizar la segunda ronda de supervisión\n\n${horaMedio}`);
+            
+            // Intentar notificación del navegador si está disponible
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("Segunda Ronda de Supervisión", {
+                    body: "Es momento de realizar la segunda ronda",
+                    icon: "/favicon.ico"
+                });
+            }
+        }
+
+        // Iniciar verificación periódica
+        let intervaloAlerta = null;
+        function iniciarVerificacionAlertas() {
+            // Limpiar intervalo anterior si existe
+            if (intervaloAlerta) {
+                clearInterval(intervaloAlerta);
+            }
+            
+            // Verificar cada 30 segundos
+            intervaloAlerta = setInterval(verificarAlertaSegundaRonda, 30000);
+            
+            // Verificar inmediatamente
+            verificarAlertaSegundaRonda();
+        }
+
+        // Eventos para recalcular horario medio cuando cambien las fechas/horas
+        document.getElementById('fechaInicio').addEventListener('change', calcularHorarioMedio);
+        document.getElementById('horaInicio').addEventListener('change', calcularHorarioMedio);
+        document.getElementById('fechaFinFicticia').addEventListener('change', calcularHorarioMedio);
+        document.getElementById('horaFinFicticia').addEventListener('change', calcularHorarioMedio);
+
+        // Solicitar permisos de notificación al cargar la página
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+
+        // Configuración de salas por Sitio y Tipo de Sala REMEDY
+        const salasPorSitioYTipo = {
+            'DC Apoquindo': {
+                'Salas de RED': ['Conmutacion', 'M8', 'Movil', 'SDH', 'CrossConect'],
+                'Salas TI': ['GSM', 'CPD1', 'CPD2', 'Mainframe'],
+                'Salas TI & Red': ['M8', 'SDH', 'Movil', 'CrossConect', 'Conmutación', 'Mainframe', 'CPD1', 'CPD2', 'GSM']
+            },
+            'DC San Martin': {
+                'Salas de RED': [],  // Pendiente: El usuario proporcionará estas salas
+                'Salas TI': [],
+                'Salas TI & Red': []
+            },
+            'MC Chiloé': {
+                'Salas de RED': ['Nueva Chiloe', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
+            },
+            'MC Independencia': {
+                'Salas de RED': ['Nueva Independencia', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
+            },
+            'MC la Florida': {
+                'Salas de RED': ['Nueva Florida', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
+            },
+            'MC Manuel Montt': {
+                'Salas de RED': ['Nueva Manuel Montt', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
+            },
+            'MC Pedro de Valdivia': {
+                'Salas de RED': ['Nueva Pedro de Valdivia', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
+            },
+            'MC Providencia': {
+                'Salas de RED': ['Nueva Providencia', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
+            }
+        };
+
+        // Función para cargar checkboxes de salas según Sala REMEDY y Sitio
+        function cargarCheckboxesSalas() {
+            const salaRemedy = document.getElementById('salaRemedy').value;
+            const sitio = document.getElementById('sitioIngreso').value;
+            const contenedorCheckboxes = document.getElementById('checkboxesSalas');
+            const seccionSalas = document.getElementById('salasEspecificas');
+            const inputHidden = document.getElementById('salaIngresa');
+
+            // Limpiar checkboxes previos
+            contenedorCheckboxes.innerHTML = '';
+            inputHidden.value = '';
+
+            // Verificar si hay salas disponibles para la combinación seleccionada
+            if (salaRemedy && sitio && salasPorSitioYTipo[sitio] && salasPorSitioYTipo[sitio][salaRemedy]) {
+                const salas = salasPorSitioYTipo[sitio][salaRemedy];
+                
+                if (salas.length > 0) {
+                    seccionSalas.classList.remove('hidden');
+                    
+                    // Crear checkboxes para cada sala
+                    salas.forEach((sala, index) => {
+                        const div = document.createElement('div');
+                        div.className = 'flex items-center';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = `sala_${index}`;
+                        checkbox.value = sala;
+                        checkbox.className = 'w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500';
+                        checkbox.addEventListener('change', actualizarSalasSeleccionadas);
+                        
+                        const label = document.createElement('label');
+                        label.htmlFor = `sala_${index}`;
+                        label.className = 'ml-2 text-sm text-gray-700';
+                        label.textContent = sala;
+                        
+                        div.appendChild(checkbox);
+                        div.appendChild(label);
+                        contenedorCheckboxes.appendChild(div);
+                    });
+                } else {
+                    seccionSalas.classList.add('hidden');
+                    alert('No hay salas configuradas para DC San Martin aún. Por favor contacte al administrador.');
+                }
+            } else {
+                seccionSalas.classList.add('hidden');
+            }
+        }
+
+        // Función para actualizar el campo oculto con las salas seleccionadas
+        function actualizarSalasSeleccionadas() {
+            const checkboxes = document.querySelectorAll('#checkboxesSalas input[type="checkbox"]:checked');
+            const salasSeleccionadas = Array.from(checkboxes).map(cb => cb.value);
+            const salasTexto = salasSeleccionadas.join(', ');
+            
+            // Actualizar campo oculto (para enviar en el formulario)
+            document.getElementById('salaIngresa').value = salasTexto;
+            
+            // Actualizar campo de visualización en "Motivos y Ubicación Específica"
+            const displayField = document.getElementById('salasSeleccionadasDisplay');
+            displayField.value = salasTexto || 'Ninguna sala seleccionada';
+        }
+
+        // Eventos para actualizar checkboxes cuando cambien Sala REMEDY o Sitio
+        document.getElementById('salaRemedy').addEventListener('change', cargarCheckboxesSalas);
+        document.getElementById('sitioIngreso').addEventListener('change', cargarCheckboxesSalas);
+    </script>
+</body>
+</html>
 
     <!-- modals for error/success -->
     <div th:if="${errorMessage}" id="errorModal" style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(4,10,25,0.4); z-index:60;">

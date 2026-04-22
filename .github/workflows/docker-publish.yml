@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: achaconrios43/clases-app
+  DOCKER_IMAGE: achaconrios43/dcim-app
 
 jobs:
   docker:
@@ -57,5 +57,3 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         run: |
           echo "Docker image built and pushed: ${{ env.DOCKER_IMAGE }}:latest"
-          echo "To deploy to Kubernetes, run:"
-          echo "kubectl apply -f k8s/"

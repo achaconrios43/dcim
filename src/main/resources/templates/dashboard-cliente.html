@@ -368,7 +368,7 @@
 
                     <!-- Botón de detalles completos -->
                     <div class="mt-4">
-                        <a th:href="@{'/ingreso/ap/read/' + ${ingreso.id}}" 
+                        <a th:href="@{'/user/ingresoap-read/' + ${ingreso.id}}" 
                            class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
                             Ver Detalles Completos
                         </a>
@@ -378,7 +378,7 @@
 
             <!-- Footer con link a ver todos -->
             <div th:unless="${#lists.isEmpty(registrosRecientes)}" class="mt-6 text-center border-t border-gray-200 pt-4">
-                <a href="/ingreso/ap/list" 
+                <a href="/user/ingresoap-list" 
                    class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">
                     Ver todos los registros
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -405,14 +405,14 @@
 
         <!-- Botones de acción rápida -->
         <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}" class="mt-8 flex justify-center space-x-4">
-            <a href="/ingreso/ap" 
+            <a href="/ingresoap" 
                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center shadow-lg transition-colors duration-200">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Registrar Nuevo Ingreso
             </a>
-            <a href="/ingreso/ap/list" 
+            <a href="/user/ingresoap-list" 
                class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center shadow-lg transition-colors duration-200">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>

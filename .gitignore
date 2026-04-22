@@ -29,6 +29,11 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Database exports
+*.sql.bak
+*_export.sql
+*_migrate.sql
+
 # IntelliJ IDEA
 .idea/
 *.iws

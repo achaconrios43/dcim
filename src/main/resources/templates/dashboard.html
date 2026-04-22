@@ -99,13 +99,13 @@
                     </div>
                     <p class="text-gray-600 text-sm mb-4">Control de accesos y registro de personal técnico</p>
                     <div class="space-y-2">
-                        <a th:href="@{/ingreso/ap}" class="flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
+                        <a th:href="@{/ingresoap}" class="flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
                             📝 Registro de Ingresos
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </a>
-                        <a th:href="@{/ingreso/ap/list}" class="flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
+                        <a th:href="@{/user/ingresoap-list}" class="flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
                             📋 Lista de Accesos
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -275,14 +275,14 @@
                         <h3 class="text-lg font-semibold text-gray-900 ml-3">Accesos Rápidos</h3>
                     </div>
                     <div class="space-y-2">
-                        <a th:href="@{/ingreso/ap}" class="flex items-center justify-between p-2 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
+                        <a th:href="@{/ingresoap}" class="flex items-center justify-between p-2 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
                             <span class="text-sm font-medium">📝 Nuevo Registro</span>
                         </a>
                         <a th:href="@{/gestion/create}" class="flex items-center justify-between p-2 border border-indigo-200 rounded hover:bg-indigo-50 transition-colors">
                             <span class="text-sm font-medium text-indigo-600">📋 Nueva Gestión</span>
                         </a>
-                        <a href="https://tidbcloud.com/clusters/10397442238757164765/sqleditor?orgId=1372813089209291898&projectId=1372813089454609857" target="_blank" class="flex items-center justify-between p-2 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
-                            <span class="text-sm font-medium">💾 Base de Datos</span>
+                        <a th:href="@{/database-viewer}" class="flex items-center justify-between p-2 border border-green-200 rounded hover:bg-green-50 transition-colors">
+                            <span class="text-sm font-medium text-green-700">💾 Ver Base de Datos Local</span>
                         </a>
                         <a href="#" class="flex items-center justify-between p-2 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
                             <span class="text-sm font-medium">📊 Reportes</span>
@@ -305,7 +305,7 @@
                     <div class="flex items-center justify-between py-2 border-b border-gray-100">
                         <div class="flex items-center">
                             <span class="text-blue-600">💾</span>
-                            <span class="text-sm text-gray-600 ml-2">Base de datos H2 conectada</span>
+                            <span class="text-sm text-gray-600 ml-2">Base de datos MySQL local conectada</span>
                         </div>
                         <span class="text-xs text-gray-400">Hace unos minutos</span>
                     </div>

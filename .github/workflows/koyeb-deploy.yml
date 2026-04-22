@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  KOYEB_SERVICE_NAME: clases-spring-boot
-  DOCKER_IMAGE: achaconrios43/clases-app:latest
+  KOYEB_SERVICE_NAME: dcim-spring-boot
+  DOCKER_IMAGE: achaconrios43/dcim-app:latest
 
 jobs:
   deploy:
@@ -36,7 +36,7 @@ jobs:
           else
             echo "Service does not exist, creating new service..."
             koyeb service create ${{ env.KOYEB_SERVICE_NAME }} \
-              --app clases-app \
+              --app dcim-app \
               --docker ${{ env.DOCKER_IMAGE }} \
               --ports 8082:http \
               --routes /:8082 \

@@ -33,11 +33,11 @@
                 <h1 class="text-3xl font-bold text-gray-900">📋 Detalles del Registro de Acceso</h1>
                 <nav class="text-sm text-gray-600 mt-2">
                     <a href="/dashboard" class="hover:text-blue-600">Dashboard</a> > 
-                    <a href="/ingreso/ap/list" class="hover:text-blue-600">Lista de Registros</a> > 
+                    <a href="/user/ingresoap-list" class="hover:text-blue-600">Lista de Registros</a> > 
                     <span class="text-blue-600">Ver Registro #<span th:text="${ingreso.id}"></span></span>
                 </nav>
             </div>
-            <a href="/ingreso/ap/list" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center transition-colors duration-200">
+            <a href="/user/ingresoap-list" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-flex items-center transition-colors duration-200">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
@@ -59,14 +59,14 @@
                         </p>
                     </div>
                     <div class="flex space-x-2">
-                        <a th:href="@{'/ingreso/ap/update/' + ${ingreso.id}}" 
+                        <a th:href="@{'/user/ingresoap-update/' + ${ingreso.id}}" 
                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded text-sm inline-flex items-center transition-colors duration-200">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
                             Editar
                         </a>
-                        <a th:href="@{'/ingreso/ap/delete/' + ${ingreso.id}}" 
+                        <a th:href="@{'/user/ingresoap-delete/' + ${ingreso.id}}" 
                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm inline-flex items-center transition-colors duration-200"
                            onclick="return confirm('¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.')">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -470,14 +470,14 @@
 
                 <!-- Botones de acción adicionales -->
                 <div class="flex justify-center space-x-4 mt-8 pt-6 border-t">
-                    <a th:href="@{'/ingreso/ap/update/' + ${ingreso.id}}" 
+                    <a th:href="@{'/user/ingresoap-update/' + ${ingreso.id}}" 
                        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg inline-flex items-center transition-colors duration-200">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
                         Editar Registro
                     </a>
-                    <a href="/ingreso/ap/list" 
+                    <a href="/user/ingresoap-list" 
                        class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg inline-flex items-center transition-colors duration-200">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>

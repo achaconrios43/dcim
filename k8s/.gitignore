@@ -1,6 +1,0 @@
-# Ignorar archivos con datos sensibles
-secrets.yaml
-*.secret.yaml
-.env
-*.pem
-*.key

@@ -1,10 +1,10 @@
 -- Inserción de datos para tabla de usuarios
--- Estructura: rut, nombre, apellido, email, password, ubicacion, rol, creat_at, update_at
+-- Estructura: rut, nombre, apellido, email, password, rol, creat_at, update_at
 
 -- Usuarios del sistema Data Center Management
-INSERT INTO usuario (rut, nombre, apellido, email, password, ubicacion, rol, creat_at, update_at) VALUES ('15.441.473-8', 'arturo', 'chacon', 'achaconrios@gmail.com', '$2a$10$/X6Y2zeDlVhvtJVDsVI2jeVwXdfh4hGq2n9PTicbWCo9pzAi7hmCy', 'ADMIN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO usuario (rut, nombre, apellido, email, password, ubicacion, rol, creat_at, update_at) VALUES ('11111111-1', 'Administrador', 'Sistema', 'admin@clases.com', '$2a$10$NZq7HFDyeXSLCWXbKPYo/.kDnCajT6TEuoA3m5bbMCaIWh/8cLjDC', 'ADMIN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO usuario (rut, nombre, apellido, email, password, ubicacion, rol, creat_at, update_at) VALUES ('18.052.030-9', 'judith', 'linco espinoza', 'judithlinco@gmail.com', '$2a$10$fk/.8YJEP4iSPqW4l0.V.e.yqScP8E0KJB5OkYEb89nH10as7IVCe', 'USER', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO usuario (rut, nombre, apellido, email, password, rol, creat_at, update_at) VALUES ('15.441.473-8', 'arturo', 'chacon', 'achaconrios@gmail.com', '$2a$10$/X6Y2zeDlVhvtJVDsVI2jeVwXdfh4hGq2n9PTicbWCo9pzAi7hmCy', 'ADMIN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO usuario (rut, nombre, apellido, email, password, rol, creat_at, update_at) VALUES ('11111111-1', 'Administrador', 'Sistema', 'admin@dcim.com', '$2a$10$NZq7HFDyeXSLCWXbKPYo/.kDnCajT6TEuoA3m5bbMCaIWh/8cLjDC', 'ADMIN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO usuario (rut, nombre, apellido, email, password, rol, creat_at, update_at) VALUES ('18.052.030-9', 'judith', 'linco espinoza', 'judithlinco@gmail.com', '$2a$10$fk/.8YJEP4iSPqW4l0.V.e.yqScP8E0KJB5OkYEb89nH10as7IVCe', 'USER', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ═══════════════════════════════════════════════════════════════
 -- DATOS DE EJEMPLO PARA REGISTROS DE INGRESO AL DATA CENTER
