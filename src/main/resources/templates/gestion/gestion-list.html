@@ -7,7 +7,7 @@
     <div th:replace="fragments/headers :: headers"></div>
   </head>
   <body class="bg-gray-100">
-    <div th:replace="fragments/navdar :: nav"></div>
+    <div th:replace="~{fragments/navdar :: nav}"></div>
 
     <div th:replace="fragments/dashboard-button :: navigation-buttons"></div>
 
@@ -185,7 +185,7 @@
       </div>
     </div>
 
-    <footer th:replace="fragments/footer :: footer"></footer>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 
     <script>
       // Filtros en tiempo real

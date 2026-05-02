@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.dcim.dao.IGestionAccesoDao;
 import com.example.dcim.entity.GestionAcceso;
 import com.example.dcim.service.GestionAccesoService;
+import com.example.dcim.service.TemperaturaService;
 
 /**
  * Implementación del servicio de Gestión de Accesos
@@ -21,6 +22,9 @@ public class GestionAccesoServiceImpl implements GestionAccesoService {
 
     @Autowired
     private IGestionAccesoDao gestionAccesoDao;
+
+    @Autowired
+    private TemperaturaService temperaturaService;
 
     // ==================== OPERACIONES CRUD BÁSICAS ====================
     
@@ -42,6 +46,7 @@ public class GestionAccesoServiceImpl implements GestionAccesoService {
     @Override
     @Transactional
     public GestionAcceso guardar(GestionAcceso gestionAcceso) {
+        temperaturaService.vincularGestionConUbicacion(gestionAcceso);
         return gestionAccesoDao.save(gestionAcceso);
     }
 

@@ -195,14 +195,9 @@
                                 <select name="sitioIngreso" id="sitioIngreso" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="">Seleccionar sitio</option>
-                                    <option value="DC San Martin">DC San Martin</option>
-                                    <option value="DC Apoquindo">DC Apoquindo</option>
-                                    <option value="MC Chiloé">MC Chiloé</option>
-                                    <option value="MC Independencia">MC Independencia</option>
-                                    <option value="MC la Florida">MC la Florida</option>
-                                    <option value="MC Manuel Montt">MC Manuel Montt</option>
-                                    <option value="MC Pedro de Valdivia">MC Pedro de Valdivia</option>
-                                    <option value="MC Providencia">MC Providencia</option>
+                                    <option th:each="sitioItem : ${sitiosCatalogo}"
+                                            th:value="${sitioItem.nombre}"
+                                            th:text="${sitioItem.nombre}"></option>
                                 </select>
                             </div>
                         </div>
@@ -338,9 +333,9 @@
     </div>
 
     <!-- Footer -->
-    <th:block th:insert="fragments/footer :: footer"></th:block>
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
 
-    <script>
+    <script th:inline="javascript">
         // Función para calcular el turno automáticamente según la hora
         function calcularTurno(hora) {
             if (!hora) return '';
@@ -515,37 +510,7 @@
             Notification.requestPermission();
         }
 
-        // Configuración de salas por Sitio y Tipo de Sala REMEDY
-        const salasPorSitioYTipo = {
-            'DC Apoquindo': {
-                'Salas de RED': ['Conmutacion', 'M8', 'Movil', 'SDH', 'CrossConect'],
-                'Salas TI': ['GSM', 'CPD1', 'CPD2', 'Mainframe'],
-                'Salas TI & Red': ['M8', 'SDH', 'Movil', 'CrossConect', 'Conmutación', 'Mainframe', 'CPD1', 'CPD2', 'GSM']
-            },
-            'DC San Martin': {
-                'Salas de RED': [],  // Pendiente: El usuario proporcionará estas salas
-                'Salas TI': [],
-                'Salas TI & Red': []
-            },
-            'MC Chiloé': {
-                'Salas de RED': ['Nueva Chiloe', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
-            },
-            'MC Independencia': {
-                'Salas de RED': ['Nueva Independencia', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
-            },
-            'MC la Florida': {
-                'Salas de RED': ['Nueva Florida', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
-            },
-            'MC Manuel Montt': {
-                'Salas de RED': ['Nueva Manuel Montt', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
-            },
-            'MC Pedro de Valdivia': {
-                'Salas de RED': ['Nueva Pedro de Valdivia', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
-            },
-            'MC Providencia': {
-                'Salas de RED': ['Nueva Providencia', 'CX2', 'Conmutacion', 'Transmisión', 'Huawei', 'Datos', 'Ericcson', 'SDH', 'M8', 'Movil']
-            }
-        };
+        const salasPorSitio = /*[[${salasPorSitio}]]*/ {};
 
         // Función para cargar checkboxes de salas según Sala REMEDY y Sitio
         function cargarCheckboxesSalas() {
@@ -559,9 +524,9 @@
             contenedorCheckboxes.innerHTML = '';
             inputHidden.value = '';
 
-            // Verificar si hay salas disponibles para la combinación seleccionada
-            if (salaRemedy && sitio && salasPorSitioYTipo[sitio] && salasPorSitioYTipo[sitio][salaRemedy]) {
-                const salas = salasPorSitioYTipo[sitio][salaRemedy];
+            // Cargar salas configuradas para el sitio seleccionado
+            if (sitio && salasPorSitio[sitio]) {
+                const salas = salasPorSitio[sitio];
                 
                 if (salas.length > 0) {
                     seccionSalas.classList.remove('hidden');
@@ -589,7 +554,7 @@
                     });
                 } else {
                     seccionSalas.classList.add('hidden');
-                    alert('No hay salas configuradas para DC San Martin aún. Por favor contacte al administrador.');
+                    alert('No hay salas configuradas para este sitio. Cree las salas en el modulo de temperaturas.');
                 }
             } else {
                 seccionSalas.classList.add('hidden');

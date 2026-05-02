@@ -14,6 +14,7 @@ import com.example.dcim.dao.IUsuarioDao;
 import com.example.dcim.entity.Usuario;
 import com.example.dcim.service.GestionAccesoService;
 import com.example.dcim.service.IngresoAPService;
+import com.example.dcim.service.TemperaturaService;
 
 /**
  * Controlador para el Dashboard de Cliente - Vista Mensual
@@ -32,6 +33,9 @@ public class DashboardClienteMensualController {
     
     @Autowired
     private IUsuarioDao usuarioDao;
+
+    @Autowired
+    private TemperaturaService temperaturaService;
     
     @GetMapping
     public String mostrarDashboardMensual(@RequestParam(required = false) String sitio, Authentication authentication, Model model) {
@@ -47,9 +51,10 @@ public class DashboardClienteMensualController {
         }
         
         // Solo ADMIN puede acceder al dashboard mensual
-        if ("USER".equals(usuarioLogueado.getRol())) {
-            model.addAttribute("error", "Acceso denegado. No tiene permisos para acceder al Dashboard Cliente Mensual.");
-            model.addAttribute("usuarioLogueado", usuarioLogueado);
+        // Solo USER sin privilegios de visualización no puede acceder
+        // ADMIN y VIEWER pueden ver estadísticas
+        String rol = usuarioLogueado.getRol();
+        if (!"ADMIN".equals(rol) && !"VIEWER".equals(rol)) {
             return "redirect:/dashboard";
         }
         
@@ -57,6 +62,7 @@ public class DashboardClienteMensualController {
         LocalDate now = LocalDate.now();
         LocalDate primerDiaMes = now.withDayOfMonth(1);
         LocalDate ultimoDiaMes = now.withDayOfMonth(now.lengthOfMonth());
+        model.addAttribute("sitiosDisponibles", temperaturaService.listarSitiosActivos());
         
         model.addAttribute("sitioSeleccionado", sitio);
         model.addAttribute("mesActual", now.getMonth().toString());
@@ -132,6 +138,9 @@ public class DashboardClienteMensualController {
         model.addAttribute("ticketsDevueltosMes", ticketsDevueltosMes);
         model.addAttribute("ticketsPendientesAprobacion", ticketsPendientesAprobacion != null ? ticketsPendientesAprobacion : 0L);
         model.addAttribute("ticketsPendientesCierre", ticketsPendientesCierre != null ? ticketsPendientesCierre : 0L);
+
+        TemperaturaService.TemperaturaResumen resumenMensualTemp = temperaturaService.obtenerResumenMensual(sitio, now);
+        model.addAttribute("resumenTempMensual", resumenMensualTemp);
         
         return "dashboard-cliente-mensual";
     }

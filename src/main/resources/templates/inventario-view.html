@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/headers :: headers}"></head>
+<body>
+  <nav th:replace="~{fragments/navdar :: nav}"></nav>
+
+  <div class="container mx-auto py-8 px-4 max-w-3xl">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">Detalle de Inventario</h1>
+      <div class="flex gap-2">
+        <a th:href="@{/inventario/editar/{id}(id=${inventario.id})}" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">✏️ Editar</a>
+        <a href="/inventario" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Volver</a>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="grid grid-cols-2 gap-6">
+        <!-- Información General -->
+        <div>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">Información General</h2>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="font-semibold text-gray-600">ID:</span>
+              <span th:text="${inventario.id}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Número Serie:</span>
+              <span class="font-mono bg-gray-100 px-2 py-1 rounded" th:text="${inventario.numeroSerie}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">TAG:</span>
+              <span class="font-mono bg-gray-100 px-2 py-1 rounded" th:text="${inventario.tag}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Tipo:</span>
+              <span th:text="${inventario.tipo}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Marca:</span>
+              <span th:text="${inventario.marca}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Modelo:</span>
+              <span th:text="${inventario.modelo}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Sala:</span>
+              <span th:text="${inventario.sala}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Sitio:</span>
+              <span th:text="${inventario.sitio}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Cliente:</span>
+              <span th:text="${inventario.cliente}">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ubicación Física -->
+        <div>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">Ubicación Física</h2>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="font-semibold text-gray-600">Nombre Rack:</span>
+              <span th:text="${inventario.nombreRack}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Ubicación UR:</span>
+              <span th:text="${inventario.ubicacionUr}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">UR Utilizada:</span>
+              <span th:text="${inventario.urUtilizada}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Coordenadas:</span>
+              <span th:text="${inventario.coordenadas}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Número Temporal:</span>
+              <span th:text="${inventario.numeroTemporal}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Hotname:</span>
+              <span class="font-mono bg-gray-100 px-2 py-1 rounded" th:text="${inventario.hotname}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Dirección IP:</span>
+              <span class="font-mono bg-gray-100 px-2 py-1 rounded" th:text="${inventario.direccionIp}">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado y Alarmas -->
+        <div>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">Estado y Alarmas</h2>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="font-semibold text-gray-600">Estado:</span>
+              <span class="px-2 py-1 rounded text-white text-xs"
+                    th:classappend="${inventario.estado == 'Activo'} ? 'bg-green-600' : ${inventario.estado == 'Inactivo'} ? 'bg-red-600' : 'bg-yellow-600'"
+                    th:text="${inventario.estado}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Fecha Alarma:</span>
+              <span th:text="${inventario.fechaAlarma}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Alarma Hardware:</span>
+              <span class="px-2 py-1 rounded text-white text-xs" 
+                    th:classappend="${inventario.alarmaHardware} ? 'bg-red-500' : 'bg-green-500'"
+                    th:text="${inventario.alarmaHardware} ? 'SÍ' : 'NO'"></span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Alarma Ventilador:</span>
+              <span class="px-2 py-1 rounded text-white text-xs" 
+                    th:classappend="${inventario.alarmaVentilador} ? 'bg-red-500' : 'bg-green-500'"
+                    th:text="${inventario.alarmaVentilador} ? 'SÍ' : 'NO'"></span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Alarma Fuente Poder:</span>
+              <span class="px-2 py-1 rounded text-white text-xs" 
+                    th:classappend="${inventario.alarmaFuentePoder} ? 'bg-red-500' : 'bg-green-500'"
+                    th:text="${inventario.alarmaFuentePoder} ? 'SÍ' : 'NO'"></span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Alarma HDD:</span>
+              <span class="px-2 py-1 rounded text-white text-xs" 
+                    th:classappend="${inventario.alarmaHdd} ? 'bg-red-500' : 'bg-green-500'"
+                    th:text="${inventario.alarmaHdd} ? 'SÍ' : 'NO'"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Especificaciones -->
+        <div>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">Especificaciones</h2>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="font-semibold text-gray-600">Peso Equipo:</span>
+              <span th:text="${inventario.pesoEquipoKg} ? ${inventario.pesoEquipoKg} + ' KG' : '-'">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Potencia Consumo:</span>
+              <span th:text="${inventario.potenciaConsumoWatts} ? ${inventario.potenciaConsumoWatts} + ' WATTS' : '-'">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Flujo Aire:</span>
+              <span th:text="${inventario.flujoAire}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Fuentes de Poder:</span>
+              <span th:text="${inventario.fuentesPoder}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Tipos Enchufe:</span>
+              <span th:text="${inventario.tiposEnchufe}">-</span>
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Ticket Relación:</span>
+              <span th:text="${inventario.ticketRelacion}">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Observaciones completas -->
+      <div class="mt-6 space-y-4">
+        <div>
+          <h3 class="font-semibold mb-2 border-b pb-2">Comentarios de Alarma</h3>
+          <p class="text-sm text-gray-700 bg-gray-50 p-3 rounded" th:text="${inventario.comentariosAlarma}">Sin comentarios</p>
+        </div>
+
+        <div>
+          <h3 class="font-semibold mb-2 border-b pb-2">Observación Tipo Enchufe</h3>
+          <p class="text-sm text-gray-700 bg-gray-50 p-3 rounded" th:text="${inventario.observacionTipoEnchufe}">Sin observaciones</p>
+        </div>
+
+        <div>
+          <h3 class="font-semibold mb-2 border-b pb-2">Observaciones</h3>
+          <p class="text-sm text-gray-700 bg-gray-50 p-3 rounded" th:text="${inventario.observaciones}">Sin observaciones</p>
+        </div>
+      </div>
+
+      <!-- Timestamps -->
+      <div class="mt-6 pt-4 border-t text-xs text-gray-500">
+        <p>Creado: <span th:text="${inventario.fechaCreacion}">-</span></p>
+        <p>Modificado: <span th:text="${inventario.fechaModificacion}">-</span></p>
+      </div>
+    </div>
+  </div>
+
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

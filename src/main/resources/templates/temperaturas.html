@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
+    <title>Sitios, Salas y Temperaturas</title>
+</head>
+<body class="bg-gray-100">
+    <nav th:replace="~{fragments/navdar :: nav}"></nav>
+
+    <div class="container mx-auto px-4 py-8 space-y-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Gestion de Sitios, Salas y Temperaturas</h1>
+                <p class="text-gray-600">Configure sitios, salas y puntos de medicion, y registre temperaturas diarias.</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="/temperaturas/registro" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">Ingresar Temperaturas</a>
+                <a href="/plano-sala" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">🗺️ Planos de Sala</a>
+                <a href="/dashboard" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Volver a Dashboard</a>
+            </div>
+        </div>
+
+        <div th:if="${success}" class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded" th:text="${success}"></div>
+        <div th:if="${error}" class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded" th:text="${error}"></div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl shadow p-5">
+                <h2 class="text-xl font-semibold mb-4">1) Crear Sitio</h2>
+                <form method="post" action="/temperaturas/sitios" class="space-y-3">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <input name="nombre" placeholder="Ej: DC SAN MARTIN" class="w-full border rounded px-3 py-2" required>
+                    <input name="descripcion" placeholder="Descripcion" class="w-full border rounded px-3 py-2">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Guardar Sitio</button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-xl shadow p-5">
+                <h2 class="text-xl font-semibold mb-4">2) Crear Sala</h2>
+                <form method="post" action="/temperaturas/salas" class="space-y-3">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <select name="sitioId" class="w-full border rounded px-3 py-2" required>
+                        <option value="">Seleccione sitio</option>
+                        <option th:each="s : ${sitios}" th:value="${s.id}" th:text="${s.nombre}" th:selected="${sitioIdSeleccionado == s.id}"></option>
+                    </select>
+                    <input name="nombre" placeholder="Ej: Sala A1" class="w-full border rounded px-3 py-2" required>
+                    <input name="descripcion" placeholder="Descripcion" class="w-full border rounded px-3 py-2">
+                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Guardar Sala</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl shadow p-5">
+                <h2 class="text-xl font-semibold mb-4">3) Crear Punto de Medicion</h2>
+                <form method="post" action="/temperaturas/puntos" class="space-y-3">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <select id="sitioPunto" name="sitioId" class="w-full border rounded px-3 py-2" required onchange="window.location='/temperaturas?sitioId='+this.value">
+                        <option value="">Seleccione sitio</option>
+                        <option th:each="s : ${sitios}" th:value="${s.id}" th:text="${s.nombre}" th:selected="${sitioIdSeleccionado == s.id}"></option>
+                    </select>
+                    <select name="salaId" class="w-full border rounded px-3 py-2" required>
+                        <option value="">Seleccione sala</option>
+                        <option th:each="sa : ${salas}" th:value="${sa.id}" th:text="${sa.nombre}" th:selected="${salaIdSeleccionada == sa.id}"></option>
+                    </select>
+                    <input name="codigo" placeholder="Ej: PT-01" class="w-full border rounded px-3 py-2" required>
+                    <input name="nombre" placeholder="Ej: Retorno HVAC" class="w-full border rounded px-3 py-2" required>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" step="0.01" name="temperaturaMinima" placeholder="Min" class="w-full border rounded px-3 py-2" value="18.00" required>
+                        <input type="number" step="0.01" name="temperaturaMaxima" placeholder="Max" class="w-full border rounded px-3 py-2" value="27.00" required>
+                    </div>
+                    <button class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded">Guardar Punto</button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-xl shadow p-5">
+                <h2 class="text-xl font-semibold mb-4">4) Registro de Temperaturas</h2>
+                <p class="text-gray-600 mb-4">
+                    El ingreso de temperaturas se realiza solo en la pagina dedicada de registro.
+                </p>
+                <a href="/temperaturas/registro"
+                   class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded">
+                    Ir a Registro de Temperaturas
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-5" th:if="${sitioIdSeleccionado != null}">
+            <h2 class="text-xl font-semibold mb-1">Resumen Diario por Sala</h2>
+            <p class="text-sm text-gray-600 mb-4" th:text="'Fecha: ' + ${#temporals.format(fechaResumenSalas, 'dd/MM/yyyy')}">Fecha</p>
+
+            <div th:if="${#lists.isEmpty(resumenSalas)}" class="text-gray-500">
+                El sitio seleccionado aun no tiene salas configuradas.
+            </div>
+
+            <div th:if="${!#lists.isEmpty(resumenSalas)}" class="overflow-x-auto border rounded-lg">
+                <table class="min-w-full text-sm">
+                    <thead>
+                    <tr class="bg-gray-100">
+                        <th class="text-left px-3 py-2">Sala</th>
+                        <th class="text-left px-3 py-2">Puntos Configurados</th>
+                        <th class="text-left px-3 py-2">Puntos Medidos Hoy</th>
+                        <th class="text-left px-3 py-2">Promedio Hoy</th>
+                        <th class="text-left px-3 py-2">Alertas Hoy</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${resumenSalas}" class="border-t">
+                        <td class="px-3 py-2 font-medium">
+                            <a class="text-blue-700 hover:text-blue-900 hover:underline"
+                               th:href="@{/temperaturas/registro(sitioId=${sitioIdSeleccionado},salaId=${r.salaId})}"
+                               th:text="${r.salaNombre}">Sala A</a>
+                        </td>
+                        <td class="px-3 py-2" th:text="${r.totalPuntos}">0</td>
+                        <td class="px-3 py-2" th:text="${r.puntosMedidos}">0</td>
+                        <td class="px-3 py-2" th:text="${r.promedio + ' C'}">0.00 C</td>
+                        <td class="px-3 py-2">
+                            <span class="px-2 py-1 rounded text-xs"
+                                  th:text="${r.alertas}"
+                                  th:classappend="${r.alertas > 0} ? ' bg-red-100 text-red-700' : ' bg-green-100 text-green-700'">0</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-5">
+            <h2 class="text-xl font-semibold mb-4">Reporte Diario/Mensual por Sitio</h2>
+            <form method="get" action="/temperaturas" class="flex flex-wrap gap-3 items-end mb-4">
+                <div class="min-w-[280px]">
+                    <label class="block text-sm text-gray-700 mb-1">Sitio</label>
+                    <select name="sitioReporte" class="w-full border rounded px-3 py-2" required>
+                        <option value="">Seleccione</option>
+                        <option th:each="s : ${sitios}" th:value="${s.nombre}" th:text="${s.nombre}" th:selected="${sitioReporte == s.nombre}"></option>
+                    </select>
+                </div>
+                <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded">Ver Reporte</button>
+            </form>
+
+            <div th:if="${sitioReporte != null}" class="grid md:grid-cols-3 gap-4 mb-4">
+                <div class="border rounded p-4">
+                    <div class="text-sm text-gray-600">Promedio Diario</div>
+                    <div class="text-2xl font-bold" th:text="${resumenDiarioTemp.promedio + ' C'}">0 C</div>
+                </div>
+                <div class="border rounded p-4">
+                    <div class="text-sm text-gray-600">Promedio Mensual</div>
+                    <div class="text-2xl font-bold" th:text="${resumenMensualTemp.promedio + ' C'}">0 C</div>
+                </div>
+                <div class="border rounded p-4">
+                    <div class="text-sm text-gray-600">Estado General</div>
+                    <div class="text-2xl font-bold" th:text="${resumenDiarioTemp.estadoGeneral}"
+                         th:classappend="${resumenDiarioTemp.estadoGeneral == 'ALERTA'} ? ' text-red-600' : ' text-green-600'">OK</div>
+                </div>
+            </div>
+
+            <div th:if="${sitioReporte != null}" class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="text-left px-3 py-2">Fecha/Hora</th>
+                            <th class="text-left px-3 py-2">Punto</th>
+                            <th class="text-left px-3 py-2">Temperatura</th>
+                            <th class="text-left px-3 py-2">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(ultimasMediciones)}">
+                            <td colspan="4" class="px-3 py-3 text-center text-gray-500">Sin mediciones del dia.</td>
+                        </tr>
+                        <tr th:each="m : ${ultimasMediciones}" class="border-t">
+                            <td class="px-3 py-2" th:text="${#temporals.format(m.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td class="px-3 py-2" th:text="${m.punto.codigo + ' - ' + m.punto.nombre}"></td>
+                            <td class="px-3 py-2" th:text="${m.temperaturaCelsius + ' C'}"></td>
+                            <td class="px-3 py-2">
+                                <span class="px-2 py-1 rounded text-xs"
+                                      th:text="${m.estado}"
+                                      th:classappend="${m.estado == 'OK'} ? ' bg-green-100 text-green-700' : ' bg-red-100 text-red-700'"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

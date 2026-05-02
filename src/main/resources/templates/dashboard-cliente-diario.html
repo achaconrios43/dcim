@@ -55,14 +55,10 @@
                     <select id="sitio" name="sitio" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                         <option value="">Seleccione un sitio</option>
-                        <option value="DC APOQUINDO" th:selected="${sitioSeleccionado == 'DC APOQUINDO'}">DC APOQUINDO</option>
-                        <option value="DC SAN MARTIN" th:selected="${sitioSeleccionado == 'DC SAN MARTIN'}">DC SAN MARTIN</option>
-                        <option value="MC CHILOE" th:selected="${sitioSeleccionado == 'MC CHILOE'}">MC CHILOE</option>
-                        <option value="MC INDEPENDENCIA" th:selected="${sitioSeleccionado == 'MC INDEPENDENCIA'}">MC INDEPENDENCIA</option>
-                        <option value="MC LA FLORIDA" th:selected="${sitioSeleccionado == 'MC LA FLORIDA'}">MC LA FLORIDA</option>
-                        <option value="MC MANUEL MONTT" th:selected="${sitioSeleccionado == 'MC MANUEL MONTT'}">MC MANUEL MONTT</option>
-                        <option value="MC PEDRO DE VALDIVIA" th:selected="${sitioSeleccionado == 'MC PEDRO DE VALDIVIA'}">MC PEDRO DE VALDIVIA</option>
-                        <option value="MC PROVIDENCIA" th:selected="${sitioSeleccionado == 'MC PROVIDENCIA'}">MC PROVIDENCIA</option>
+                        <option th:each="sitioItem : ${sitiosDisponibles}"
+                                th:value="${sitioItem.nombre}"
+                                th:text="${sitioItem.nombre}"
+                                th:selected="${sitioSeleccionado == sitioItem.nombre}"></option>
                     </select>
                 </div>
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
@@ -206,6 +202,37 @@
                     <div class="text-3xl font-bold" th:text="${ticketsPendientesCierre}">0</div>
                     <div class="text-xs opacity-90 mt-1">por cerrar</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Sección: TEMPERATURA DIARIA -->
+        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl shadow-lg p-6 mb-6 text-white">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fas fa-temperature-half mr-3"></i>
+                Monitoreo de Temperatura - Hoy
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="text-sm font-medium">Promedio Diario</div>
+                    <div class="text-3xl font-bold" th:text="${resumenTempDiario.promedio} + '°C'">0°C</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="text-sm font-medium">Puntos Configurados</div>
+                    <div class="text-3xl font-bold" th:text="${resumenTempDiario.totalPuntos}">0</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="text-sm font-medium">Puntos en Alerta</div>
+                    <div class="text-3xl font-bold" th:text="${resumenTempDiario.puntosEnAlerta}">0</div>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4">
+                    <div class="text-sm font-medium">Estado General</div>
+                    <div class="text-3xl font-bold" th:text="${resumenTempDiario.estadoGeneral}">OK</div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="/temperaturas" class="inline-flex items-center bg-white text-emerald-700 font-semibold px-4 py-2 rounded-lg hover:bg-emerald-50">
+                    <i class="fas fa-sliders mr-2"></i> Administrar Sitios/Salas/Puntos y Mediciones
+                </a>
             </div>
         </div>
 

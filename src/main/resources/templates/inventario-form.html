@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/headers :: headers}"></head>
+<body>
+  <nav th:replace="~{fragments/navdar :: nav}"></nav>
+
+  <div class="container mx-auto py-8 px-4 max-w-4xl">
+    <h1 class="text-3xl font-bold mb-6" th:text="${editar} ? 'Editar Inventario' : 'Nuevo Inventario'"></h1>
+
+    <!-- Alertas -->
+    <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <span th:text="${error}"></span>
+    </div>
+
+    <form th:action="${editar} ? @{/inventario/actualizar/{id}(id=${inventario.id})} : @{/inventario/guardar}"
+          method="POST" class="bg-white rounded-lg shadow p-6">
+      
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <!-- Fila 1 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Sitio</label>
+          <select name="sitio" class="w-full px-3 py-2 border rounded">
+            <option value="">Seleccione sitio</option>
+            <option th:each="sitioItem : ${sitiosCatalogo}"
+                    th:value="${sitioItem.nombre}"
+                    th:text="${sitioItem.nombre}"
+                    th:selected="${inventario?.sitio == sitioItem.nombre}"></option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Sala</label>
+          <select name="sala" class="w-full px-3 py-2 border rounded">
+            <option value="">Seleccione sala</option>
+            <option th:each="salaItem : ${salasCatalogo}"
+                    th:value="${salaItem.nombre}"
+                    th:text="${salaItem.sitio.nombre + ' - ' + salaItem.nombre}"
+                    th:selected="${inventario?.sala == salaItem.nombre}"></option>
+          </select>
+        </div>
+
+        <!-- Fila 2 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Tipo</label>
+          <input type="text" name="tipo" th:value="${inventario?.tipo}" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Marca</label>
+          <input type="text" name="marca" th:value="${inventario?.marca}" class="w-full px-3 py-2 border rounded">
+        </div>
+
+        <!-- Fila 3 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Modelo</label>
+          <input type="text" name="modelo" th:value="${inventario?.modelo}" class="w-full px-3 py-2 border rounded">
+        </div>
+
+        <!-- Fila 3 - Únicos -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Número de Serie <span class="text-red-600">*</span></label>
+          <input type="text" name="numeroSerie" th:value="${inventario?.numeroSerie}" required class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">TAG <span class="text-red-600">*</span></label>
+          <input type="text" name="tag" th:value="${inventario?.tag}" required class="w-full px-3 py-2 border rounded">
+        </div>
+
+        <!-- Fila 4 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Cliente</label>
+          <input type="text" name="cliente" th:value="${inventario?.cliente}" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Coordenadas</label>
+          <input type="text" name="coordenadas" th:value="${inventario?.coordenadas}" class="w-full px-3 py-2 border rounded">
+        </div>
+
+        <!-- Fila 5 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Nombre Rack</label>
+          <input type="text" name="nombreRack" th:value="${inventario?.nombreRack}" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Ubicación UR</label>
+          <input type="text" name="ubicacionUr" th:value="${inventario?.ubicacionUr}" class="w-full px-3 py-2 border rounded">
+        </div>
+
+        <!-- Fila 6 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">UR Utilizada</label>
+          <input type="text" name="urUtilizada" th:value="${inventario?.urUtilizada}" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Número Temporal</label>
+          <input type="text" name="numeroTemporal" th:value="${inventario?.numeroTemporal}" class="w-full px-3 py-2 border rounded">
+        </div>
+
+        <!-- Fila 7 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Hotname</label>
+          <input type="text" name="hotname" th:value="${inventario?.hotname}" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Estado</label>
+          <select name="estado" class="w-full px-3 py-2 border rounded">
+            <option value="">Seleccionar</option>
+            <option value="Operativo" th:selected="${inventario?.estado == 'Operativo'}">Operativo</option>
+            <option value="Apagado" th:selected="${inventario?.estado == 'Apagado'}">Apagado</option>
+            <option value="STAND BY" th:selected="${inventario?.estado == 'STAND BY'}">STAND BY</option>
+            <option value="Retirado" th:selected="${inventario?.estado == 'Retirado'}">Retirado</option>
+            <option value="Alarmado" th:selected="${inventario?.estado == 'Alarmado'}">Alarmado</option>
+          </select>
+        </div>
+
+        <!-- Fila 8 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Fecha Alarma</label>
+          <input type="date" name="fechaAlarma" th:value="${inventario?.fechaAlarma}" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Ticket Relación</label>
+          <input type="text" name="ticketRelacion" th:value="${inventario?.ticketRelacion}" class="w-full px-3 py-2 border rounded">
+        </div>
+        
+
+        <!-- Fila 9 - Checkboxes -->
+        <div>
+          <label class="flex items-center">
+            <input type="checkbox" name="alarmaHardware" th:checked="${inventario?.alarmaHardware}" class="mr-2">
+            <span class="text-sm">Alarma Hardware</span>
+          </label>
+        </div>
+        <div>
+          <label class="flex items-center">
+            <input type="checkbox" name="alarmaVentilador" th:checked="${inventario?.alarmaVentilador}" class="mr-2">
+            <span class="text-sm">Alarma Ventilador</span>
+          </label>
+        </div>
+
+        <!-- Fila 10 - Checkboxes -->
+        <div>
+          <label class="flex items-center">
+            <input type="checkbox" name="alarmaFuentePoder" th:checked="${inventario?.alarmaFuentePoder}" class="mr-2">
+            <span class="text-sm">Alarma Fuente de Poder</span>
+          </label>
+        </div>
+        <div>
+          <label class="flex items-center">
+            <input type="checkbox" name="alarmaHdd" th:checked="${inventario?.alarmaHdd}" class="mr-2">
+            <span class="text-sm">Alarma HDD</span>
+          </label>
+        </div>
+
+        <!-- Fila 11 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Peso Equipo (KG)</label>
+          <input type="number" name="pesoEquipoKg" step="0.01" th:value="${inventario?.pesoEquipoKg}" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Potencia Consumo (WATTS)</label>
+          <input type="number" name="potenciaConsumoWatts" step="0.01" th:value="${inventario?.potenciaConsumoWatts}" class="w-full px-3 py-2 border rounded">
+        </div>
+
+        <!-- Fila 12 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Flujo de Aire</label>
+          <input type="text" name="flujoAire" th:value="${inventario?.flujoAire}" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Fuentes de Poder</label>
+          <input type="text" name="fuentesPoder" th:value="${inventario?.fuentesPoder}" class="w-full px-3 py-2 border rounded">
+        </div>
+
+        <!-- Fila 13 -->
+        <div>
+          <label class="block text-sm font-semibold mb-2">Tipos de Enchufe</label>
+          <input type="text" name="tiposEnchufe" th:value="${inventario?.tiposEnchufe}" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Dirección IP</label>
+          <input type="text" name="direccionIp" th:value="${inventario?.direccionIp}" placeholder="192.168.1.1" class="w-full px-3 py-2 border rounded">
+        </div>
+      </div>
+
+      <!-- Campos full-width -->
+      <div class="mb-4">
+        <label class="block text-sm font-semibold mb-2">Comentarios Alarma</label>
+        <textarea name="comentariosAlarma" rows="2" class="w-full px-3 py-2 border rounded" th:text="${inventario?.comentariosAlarma}"></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-semibold mb-2">Observación Tipo Enchufe</label>
+        <textarea name="observacionTipoEnchufe" rows="2" class="w-full px-3 py-2 border rounded" th:text="${inventario?.observacionTipoEnchufe}"></textarea>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-semibold mb-2">Observaciones</label>
+        <textarea name="observaciones" rows="3" class="w-full px-3 py-2 border rounded" th:text="${inventario?.observaciones}"></textarea>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex gap-2">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+          <span th:text="${editar} ? 'Actualizar' : 'Guardar'"></span>
+        </button>
+        <a href="/inventario" class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700">Cancelar</a>
+      </div>
+    </form>
+  </div>
+
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

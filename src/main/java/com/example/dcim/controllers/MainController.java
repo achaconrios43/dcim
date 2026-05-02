@@ -19,16 +19,6 @@ public class MainController {
     public String index() {
         return "index";
     }
-    
-    @GetMapping("/home")
-    public String home() {
-        return "redirect:/";
-    }
-    
-    @GetMapping("/index")
-    public String indexDirect() {
-        return "redirect:/";
-    }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Authentication authentication) {

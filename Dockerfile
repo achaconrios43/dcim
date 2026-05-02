@@ -21,18 +21,21 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # ========================================
-# ETAPA 2: RUNTIME - Imagen final optimizada
+# ETAPA 2: RUNTIME - Imagen final con Red Hat UBI 9
 # ========================================
-FROM eclipse-temurin:21-jre-alpine AS runtime
+FROM registry.access.redhat.com/ubi9/openjdk-21:latest AS runtime
 
 # Metadatos de la imagen
 LABEL maintainer="achaconrios@gmail.com"
-LABEL description="Sistema de Control de Acceso - Spring Boot Application"
+LABEL description="Sistema de Control de Acceso DCIM - Spring Boot Application"
 LABEL version="1.0"
+LABEL source="Red Hat UBI 9 with OpenJDK 21"
 
-# Instalar wget para healthcheck y crear usuario no-root
-RUN apk add --no-cache wget && \
-    addgroup -S spring && adduser -S spring -G spring
+# Instalar herramientas necesarias (wget para healthcheck, crear usuario no-root)
+RUN yum update -y && \
+    yum install -y wget && \
+    yum clean all && \
+    groupadd -r spring && useradd -r -g spring spring
 
 # Establecer directorio de trabajo
 WORKDIR /app

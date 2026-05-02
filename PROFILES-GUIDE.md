@@ -7,7 +7,7 @@ Este proyecto usa **MySQL local** en todos sus perfiles de ejecución.
 ### 1. **default**
 - **Uso**: Aplicación web desde navegador
 - **Características**:
-  - MySQL local en `127.0.0.1:3306/clasesdb`
+  - MySQL local en `127.0.0.1:3307/dcimdb`
   - CSRF habilitado para formularios
   - Encoding UTF-8 estándar (sin BOM)
   - Thymeleaf templates
@@ -53,13 +53,13 @@ mvn spring-boot:run -Dspring-boot.run.profiles=production
 mvn clean package
 
 # Perfil default
-java -jar target/clases-0.0.1-SNAPSHOT.jar
+java -jar target/dcim-1.0.0.jar
 
 # Perfil mobile
-java -jar -Dspring.profiles.active=mobile target/clases-0.0.1-SNAPSHOT.jar
+java -jar -Dspring.profiles.active=mobile target/dcim-1.0.0.jar
 
 # Perfil production
-java -jar -Dspring.profiles.active=production target/clases-0.0.1-SNAPSHOT.jar
+java -jar -Dspring.profiles.active=production target/dcim-1.0.0.jar
 ```
 
 ### Variable de Entorno
@@ -90,7 +90,7 @@ mvn spring-boot:run
 
 ## Configuración Actual
 
-El proyecto está configurado con el **perfil default**. Si no se especifica ningún perfil, se usará [application.properties](c:/Users/achac/Desktop/clases/src/main/resources/application.properties).
+El proyecto está configurado con el **perfil default**. Si no se especifica ningún perfil, se usará `src/main/resources/application.properties`.
 
 ## Archivos de Configuración
 

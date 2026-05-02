@@ -51,14 +51,9 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700">Sitio *</label>
                 <select th:field="*{sitio}" required class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2">
-                  <option value="DC San Martin">DC San Martin</option>
-                  <option value="DC Apoquindo">DC Apoquindo</option>
-                  <option value="MC La Florida">MC La Florida</option>
-                  <option value="MC Chiloé">MC Chiloé</option>
-                  <option value="MC Independencia">MC Independencia</option>
-                  <option value="MC Providencia">MC Providencia</option>
-                  <option value="MC Pedro de Valdivia">MC Pedro de Valdivia</option>
-                  <option value="MC Manuel Montt">MC Manuel Montt</option>
+                  <option th:each="sitioItem : ${sitiosCatalogo}"
+                          th:value="${sitioItem.nombre}"
+                          th:text="${sitioItem.nombre}"></option>
                 </select>
               </div>
             </div>
@@ -176,7 +171,7 @@
       </div>
     </div>
 
-    <footer th:replace="fragments/footer :: footer"></footer>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
     
     <script>
       // Capturar fecha y hora cuando se marca gestión realizada para KPI

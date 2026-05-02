@@ -34,13 +34,29 @@
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900">Panel de Control</h1>
                         <p class="text-gray-600 mt-1">Sistema de Gestión del Data Center</p>
+                    <!-- Modulo Temperaturas -->
+                    <div th:if="${usuario.rol != 'VIEWER'}"
+                         class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-emerald-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-emerald-100 p-3 rounded-full">
+                                <i class="fas fa-temperature-half text-emerald-600 text-2xl"></i>
+                            </div>
+                            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full">nuevo</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Sitios, Salas y Temperatura</h3>
+                        <p class="text-gray-600 mb-4">Administra puntos de medicion y reportes diarios/mensuales.</p>
+                        <a href="/temperaturas" class="inline-flex items-center text-emerald-600 hover:text-emerald-700 font-semibold">
+                            Ir al modulo
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
                     </div>
                     <div class="text-right">
                         <div class="text-sm text-gray-500">Bienvenido</div>
                         <div class="font-semibold text-gray-900" th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre Usuario</div>
                         <div class="text-xs text-gray-500" th:text="${usuario.email}">Email</div>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                               th:class="${usuario.rol == 'ADMIN'} ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'"
+                                                             th:class="${usuario.rol == 'ADMIN'} ? 'bg-red-100 text-red-800' : (${usuario.rol == 'VIEWER'} ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800')"
                               th:text="${usuario.rol}">ROL</span>
                     </div>
                 </div>
@@ -49,7 +65,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
                 <!-- Data Center Menu -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                    <div th:if="${usuario.rol != 'VIEWER'}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                     <div class="flex items-center mb-4">
                         <div class="p-2 bg-blue-100 rounded-lg">
                             <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,20 +76,26 @@
                     </div>
                     <p class="text-gray-600 text-sm mb-4">Gestión de infraestructura y equipamiento del data center</p>
                     <div class="space-y-2">
-                        <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <a th:href="@{/inventario}" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
                             🏢 Inventario Racks
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </a>
-                        <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <a href="/temperaturas/registro" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
                             🌡️ Monitoreo Temperatura
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </a>
-                        <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <a href="/plano-sala" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
                             🗺️ Layout de Salas
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                        <a href="/plano-sala/plantillas" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            📐 Plantillas de Salas
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
@@ -88,7 +110,7 @@
                 </div>
 
                 <!-- Registro Técnicos -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                <div th:if="${usuario.rol != 'VIEWER'}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                     <div class="flex items-center mb-4">
                         <div class="p-2 bg-green-100 rounded-lg">
                             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +182,7 @@
                 </div>
 
                 <!-- Gestión de Acceso -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                <div th:if="${usuario.rol != 'VIEWER'}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                     <div class="flex items-center mb-4">
                         <div class="p-2 bg-indigo-100 rounded-lg">
                             <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +221,7 @@
                 </div>
 
                 <!-- Dashboard Cliente (SOLO ADMIN) -->
-                <div th:if="${usuarioLogueado != null and usuarioLogueado.rol == 'ADMIN'}" 
+                <div th:if="${usuarioLogueado != null and (usuarioLogueado.rol == 'ADMIN' or usuarioLogueado.rol == 'VIEWER')}" 
                      class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                     <div class="flex items-center mb-4">
                         <div class="p-2 bg-yellow-100 rounded-lg">
@@ -207,7 +229,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Dashboard Cliente <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">ADMIN</span></h3>
+                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Dashboard Cliente <span th:class="${usuarioLogueado.rol == 'ADMIN'} ? 'text-xs bg-red-100 text-red-800 px-2 py-1 rounded' : 'text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded'" th:text="${usuarioLogueado.rol}">ROL</span></h3>
                     </div>
                     <p class="text-gray-600 text-sm mb-4">Estadísticas y reportes del mes actual (Acceso restringido)</p>
                     <div class="space-y-2">
@@ -238,8 +260,26 @@
                     </div>
                 </div>
 
-                <!-- Estadísticas Rápidas -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <!-- Plantillas de Salas (visible para VIEWER) -->
+                <div th:if="${usuario.rol == 'VIEWER'}" class="bg-white rounded-xl shadow-sm border border-indigo-200 p-6 hover:shadow-md transition-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="p-2 bg-indigo-100 rounded-lg">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Plantillas de Salas</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Consulta los layouts de salas guardados como plantilla reutilizable.</p>
+                    <a href="/plano-sala/plantillas" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                        📐 Ver plantillas
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Estadísticas Rápidas -->                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center mb-4">
                         <div class="p-2 bg-indigo-100 rounded-lg">
                             <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,6 +361,6 @@
         </div>
     </main>
 
-    <footer th:replace="fragments/footer :: footer"></footer>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

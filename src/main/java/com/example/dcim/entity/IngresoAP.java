@@ -1,11 +1,23 @@
 package com.example.dcim.entity;
 
-import jakarta.persistence.*;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 @Entity
 @Table(name = "ingresoap")
@@ -129,9 +141,17 @@ public class IngresoAP {
     @Column(name = "sitio_ingreso", length = 100)
     private String sitioIngreso;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sitio_id")
+    private Sitio sitioRef;
+
     @JsonProperty("sala_ingresa")
     @Column(name = "sala_ingresa", nullable = false, columnDefinition = "TEXT")
     private String salaIngresa;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sala_id")
+    private Sala salaRef;
 
     @JsonProperty("rack_ingresa")
     @Column(name = "rack_ingresa", length = 50)
@@ -246,8 +266,14 @@ public class IngresoAP {
     public String getSitioIngreso() { return sitioIngreso; }
     public void setSitioIngreso(String sitioIngreso) { this.sitioIngreso = sitioIngreso; }
 
+    public Sitio getSitioRef() { return sitioRef; }
+    public void setSitioRef(Sitio sitioRef) { this.sitioRef = sitioRef; }
+
     public String getSalaIngresa() { return salaIngresa; }
     public void setSalaIngresa(String salaIngresa) { this.salaIngresa = salaIngresa; }
+
+    public Sala getSalaRef() { return salaRef; }
+    public void setSalaRef(Sala salaRef) { this.salaRef = salaRef; }
 
     public String getRackIngresa() { return rackIngresa; }
     public void setRackIngresa(String rackIngresa) { this.rackIngresa = rackIngresa; }

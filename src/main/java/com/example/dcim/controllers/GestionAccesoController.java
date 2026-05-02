@@ -19,6 +19,7 @@ import com.example.dcim.dao.IUsuarioDao;
 import com.example.dcim.entity.GestionAcceso;
 import com.example.dcim.entity.Usuario;
 import com.example.dcim.service.GestionAccesoService;
+import com.example.dcim.service.TemperaturaService;
 
 @Controller
 @RequestMapping("/gestion")
@@ -29,6 +30,9 @@ public class GestionAccesoController {
     
     @Autowired
     private IUsuarioDao usuarioDao;
+
+    @Autowired
+    private TemperaturaService temperaturaService;
 
     @GetMapping("/list")
     public String listarGestiones(Model model, Authentication authentication) {
@@ -115,6 +119,7 @@ public class GestionAccesoController {
         
         model.addAttribute("gestion", gestion);
         model.addAttribute("titulo", "Nueva Gestión de Acceso");
+        model.addAttribute("sitiosCatalogo", temperaturaService.listarSitiosActivos());
         return "gestion/gestion-create";
     }
 
@@ -182,6 +187,7 @@ public class GestionAccesoController {
         
         model.addAttribute("gestion", gestion);
         model.addAttribute("titulo", "Editar Gestión de Acceso");
+        model.addAttribute("sitiosCatalogo", temperaturaService.listarSitiosActivos());
         return "gestion/gestion-edit";
     }
 

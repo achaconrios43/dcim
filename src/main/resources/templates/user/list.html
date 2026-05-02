@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head th:replace="fragments/headers :: headers"></head>
   <body>
-    <nav th:replace="fragments/navdar :: nav"></nav>
+    <nav th:replace="~{fragments/navdar :: nav}"></nav>
     <style>
       /* Static 3D card look in Telefónica colors */
       .card-3d {
@@ -44,7 +44,7 @@
               <td class="px-4 py-2" th:text="${u['rut']}">rut</td>
               <td class="px-4 py-2" th:text="${u['password']}">******</td>
               <td class="px-4 py-2">
-                <span th:text="${u['rol']}" th:classappend="${u['rol'] == 'ADMIN'} ? ' text-red-600 font-semibold' : ' text-gray-700'">ROLE</span>
+                <span th:text="${u['rol']}" th:classappend="${u['rol'] == 'ADMIN'} ? ' text-red-600 font-semibold' : (${u['rol'] == 'VIEWER'} ? ' text-orange-600 font-semibold' : ' text-gray-700')">ROLE</span>
               </td>
               <td class="px-4 py-2 flex items-center gap-3">
                 <!-- Always show edit icon -->

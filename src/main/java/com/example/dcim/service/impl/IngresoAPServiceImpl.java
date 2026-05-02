@@ -1,17 +1,19 @@
 package com.example.dcim.service.impl;
 
-import com.example.dcim.dao.IIngresoAPDao;
-import com.example.dcim.entity.IngresoAP;
-import com.example.dcim.service.IngresoAPService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.dcim.dao.IIngresoAPDao;
+import com.example.dcim.entity.IngresoAP;
+import com.example.dcim.service.IngresoAPService;
+import com.example.dcim.service.TemperaturaService;
 
 /**
  * Implementaci????n del servicio para l????gica de negocio de IngresoAP
@@ -22,6 +24,11 @@ public class IngresoAPServiceImpl implements IngresoAPService {
 
     @Autowired
     private IIngresoAPDao ingresoAPRepository;    // Horarios de acceso - DESHABILITADO para permitir acceso 24/7
+
+    @Autowired
+    private TemperaturaService temperaturaService;
+
+    // Horarios de acceso - DESHABILITADO para permitir acceso 24/7
     // private static final LocalTime HORA_INICIO_ACCESO = LocalTime.of(7, 0);
     // private static final LocalTime HORA_FIN_ACCESO = LocalTime.of(22, 0);
     
@@ -59,6 +66,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
         }
         
         ingresoAP.setActivo(true);
+        temperaturaService.vincularIngresoAPConUbicacion(ingresoAP);
         
         return ingresoAPRepository.save(ingresoAP);
     }
@@ -99,6 +107,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
         }
         
         validarDatosIngreso(ingresoAP);
+        temperaturaService.vincularIngresoAPConUbicacion(ingresoAP);
         return ingresoAPRepository.save(ingresoAP);
     }
     
@@ -363,6 +372,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     /**
      * Obtiene todos los ingresos ordenados por fecha (m????s recientes primero)
      */
+    @Override
     public List<IngresoAP> obtenerIngresosOrdenadosPorFecha() {
         return ingresoAPRepository.findAllOrdenadosPorFecha();
     }
@@ -370,6 +380,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     /**
      * Obtiene ingresos por rango de fechas ordenados
      */
+    @Override
     public List<IngresoAP> obtenerIngresosPorRangoOrdenados(LocalDate fechaInicio, LocalDate fechaFin) {
         if (fechaInicio == null || fechaFin == null) {
             return obtenerIngresosOrdenadosPorFecha();
@@ -380,6 +391,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     /**
      * Obtiene solo ingresos activos ordenados por fecha
      */
+    @Override
     public List<IngresoAP> obtenerIngresosActivosOrdenados() {
         return ingresoAPRepository.findActivosOrdenadosPorFecha();
     }

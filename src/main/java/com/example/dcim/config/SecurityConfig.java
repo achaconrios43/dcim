@@ -69,15 +69,22 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health/**", "/actuator/health").permitAll()
 
                 // TODAS LAS DEMÁS RUTAS: Requieren autenticación
-                .requestMatchers("/dashboard/**").authenticated()
-                .requestMatchers("/user/**").authenticated()
-                .requestMatchers("/ingresoap/**", "/ingresoap").authenticated()
-                .requestMatchers("/ingreso/**").authenticated()
-                .requestMatchers("/gestion/**").authenticated()
+                // Dashboard de estadísticas: accesible por ADMIN, USER y VIEWER
+                .requestMatchers("/dashboard/**").hasAnyRole("ADMIN", "USER", "VIEWER")
+
+                // Módulos operativos: solo ADMIN y USER (VIEWER no tiene acceso)
+                .requestMatchers("/user/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/ingresoap/**", "/ingresoap").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/ingreso/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/gestion/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/inventario/**", "/inventario").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/temperaturas/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/plano-sala/plantillas", "/plano-sala/plantillas/**").hasAnyRole("ADMIN", "USER", "VIEWER")
+                .requestMatchers("/plano-sala/**", "/plano-sala").hasAnyRole("ADMIN", "USER")
 
                 // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
-            )
+                )
 
             // Configuración de CSRF para aplicación web
             .csrf(csrf -> csrf

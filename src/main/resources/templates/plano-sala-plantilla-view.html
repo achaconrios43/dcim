@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/headers :: headers}"></head>
+<style>
+    :root { --cell-size: 38px; }
+    .canvas-wrapper {
+        overflow: auto;
+        border: 1px solid #d1d5db;
+        border-radius: 0.75rem;
+        background: #fff;
+        padding: 10px;
+    }
+    .board { display: grid; gap: 0; }
+    .corner { width: 32px; height: 24px; background: #dbeafe; border: 1px solid #bfdbfe; }
+    .col-header {
+        width: var(--cell-size); height: 24px;
+        display: flex; align-items: center; justify-content: center;
+        background: #eff6ff; border: 1px solid #bfdbfe;
+        color: #1e40af; font-size: 11px; font-weight: 700;
+    }
+    .row-header {
+        width: 32px; height: var(--cell-size);
+        display: flex; align-items: center; justify-content: flex-end; padding-right: 6px;
+        background: #eff6ff; border: 1px solid #bfdbfe;
+        color: #1e40af; font-size: 11px; font-weight: 700;
+    }
+    .grid-cell {
+        width: var(--cell-size); height: var(--cell-size);
+        border: 1px solid #cbd5e1; background: #f8fafc; position: relative;
+    }
+    .layout-item {
+        position: absolute;
+        border: 2px solid rgba(17, 24, 39, 0.55);
+        color: #111827; font-size: 10px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+        text-align: center; line-height: 1.1; padding: 2px;
+        border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .tipo-MURO { z-index: 10; }
+    .tipo-PUERTA { z-index: 20; }
+    .tipo-TABLERO_ENERGIA { z-index: 30; }
+    .tipo-EQUIPO_CLIMA { z-index: 40; }
+    .tipo-BASTIDOR { z-index: 45; }
+    .tipo-RACK { z-index: 50; }
+</style>
+<body class="bg-gray-100">
+<nav th:replace="~{fragments/navdar :: nav}"></nav>
+
+<div class="container mx-auto px-4 py-6 max-w-full space-y-4">
+
+    <!-- Encabezado -->
+    <div class="bg-white rounded-xl shadow-sm border border-indigo-200 p-5">
+        <div class="flex items-start justify-between flex-wrap gap-3">
+            <div>
+                <div class="text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full inline-block mb-2">PLANTILLA</div>
+                <h1 class="text-2xl font-bold text-gray-900" th:text="${plano.nombrePlantilla}">Nombre plantilla</h1>
+                <p class="text-gray-500 text-sm mt-1"
+                   th:text="${(plano.sala != null ? plano.sala.nombre : '?') + ' · ' + plano.cantidadColumnas + ' col × ' + plano.cantidadFilas + ' fil · ' + areaTotalM2 + ' m²'}"></p>
+                <p class="text-gray-400 text-xs mt-1" th:if="${plano.descripcion}" th:text="${plano.descripcion}"></p>
+            </div>
+            <div class="flex gap-3 flex-wrap">
+                <!-- Aplicar a sala: solo ADMIN/USER -->
+                <button sec:authorize="hasAnyRole('ADMIN','USER')"
+                        onclick="document.getElementById('modalAplicar').classList.remove('hidden')"
+                        class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                    ✅ Aplicar a sala
+                </button>
+                <a href="/plano-sala/plantillas" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition-colors">
+                    ← Volver a plantillas
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grilla (solo lectura) -->
+    <div class="bg-white rounded-xl shadow p-4">
+        <h2 class="text-base font-semibold text-gray-800 mb-3">Vista del layout</h2>
+
+        <div class="canvas-wrapper">
+            <div id="boardWrapper" style="position: relative; display: inline-block;">
+                <div id="board" class="board"
+                     th:style="'grid-template-columns: 32px repeat(' + ${plano.cantidadColumnas} + ', var(--cell-size)); grid-template-rows: 24px repeat(' + ${plano.cantidadFilas} + ', var(--cell-size));'">
+
+                    <!-- Esquina vacía -->
+                    <div class="corner"></div>
+                    <!-- Cabeceras de columnas -->
+                    <div th:each="col : ${columnLabels}" class="col-header" th:text="${col}"></div>
+
+                    <!-- Filas con cabecera + celdas -->
+                    <th:block th:each="row : ${rowNumbers}">
+                        <div class="row-header" th:text="${row}"></div>
+                        <th:block th:each="col, stat : ${columnLabels}">
+                            <div class="grid-cell"
+                                 th:attr="data-col=${stat.count},data-row=${row}"></div>
+                        </th:block>
+                    </th:block>
+                </div>
+
+                <!-- Capa de elementos -->
+                <div id="elementsLayer" style="position: absolute; top: 24px; left: 32px; pointer-events: none;">
+                    <th:block th:each="el : ${elementos}">
+                        <th:block th:with="
+                            cellPx=38,
+                            anchoEf=${el.rotado90 ? el.largoCm : el.anchoCm},
+                            largoEf=${el.rotado90 ? el.anchoCm : el.largoCm},
+                            wPx=${#numbers.formatInteger(anchoEf / 60.0 * cellPx, 1, 'DEFAULT')},
+                            hPx=${#numbers.formatInteger(largoEf / 60.0 * cellPx, 1, 'DEFAULT')},
+                            leftPx=${(el.columnaInicio - 1) * cellPx},
+                            topPx=${(plano.cantidadFilas - el.filaInicio) * cellPx - (largoEf / 60 - 1) * cellPx}">
+                            <div class="layout-item"
+                                 th:classappend="'tipo-' + ${el.tipo}"
+                                 th:style="'background-color:' + ${el.color} + ';opacity:0.85;left:' + ${leftPx} + 'px;top:' + ${topPx} + 'px;width:' + ${wPx} + 'px;height:' + ${hPx} + 'px;'"
+                                 th:text="${el.nombre != null and !el.nombre.isEmpty() ? el.nombre : el.tipo}">
+                            </div>
+                        </th:block>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de elementos -->
+    <div class="bg-white rounded-xl shadow p-4" th:if="${!elementos.isEmpty()}">
+        <h2 class="text-base font-semibold text-gray-800 mb-3">Elementos en esta plantilla</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead>
+                    <tr class="bg-gray-50 text-left text-gray-700 text-xs uppercase">
+                        <th class="px-3 py-2">Tipo</th>
+                        <th class="px-3 py-2">Nombre</th>
+                        <th class="px-3 py-2">Posición</th>
+                        <th class="px-3 py-2">Tamaño (cm)</th>
+                        <th class="px-3 py-2">Rotado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="el : ${elementos}" class="border-t hover:bg-gray-50">
+                        <td class="px-3 py-2 font-semibold" th:text="${el.tipo}"></td>
+                        <td class="px-3 py-2" th:text="${el.nombre ?: '-'}"></td>
+                        <td class="px-3 py-2" th:text="${'Col ' + el.columnaInicio + ', Fila ' + el.filaInicio}"></td>
+                        <td class="px-3 py-2" th:text="${el.anchoCm + ' × ' + el.largoCm}"></td>
+                        <td class="px-3 py-2" th:text="${el.rotado90 ? 'Sí' : 'No'}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:if="${elementos.isEmpty()}" class="bg-white rounded-xl border border-dashed border-gray-300 p-8 text-center text-gray-400">
+        Esta plantilla no tiene elementos colocados.
+    </div>
+
+</div>
+
+<!-- Modal: Aplicar plantilla a sala -->
+<div id="modalAplicar" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+        <h3 class="text-xl font-bold text-gray-900 mb-1">Aplicar plantilla</h3>
+        <p class="text-sm text-gray-500 mb-5" th:text="'Plantilla: ' + ${plano.nombrePlantilla}"></p>
+        <form th:action="@{/plano-sala/plantillas/{id}/aplicar(id=${plano.id})}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <label class="block text-sm font-medium text-gray-700 mb-1">Sala destino</label>
+            <select name="salaId" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-5">
+                <option value="">-- Seleccionar sala --</option>
+                <option th:each="s : ${salas}" th:value="${s.id}" th:text="${s.nombre}"></option>
+            </select>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('modalAplicar').classList.add('hidden')"
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">Cancelar</button>
+                <button type="submit"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">Aplicar plantilla</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

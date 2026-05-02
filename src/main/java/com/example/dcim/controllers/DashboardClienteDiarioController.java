@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.dcim.dao.IUsuarioDao;
 import com.example.dcim.entity.IngresoAP;
+import com.example.dcim.entity.MedicionTemperatura;
 import com.example.dcim.entity.Usuario;
 import com.example.dcim.service.GestionAccesoService;
 import com.example.dcim.service.IngresoAPService;
+import com.example.dcim.service.TemperaturaService;
 
 /**
  * Controlador para el Dashboard de Cliente - Vista Diaria
@@ -34,6 +36,9 @@ public class DashboardClienteDiarioController {
     
     @Autowired
     private IUsuarioDao usuarioDao;
+
+    @Autowired
+    private TemperaturaService temperaturaService;
     
     @GetMapping
     public String mostrarDashboardDiario(@RequestParam(required = false) String sitio, Authentication authentication, Model model) {
@@ -54,6 +59,7 @@ public class DashboardClienteDiarioController {
         
         model.addAttribute("usuarioLogueado", usuarioLogueado);
         LocalDate hoy = LocalDate.now();
+        model.addAttribute("sitiosDisponibles", temperaturaService.listarSitiosActivos());
         
         model.addAttribute("sitioSeleccionado", sitio);
         model.addAttribute("fechaActual", hoy);
@@ -124,6 +130,11 @@ public class DashboardClienteDiarioController {
         model.addAttribute("ticketsRechazadosHoy", ticketsRechazadosHoy != null ? ticketsRechazadosHoy : 0L);
         model.addAttribute("ticketsDevueltosHoy", ticketsDevueltosHoy != null ? ticketsDevueltosHoy : 0L);
         model.addAttribute("ticketsPendientesCierre", ticketsPendientesCierre != null ? ticketsPendientesCierre : 0L);
+
+        TemperaturaService.TemperaturaResumen resumenTemperatura = temperaturaService.obtenerResumenDiario(sitio, hoy);
+        List<MedicionTemperatura> ultimasMediciones = temperaturaService.ultimasMedicionesDiarias(sitio, hoy);
+        model.addAttribute("resumenTempDiario", resumenTemperatura);
+        model.addAttribute("ultimasMedicionesTemp", ultimasMediciones);
         
         return "dashboard-cliente-diario";
     }

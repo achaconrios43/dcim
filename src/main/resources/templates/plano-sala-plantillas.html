@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/headers :: headers"></head>
+<body class="min-h-screen flex flex-col bg-gray-50">
+<nav th:replace="fragments/navdar :: nav"></nav>
+
+<main class="flex-1 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Encabezado -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">📐 Plantillas de Salas</h1>
+          <p class="text-gray-500 text-sm mt-1">Layouts guardados como plantilla reutilizable</p>
+        </div>
+        <div class="flex gap-3">
+          <a href="/plano-sala" sec:authorize="hasAnyRole('ADMIN','USER')"
+             class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+            🗺️ Ver todos los planos
+          </a>
+          <a href="/dashboard" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition-colors">
+            ← Volver al Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensajes flash -->
+    <div th:if="${success}" class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg mb-4">
+      <span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+      <span th:text="${error}"></span>
+    </div>
+
+    <!-- Lista de plantillas -->
+    <div th:if="${plantillas.isEmpty()}" class="bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
+      <div class="text-5xl mb-4">📋</div>
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">No hay plantillas guardadas</h3>
+      <p class="text-gray-500 text-sm">Los usuarios ADMIN o USER pueden guardar un plano como plantilla desde su vista de edición.</p>
+    </div>
+
+    <div th:unless="${plantillas.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div th:each="p : ${plantillas}"
+           class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+
+        <!-- Icono + Nombre -->
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full inline-block mb-2">PLANTILLA</div>
+            <h3 class="text-lg font-bold text-gray-900" th:text="${p.nombrePlantilla}">Nombre</h3>
+          </div>
+          <span class="text-3xl">🗺️</span>
+        </div>
+
+        <!-- Sala / Sitio -->
+        <p class="text-sm text-gray-600 mb-1">
+          <span class="font-medium">Sala:</span>
+          <span th:text="${p.sala != null ? p.sala.nombre : 'Sin sala'}"></span>
+        </p>
+        <p class="text-sm text-gray-600 mb-1">
+          <span class="font-medium">Sitio:</span>
+          <span th:text="${p.sala != null and p.sala.sitio != null ? p.sala.sitio.nombre : '-'}"></span>
+        </p>
+        <p class="text-sm text-gray-600 mb-1">
+          <span class="font-medium">Dimensiones:</span>
+          <span th:text="${p.cantidadColumnas + ' col × ' + p.cantidadFilas + ' fil'}"></span>
+        </p>
+        <p class="text-sm text-gray-500 mb-4" th:if="${p.descripcion != null and !p.descripcion.isEmpty()}"
+           th:text="${p.descripcion}"></p>
+
+        <!-- Acciones -->
+        <div class="flex gap-2 flex-wrap">
+          <!-- Ver (todos los roles) -->
+          <a th:href="@{/plano-sala/plantillas/{id}(id=${p.id})}"
+             class="flex-1 text-center px-3 py-2 bg-indigo-50 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-100 transition-colors">
+            👁️ Ver
+          </a>
+
+          <!-- Aplicar a sala (solo ADMIN/USER) -->
+          <button th:attr="data-id=${p.id},data-nombre=${p.nombrePlantilla}"
+                  onclick="abrirModalAplicar(this)"
+                  sec:authorize="hasAnyRole('ADMIN','USER')"
+                  class="flex-1 px-3 py-2 bg-green-50 text-green-700 text-sm font-medium rounded-lg hover:bg-green-100 transition-colors">
+            ✅ Aplicar
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Modal: Aplicar plantilla a sala -->
+<div id="modalAplicar" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+    <h3 class="text-xl font-bold text-gray-900 mb-1">Aplicar plantilla</h3>
+    <p id="modalNombrePlantilla" class="text-sm text-gray-500 mb-5"></p>
+    <form id="formAplicar" method="post">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <label class="block text-sm font-medium text-gray-700 mb-1">Sala destino</label>
+      <select name="salaId" id="salaIdSelect" required
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-5">
+        <option value="">-- Seleccionar sala --</option>
+        <!-- Populated via inline Thymeleaf or JS fetch -->
+        <option th:each="s : ${salas}" th:value="${s.id}" th:text="${s.nombre}"></option>
+      </select>
+      <div class="flex justify-end gap-3">
+        <button type="button" onclick="cerrarModalAplicar()"
+                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">Cancelar</button>
+        <button type="submit"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">Aplicar plantilla</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function abrirModalAplicar(btn) {
+  const id = btn.dataset.id;
+  const nombre = btn.dataset.nombre;
+  document.getElementById('formAplicar').action = '/plano-sala/plantillas/' + id + '/aplicar';
+  document.getElementById('modalNombrePlantilla').textContent = 'Plantilla: ' + nombre;
+  document.getElementById('modalAplicar').classList.remove('hidden');
+}
+function cerrarModalAplicar() {
+  document.getElementById('modalAplicar').classList.add('hidden');
+}
+</script>
+
+<!-- Need salas list for the modal - pass from controller -->
+<th:block th:inline="javascript">
+/*<![CDATA[*/
+// salas already rendered as <option> elements above via Thymeleaf - no extra JS needed
+/*]]>*/
+</th:block>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

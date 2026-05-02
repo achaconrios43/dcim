@@ -19,8 +19,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.dcim.entity.IngresoAP;
 import com.example.dcim.entity.Usuario;
-import com.example.dcim.service.CustomUserDetailsService;
 import com.example.dcim.service.IngresoAPService;
+import com.example.dcim.service.TemperaturaService;
+import com.example.dcim.service.UsuarioService;
 
 @Controller
 public class IngresoController {
@@ -29,7 +30,10 @@ public class IngresoController {
     private IngresoAPService ingresoAPService;
     
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private TemperaturaService temperaturaService;
 
     @GetMapping("/ingresoap")
     public String ingresoForm(Model model){
@@ -37,9 +41,13 @@ public class IngresoController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()) {
             String email = auth.getName(); // El nombre de usuario es el email
-            Usuario usuario = userDetailsService.obtenerUsuarioPorEmail(email);
-            model.addAttribute("usuarioActual", usuario);
+            Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorEmail(email);
+            if (usuarioOpt.isPresent()) {
+                model.addAttribute("usuarioActual", usuarioOpt.get());
+            }
         }
+        model.addAttribute("sitiosCatalogo", temperaturaService.listarSitiosActivos());
+        model.addAttribute("salasPorSitio", temperaturaService.obtenerMapaSalasPorSitio());
         return "ingresoap";
     }
 

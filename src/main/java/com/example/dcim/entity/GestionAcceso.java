@@ -5,9 +5,12 @@ import java.time.LocalTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 /**
@@ -93,6 +96,14 @@ public class GestionAcceso {
     /** Sitio donde se realizará la actividad (DC SAN MARTIN, MC LA FLORIDA, etc.) */
     @Column(name = "sitio")
     private String sitio; // DC San Martin, DC Apoquindo, MC La Florida, etc.
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sitio_id")
+    private Sitio sitioRef;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sala_id")
+    private Sala salaRef;
 
     /** Indica si la gestión/actividad ya fue realizada físicamente */
     @Column(name = "gestion_realizada")
@@ -312,6 +323,22 @@ public class GestionAcceso {
 
     public void setSitio(String sitio) {
         this.sitio = sitio;
+    }
+
+    public Sitio getSitioRef() {
+        return sitioRef;
+    }
+
+    public void setSitioRef(Sitio sitioRef) {
+        this.sitioRef = sitioRef;
+    }
+
+    public Sala getSalaRef() {
+        return salaRef;
+    }
+
+    public void setSalaRef(Sala salaRef) {
+        this.salaRef = salaRef;
     }
 
     public String getComentarioInicio() {
