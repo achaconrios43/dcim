@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DCIM - Visor de Diagramas</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #dbe3ef;
+      --accent: #0ea5e9;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 { margin: 0 0 8px; }
+    p { color: var(--muted); margin: 0 0 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+    }
+    .title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .title h2 {
+      font-size: 18px;
+      margin: 0;
+    }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    img {
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>DCIM - Visor de Diagramas</h1>
+    <p>Si un PNG se ve pequeño, abre el enlace SVG y usa zoom del navegador (Ctrl + +) para presentación.</p>
+
+    <div class="card">
+      <div class="title">
+        <h2>ERD Actual (Base Fisica)</h2>
+        <a href="erd-dcim-actual.svg" target="_blank">Abrir SVG</a>
+      </div>
+      <img src="erd-dcim-actual-presentacion.png" alt="ERD actual" />
+    </div>
+
+    <div class="card">
+      <div class="title">
+        <h2>ERD Aplicacion (Modelo Ampliado)</h2>
+        <a href="erd-dcim-aplicacion.svg" target="_blank">Abrir SVG</a>
+      </div>
+      <img src="erd-dcim-aplicacion-presentacion.png" alt="ERD aplicacion" />
+    </div>
+
+    <div class="card">
+      <div class="title">
+        <h2>ERD Core Simplificado (Presentacion)</h2>
+        <a href="erd-dcim-core-presentacion.png" target="_blank">Abrir PNG</a>
+      </div>
+      <img src="erd-dcim-core-presentacion.png" alt="ERD core" />
+    </div>
+
+    <div class="card">
+      <div class="title">
+        <h2>ERD Temperaturas y Plano (Presentacion)</h2>
+        <a href="erd-dcim-temperaturas-presentacion.png" target="_blank">Abrir PNG</a>
+      </div>
+      <img src="erd-dcim-temperaturas-presentacion.png" alt="ERD temperaturas" />
+    </div>
+
+    <div class="card">
+      <div class="title">
+        <h2>Estructura Proyecto (Vista Sistema)</h2>
+        <a href="estructura-proyecto-dcim.svg" target="_blank">Abrir SVG</a>
+      </div>
+      <img src="estructura-proyecto-dcim-presentacion.png" alt="Estructura proyecto" />
+      <div class="hint">Sugerencia: para esta lámina usa la versión SVG, que escala mejor que PNG.</div>
+    </div>
+  </div>
+</body>
+</html>

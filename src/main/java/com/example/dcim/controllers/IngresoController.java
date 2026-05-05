@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.dcim.dao.IUsuarioDao;
 import com.example.dcim.entity.IngresoAP;
 import com.example.dcim.entity.Usuario;
 import com.example.dcim.service.IngresoAPService;
@@ -34,6 +35,9 @@ public class IngresoController {
 
     @Autowired
     private TemperaturaService temperaturaService;
+
+    @Autowired
+    private IUsuarioDao usuarioDao;
 
     @GetMapping("/ingresoap")
     public String ingresoForm(Model model){
@@ -81,6 +85,19 @@ public class IngresoController {
         try {
             // Crear nueva entidad IngresoAP
             IngresoAP ingresoAP = new IngresoAP();
+
+            // Resolver usuario autenticado y asignar FK referencial
+            Authentication authPost = SecurityContextHolder.getContext().getAuthentication();
+            if (authPost != null && authPost.isAuthenticated()) {
+                String emailPost = authPost.getName();
+                usuarioDao.findByEmail(emailPost).ifPresent(ingresoAP::setUsuarioRegistra);
+            }
+
+            // Intentar resolver aprobador como FK si existe en el sistema
+            usuarioDao.findAll().stream()
+                .filter(u -> (u.getNombre() + " " + u.getApellido()).equalsIgnoreCase(aprobador.trim()))
+                .findFirst()
+                .ifPresent(ingresoAP::setAprobadorRef);
             
             // Asignar valores de formulario
             ingresoAP.setTurno(turno);

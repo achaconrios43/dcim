@@ -1,8 +1,8 @@
 -- Inserción de datos para tabla de usuarios
--- Estructura: rut, nombre, apellido, email, password, rol, creat_at, update_at
+-- Estructura: rut, nombre, apellido, email, password, ubicacion, rol, creat_at, update_at
 
--- Usuario administrador principal del sistema
-INSERT INTO usuario (rut, nombre, apellido, email, password, rol, creat_at, update_at) VALUES ('15.441.473-8', 'Arturo', 'Chacón Ríos', 'achaconrios@gmail.com', '$2a$10$0DfDlXv6hrXU.4MDUa7Reu6j36ISK8QzgRPDtazOmOBE6eKfDyZWq', 'ADMIN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- Usuarios del sistema Data Center Management
+INSERT INTO usuario (rut, nombre, apellido, email, password, ubicacion, rol, creat_at, update_at) VALUES ('15.441.473-8', 'Arturo', 'Chacón Ríos', 'achaconrios@gmail.com', '$2a$10$0DfDlXv6hrXU.4MDUa7Reu6j36ISK8QzgRPDtazOmOBE6eKfDyZWq', 'ADMIN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ═══════════════════════════════════════════════════════════════
 -- DATOS DE EJEMPLO PARA REGISTROS DE INGRESO AL DATA CENTER

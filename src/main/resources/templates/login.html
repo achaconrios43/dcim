@@ -1,95 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
-        <head th:replace="~{fragments/headers :: headers}"></head>
-    <body>
-        <nav th:replace="~{fragments/navdar :: nav}"></nav>
-            <main class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-accent py-8">
-                <div class="w-full max-w-md bg-white bg-opacity-80 rounded-xl shadow-xl p-8 backdrop-blur">
-                    <div class="flex items-center mb-6">
-                        <div class="mr-3">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#6c5ce7" opacity="0.12"/><path d="M6 12h12M6 8h12M6 16h8" stroke="#6c5ce7" stroke-opacity="0.9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <div class="text-2xl font-bold text-accent">INGRESO DE USUARIO</div>
-                            <div class="text-sm text-gray-500">Accede a tu cuenta</div>
-                        </div>
-                    </div>
-                    <h4 class="text-xl font-semibold mb-2 text-gray-800">Bienvenido</h4>
-                    <p class="text-sm text-gray-500 mb-6">Introduce tus credenciales para seguir.</p>
-                    <form id="loginForm" action="/login" method="post" class="space-y-5">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Usuario o correo</label>
-                            <input type="text" id="email" name="email" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Usuario" />
-                            <p id="userCheck" class="text-sm text-red-600 mt-1" style="display:none">Usuario no encontrado</p>
-                        </div>
-                        <div class="relative">
-                            <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                            <input type="password" id="password" name="password" required class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-white text-gray-900" placeholder="Contraseña" />
-                            <span class="absolute top-8 right-4 text-sm text-accent cursor-pointer select-none" id="togglePassword">Mostrar</span>
-                        </div>
-                                    <div class="flex items-center justify-between mt-4">
-                                        <label class="flex items-center text-sm text-gray-600">
-                                            <input type="checkbox" name="remember" class="mr-2 rounded" /> Recuérdame
-                                        </label>
-                                        <a href="#" class="text-sm text-accent hover:underline">¿Olvidaste la contraseña?</a>
-                                    </div>
-                                    <button type="submit" class="w-full py-3 rounded-lg bg-accent text-white font-bold text-lg shadow hover:bg-indigo-700 transition mt-2">Entrar</button>
-                     </form>
-                    <div class="text-center text-sm text-gray-500 mt-6">¿No tienes cuenta? <a href="/user/create" th:href="@{/user/create}" class="text-accent hover:underline">Regístrate</a></div>
-                </div>
-                <script>
-                    // Toggle password visibility
-                    (function(){
-                        var toggle = document.getElementById('togglePassword');
-                        var pwd = document.getElementById('password');
-                        if(toggle && pwd){
-                            toggle.addEventListener('click', function(){
-                                if(pwd.type === 'password'){ pwd.type = 'text'; toggle.textContent = 'Ocultar'; }
-                                else { pwd.type = 'password'; toggle.textContent = 'Mostrar'; }
-                            });
-                        }
-                    })()
+<head th:replace="~{fragments/headers :: headers}"></head>
+<body class="min-h-screen flex flex-col" style="
+  font-family:'Barlow',sans-serif;
+  background:
+    radial-gradient(circle at 10% 15%, rgba(11,60,117,0.18), transparent 35%),
+    radial-gradient(circle at 90% 5%,  rgba(0,164,200,0.22), transparent 30%),
+    linear-gradient(160deg, #1a1a2e 0%, #0b3c75 45%, #1e3a5f 80%, #0f4c75 100%);
+  min-height:100vh;
+">
 
-                    (function(){
-                      // Consolidated script: user-exists check and submit interception
-                      const toggle = document.getElementById('togglePassword');
-                      const pwd = document.getElementById('password');
-                      if(toggle && pwd){
-                        toggle.addEventListener('click', ()=>{ if(pwd.type==='password'){ pwd.type='text'; toggle.textContent='Ocultar'; } else { pwd.type='password'; toggle.textContent='Mostrar'; }});
-                      }
+<nav th:replace="~{fragments/navdar :: nav}"></nav>
 
-                      const input = document.getElementById('email');
-                      const msg = document.getElementById('userCheck');
-                      const submitBtn = document.querySelector('#loginForm button[type="submit"]');
-                      if(input){
-                        input.addEventListener('blur', function(){
-                          const val = input.value.trim();
-                          if(!val){ if(msg) msg.style.display='none'; if(submitBtn) submitBtn.disabled=false; return; }
-                          fetch('/user/exists?email=' + encodeURIComponent(val)).then(r=>r.json()).then(data=>{
-                            if(!data){ if(msg) msg.style.display='block'; if(submitBtn) submitBtn.disabled=true; }
-                            else { if(msg) msg.style.display='none'; if(submitBtn) submitBtn.disabled=false; }
-                          }).catch(()=>{ if(msg) msg.style.display='none'; if(submitBtn) submitBtn.disabled=false; });
-                        });
-                      }
+<main class="flex-1 flex items-center justify-center py-12 px-4">
+  <div style="
+    background: rgba(255,255,255,0.97);
+    border-radius: 18px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.5);
+    width: 100%; max-width: 420px;
+    padding: 40px 36px;
+    animation: revealUp 0.4s ease both;
+  ">
+    <!-- Header card -->
+    <div class="flex items-center gap-3 mb-6">
+      <div style="width:46px; height:46px; border-radius:10px; background:linear-gradient(135deg,#0b3c75,#00a4c8); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C9.24 2 7 4.24 7 7s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM12 14c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z" fill="#fff"/>
+        </svg>
+      </div>
+      <div>
+        <div style="font-weight:800; font-size:1.15rem; color:#0b3c75; font-family:Barlow,sans-serif;">Acceso DCIM</div>
+        <div style="font-size:0.8rem; color:#5b667a;">Introduce tus credenciales para continuar</div>
+      </div>
+    </div>
 
-                      const form = document.getElementById('loginForm');
-                      if(form){
-                        form.addEventListener('submit', function handler(e){
-                          e.preventDefault();
-                          const email = (document.getElementById('email')||{}).value.trim();
-                          const password = (document.getElementById('password')||{}).value;
-                          fetch('/user/validate?email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password)).then(r=>r.json()).then(data=>{
-                            if(data && data.redirect){ window.location.href = data.url; return; }
-                            // fallback: submit normally
-                            form.removeEventListener('submit', handler);
-                            form.submit();
-                          }).catch(()=>{ form.removeEventListener('submit', handler); form.submit(); });
-                        });
-                      }
-                    })();
-                </script>
-            </main>
-    </body>
+    <!-- Error Spring Security -->
+    <div th:if="${param.error != null}"
+         style="background:#fef2f2; border:1px solid #fca5a5; border-radius:8px; padding:10px 14px; color:#b91c1c; font-size:13px; font-weight:600; margin-bottom:16px;">
+      ⚠ Credenciales incorrectas. Intenta nuevamente.
+    </div>
+    <div th:if="${param.expired != null}"
+         style="background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; padding:10px 14px; color:#92400e; font-size:13px; font-weight:600; margin-bottom:16px;">
+      ⏱ Tu sesión expiró por inactividad (3 minutos). Vuelve a iniciar sesión.
+    </div>
 
+    <form id="loginForm" th:action="@{/login}" method="post" class="space-y-4">
+
+      <!-- Email -->
+      <div>
+        <label for="email" style="font-size:13px; font-weight:600; color:#374151; display:block; margin-bottom:5px;">Usuario o correo</label>
+        <input type="text" id="email" name="email" required autocomplete="username"
+               placeholder="usuario@empresa.cl"
+               style="width:100%; padding:10px 14px; border:1.5px solid rgba(11,60,117,0.18); border-radius:8px; font-size:14px; font-family:Barlow,sans-serif; outline:none; transition:border-color 0.2s; box-sizing:border-box;"
+               onfocus="this.style.borderColor='#00a4c8'" onblur="this.style.borderColor='rgba(11,60,117,0.18)'"/>
+        <p id="userCheck" style="display:none; color:#dc2626; font-size:12px; margin-top:4px;">Usuario no encontrado</p>
+      </div>
+
+      <!-- Password -->
+      <div style="position:relative;">
+        <label for="password" style="font-size:13px; font-weight:600; color:#374151; display:block; margin-bottom:5px;">Contraseña</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password"
+               placeholder="••••••••"
+               style="width:100%; padding:10px 14px; border:1.5px solid rgba(11,60,117,0.18); border-radius:8px; font-size:14px; font-family:Barlow,sans-serif; outline:none; transition:border-color 0.2s; box-sizing:border-box;"
+               onfocus="this.style.borderColor='#00a4c8'" onblur="this.style.borderColor='rgba(11,60,117,0.18)'"/>
+        <span id="togglePassword"
+              style="position:absolute; right:12px; top:34px; font-size:12px; color:#00a4c8; font-weight:700; cursor:pointer; user-select:none;">Mostrar</span>
+      </div>
+
+      <!-- Recordar -->
+      <div class="flex items-center justify-between mt-2">
+        <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:#5b667a;">
+          <input type="checkbox" name="remember" style="accent-color:#0b3c75;"/> Recuérdame
+        </label>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" style="
+        width:100%; padding:12px; margin-top:4px;
+        background: linear-gradient(135deg, #0b3c75, #00a4c8);
+        color:#fff; font-weight:800; font-size:15px; font-family:Barlow,sans-serif;
+        border:none; border-radius:8px; cursor:pointer;
+        box-shadow: 0 4px 14px rgba(11,60,117,0.3);
+        transition: opacity 0.2s;
+      " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+        Iniciar Sesión →
+      </button>
+    </form>
+
+    <p style="text-align:center; font-size:12px; color:#5b667a; margin-top:18px;">
+      ¿No tienes cuenta?
+      <a th:href="@{/user/create}" style="color:#0b3c75; font-weight:700; text-decoration:none;">Solicitar acceso</a>
+    </p>
+  </div>
+</main>
+
+<script>
+(function(){
+  var toggle = document.getElementById('togglePassword');
+  var pwd = document.getElementById('password');
+  if(toggle && pwd){
+    toggle.addEventListener('click', function(){
+      if(pwd.type==='password'){ pwd.type='text'; toggle.textContent='Ocultar'; }
+      else { pwd.type='password'; toggle.textContent='Mostrar'; }
+    });
+  }
+
+  var input = document.getElementById('email');
+  var msg = document.getElementById('userCheck');
+  var submitBtn = document.querySelector('#loginForm button[type="submit"]');
+  if(input){
+    input.addEventListener('blur', function(){
+      var val = input.value.trim();
+      if(!val){ if(msg) msg.style.display='none'; return; }
+      fetch('/user/exists?email=' + encodeURIComponent(val))
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if(!data){ if(msg) msg.style.display='block'; if(submitBtn) submitBtn.disabled=true; }
+          else { if(msg) msg.style.display='none'; if(submitBtn) submitBtn.disabled=false; }
+        }).catch(function(){ if(msg) msg.style.display='none'; });
+    });
+  }
+})();
+</script>
+</body>
 </html>

@@ -114,6 +114,7 @@ public class GestionAccesoController {
         gestion.setFechaRegistro(LocalDate.now());
         gestion.setHoraRegistro(LocalTime.now());
         gestion.setUsuarioIngresa(usuario.getNombre() + " " + usuario.getApellido());
+        gestion.setUsuarioRegistra(usuario);  // FK referencial
         gestion.setGestionRealizada(false);
         gestion.setEstadoAprobacion("Pendiente");
         
@@ -150,6 +151,10 @@ public class GestionAccesoController {
             }
             if (gestion.getHoraRegistro() == null) {
                 gestion.setHoraRegistro(LocalTime.now());
+            }
+            // Asegurar que la FK de usuario registrador esté asignada
+            if (gestion.getUsuarioRegistra() == null) {
+                gestion.setUsuarioRegistra(usuario);
             }
             
             gestionAccesoService.guardar(gestion);

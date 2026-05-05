@@ -1,188 +1,216 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
-<head>
-    <th:block th:insert="~{fragments/headers :: headers}"></th:block>
-    <title>Sitios, Salas y Temperaturas</title>
-</head>
-<body class="bg-gray-100">
-    <nav th:replace="~{fragments/navdar :: nav}"></nav>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/headers :: headers}"></head>
+<body class="min-h-screen flex flex-col" style="font-family:'Barlow',sans-serif; color:#172134;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(11,60,117,0.08), transparent 32%),
+    radial-gradient(circle at 94% 5%, rgba(0,164,200,0.12), transparent 28%),
+    linear-gradient(180deg,#edf3f9 0%,#e6edf5 55%,#dfe9f3 100%);">
 
-    <div class="container mx-auto px-4 py-8 space-y-6">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Gestion de Sitios, Salas y Temperaturas</h1>
-                <p class="text-gray-600">Configure sitios, salas y puntos de medicion, y registre temperaturas diarias.</p>
-            </div>
-            <div class="flex gap-2">
-                <a href="/temperaturas/registro" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">Ingresar Temperaturas</a>
-                <a href="/plano-sala" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">🗺️ Planos de Sala</a>
-                <a href="/dashboard" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Volver a Dashboard</a>
-            </div>
-        </div>
+<nav th:replace="~{fragments/navdar :: nav}"></nav>
 
-        <div th:if="${success}" class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded" th:text="${success}"></div>
-        <div th:if="${error}" class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded" th:text="${error}"></div>
+<!-- Page Header -->
+<div style="background:linear-gradient(90deg,#134e4a,#0d9488); padding:22px 32px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+  <div style="display:flex; align-items:center; gap:16px;">
+    <a href="/dashboard" style="color:rgba(255,255,255,0.75); font-size:13px; text-decoration:none; font-weight:600;">← Dashboard</a>
+    <span style="color:rgba(255,255,255,0.4);">/</span>
+    <span style="color:#ffffff; font-weight:800; font-size:15px;">🌡️ Sitios, Salas y Temperaturas</span>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <a href="/temperaturas/registro" style="background:rgba(255,255,255,0.15); color:#fff; font-size:13px; font-weight:700; padding:8px 16px; border-radius:7px; text-decoration:none; border:1px solid rgba(255,255,255,0.3);">Ingresar Temperaturas</a>
+    <a href="/plano-sala" style="background:rgba(255,255,255,0.15); color:#fff; font-size:13px; font-weight:700; padding:8px 16px; border-radius:7px; text-decoration:none; border:1px solid rgba(255,255,255,0.3);">🗺️ Planos de Sala</a>
+    <a href="/dashboard" style="background:#fff; color:#134e4a; font-size:13px; font-weight:800; padding:8px 16px; border-radius:7px; text-decoration:none;">← Dashboard</a>
+  </div>
+</div>
 
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-xl shadow p-5">
-                <h2 class="text-xl font-semibold mb-4">1) Crear Sitio</h2>
-                <form method="post" action="/temperaturas/sitios" class="space-y-3">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                    <input name="nombre" placeholder="Ej: DC SAN MARTIN" class="w-full border rounded px-3 py-2" required>
-                    <input name="descripcion" placeholder="Descripcion" class="w-full border rounded px-3 py-2">
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Guardar Sitio</button>
-                </form>
-            </div>
+<main class="flex-1" style="padding:32px 24px; max-width:1100px; margin:0 auto; width:100%;">
 
-            <div class="bg-white rounded-xl shadow p-5">
-                <h2 class="text-xl font-semibold mb-4">2) Crear Sala</h2>
-                <form method="post" action="/temperaturas/salas" class="space-y-3">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                    <select name="sitioId" class="w-full border rounded px-3 py-2" required>
-                        <option value="">Seleccione sitio</option>
-                        <option th:each="s : ${sitios}" th:value="${s.id}" th:text="${s.nombre}" th:selected="${sitioIdSeleccionado == s.id}"></option>
-                    </select>
-                    <input name="nombre" placeholder="Ej: Sala A1" class="w-full border rounded px-3 py-2" required>
-                    <input name="descripcion" placeholder="Descripcion" class="w-full border rounded px-3 py-2">
-                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Guardar Sala</button>
-                </form>
-            </div>
-        </div>
+  <div th:if="${success}" style="background:#d1fae5; border:1px solid #6ee7b7; border-radius:8px; padding:12px 16px; margin-bottom:16px; color:#065f46; font-weight:600; font-size:14px;">✓ <span th:text="${success}"></span></div>
+  <div th:if="${error}" style="background:#fee2e2; border:1px solid #fca5a5; border-radius:8px; padding:12px 16px; margin-bottom:16px; color:#7f1d1d; font-weight:600; font-size:14px;">✗ <span th:text="${error}"></span></div>
 
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-xl shadow p-5">
-                <h2 class="text-xl font-semibold mb-4">3) Crear Punto de Medicion</h2>
-                <form method="post" action="/temperaturas/puntos" class="space-y-3">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                    <select id="sitioPunto" name="sitioId" class="w-full border rounded px-3 py-2" required onchange="window.location='/temperaturas?sitioId='+this.value">
-                        <option value="">Seleccione sitio</option>
-                        <option th:each="s : ${sitios}" th:value="${s.id}" th:text="${s.nombre}" th:selected="${sitioIdSeleccionado == s.id}"></option>
-                    </select>
-                    <select name="salaId" class="w-full border rounded px-3 py-2" required>
-                        <option value="">Seleccione sala</option>
-                        <option th:each="sa : ${salas}" th:value="${sa.id}" th:text="${sa.nombre}" th:selected="${salaIdSeleccionada == sa.id}"></option>
-                    </select>
-                    <input name="codigo" placeholder="Ej: PT-01" class="w-full border rounded px-3 py-2" required>
-                    <input name="nombre" placeholder="Ej: Retorno HVAC" class="w-full border rounded px-3 py-2" required>
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" step="0.01" name="temperaturaMinima" placeholder="Min" class="w-full border rounded px-3 py-2" value="18.00" required>
-                        <input type="number" step="0.01" name="temperaturaMaxima" placeholder="Max" class="w-full border rounded px-3 py-2" value="27.00" required>
-                    </div>
-                    <button class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded">Guardar Punto</button>
-                </form>
-            </div>
+  <!-- Formularios de creación -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
 
-            <div class="bg-white rounded-xl shadow p-5">
-                <h2 class="text-xl font-semibold mb-4">4) Registro de Temperaturas</h2>
-                <p class="text-gray-600 mb-4">
-                    El ingreso de temperaturas se realiza solo en la pagina dedicada de registro.
-                </p>
-                <a href="/temperaturas/registro"
-                   class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded">
-                    Ir a Registro de Temperaturas
-                </a>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow p-5" th:if="${sitioIdSeleccionado != null}">
-            <h2 class="text-xl font-semibold mb-1">Resumen Diario por Sala</h2>
-            <p class="text-sm text-gray-600 mb-4" th:text="'Fecha: ' + ${#temporals.format(fechaResumenSalas, 'dd/MM/yyyy')}">Fecha</p>
-
-            <div th:if="${#lists.isEmpty(resumenSalas)}" class="text-gray-500">
-                El sitio seleccionado aun no tiene salas configuradas.
-            </div>
-
-            <div th:if="${!#lists.isEmpty(resumenSalas)}" class="overflow-x-auto border rounded-lg">
-                <table class="min-w-full text-sm">
-                    <thead>
-                    <tr class="bg-gray-100">
-                        <th class="text-left px-3 py-2">Sala</th>
-                        <th class="text-left px-3 py-2">Puntos Configurados</th>
-                        <th class="text-left px-3 py-2">Puntos Medidos Hoy</th>
-                        <th class="text-left px-3 py-2">Promedio Hoy</th>
-                        <th class="text-left px-3 py-2">Alertas Hoy</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="r : ${resumenSalas}" class="border-t">
-                        <td class="px-3 py-2 font-medium">
-                            <a class="text-blue-700 hover:text-blue-900 hover:underline"
-                               th:href="@{/temperaturas/registro(sitioId=${sitioIdSeleccionado},salaId=${r.salaId})}"
-                               th:text="${r.salaNombre}">Sala A</a>
-                        </td>
-                        <td class="px-3 py-2" th:text="${r.totalPuntos}">0</td>
-                        <td class="px-3 py-2" th:text="${r.puntosMedidos}">0</td>
-                        <td class="px-3 py-2" th:text="${r.promedio + ' C'}">0.00 C</td>
-                        <td class="px-3 py-2">
-                            <span class="px-2 py-1 rounded text-xs"
-                                  th:text="${r.alertas}"
-                                  th:classappend="${r.alertas > 0} ? ' bg-red-100 text-red-700' : ' bg-green-100 text-green-700'">0</span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow p-5">
-            <h2 class="text-xl font-semibold mb-4">Reporte Diario/Mensual por Sitio</h2>
-            <form method="get" action="/temperaturas" class="flex flex-wrap gap-3 items-end mb-4">
-                <div class="min-w-[280px]">
-                    <label class="block text-sm text-gray-700 mb-1">Sitio</label>
-                    <select name="sitioReporte" class="w-full border rounded px-3 py-2" required>
-                        <option value="">Seleccione</option>
-                        <option th:each="s : ${sitios}" th:value="${s.nombre}" th:text="${s.nombre}" th:selected="${sitioReporte == s.nombre}"></option>
-                    </select>
-                </div>
-                <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded">Ver Reporte</button>
-            </form>
-
-            <div th:if="${sitioReporte != null}" class="grid md:grid-cols-3 gap-4 mb-4">
-                <div class="border rounded p-4">
-                    <div class="text-sm text-gray-600">Promedio Diario</div>
-                    <div class="text-2xl font-bold" th:text="${resumenDiarioTemp.promedio + ' C'}">0 C</div>
-                </div>
-                <div class="border rounded p-4">
-                    <div class="text-sm text-gray-600">Promedio Mensual</div>
-                    <div class="text-2xl font-bold" th:text="${resumenMensualTemp.promedio + ' C'}">0 C</div>
-                </div>
-                <div class="border rounded p-4">
-                    <div class="text-sm text-gray-600">Estado General</div>
-                    <div class="text-2xl font-bold" th:text="${resumenDiarioTemp.estadoGeneral}"
-                         th:classappend="${resumenDiarioTemp.estadoGeneral == 'ALERTA'} ? ' text-red-600' : ' text-green-600'">OK</div>
-                </div>
-            </div>
-
-            <div th:if="${sitioReporte != null}" class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="text-left px-3 py-2">Fecha/Hora</th>
-                            <th class="text-left px-3 py-2">Punto</th>
-                            <th class="text-left px-3 py-2">Temperatura</th>
-                            <th class="text-left px-3 py-2">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:if="${#lists.isEmpty(ultimasMediciones)}">
-                            <td colspan="4" class="px-3 py-3 text-center text-gray-500">Sin mediciones del dia.</td>
-                        </tr>
-                        <tr th:each="m : ${ultimasMediciones}" class="border-t">
-                            <td class="px-3 py-2" th:text="${#temporals.format(m.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></td>
-                            <td class="px-3 py-2" th:text="${m.punto.codigo + ' - ' + m.punto.nombre}"></td>
-                            <td class="px-3 py-2" th:text="${m.temperaturaCelsius + ' C'}"></td>
-                            <td class="px-3 py-2">
-                                <span class="px-2 py-1 rounded text-xs"
-                                      th:text="${m.estado}"
-                                      th:classappend="${m.estado == 'OK'} ? ' bg-green-100 text-green-700' : ' bg-red-100 text-red-700'"></span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <!-- 1) Crear Sitio -->
+    <div class="dcim-card" style="overflow:hidden;">
+      <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
+      <div style="padding:20px 24px;">
+        <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">1) Crear Sitio</div>
+        <form method="post" action="/temperaturas/sitios" style="display:flex; flex-direction:column; gap:10px;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <input name="nombre" placeholder="Ej: DC SAN MARTIN" required
+                 style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+          <input name="descripcion" placeholder="Descripción"
+                 style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+          <button style="padding:9px 18px; border-radius:8px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; font-weight:700; font-size:13px; border:none; cursor:pointer; width:fit-content;">Guardar Sitio</button>
+        </form>
+      </div>
     </div>
 
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <!-- 2) Crear Sala -->
+    <div class="dcim-card" style="overflow:hidden;">
+      <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
+      <div style="padding:20px 24px;">
+        <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">2) Crear Sala</div>
+        <form method="post" action="/temperaturas/salas" style="display:flex; flex-direction:column; gap:10px;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <select name="sitioId" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+            <option value="">Seleccione sitio</option>
+            <option th:each="s : ${sitios}" th:value="${s.id}" th:text="${s.nombre}" th:selected="${sitioIdSeleccionado == s.id}"></option>
+          </select>
+          <input name="nombre" placeholder="Ej: Sala A1" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+          <input name="descripcion" placeholder="Descripción" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+          <button style="padding:9px 18px; border-radius:8px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; font-weight:700; font-size:13px; border:none; cursor:pointer; width:fit-content;">Guardar Sala</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 3) Crear Punto de Medición -->
+    <div class="dcim-card" style="overflow:hidden;">
+      <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
+      <div style="padding:20px 24px;">
+        <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">3) Crear Punto de Medición</div>
+        <form method="post" action="/temperaturas/puntos" style="display:flex; flex-direction:column; gap:10px;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <select id="sitioPunto" name="sitioId" required onchange="window.location='/temperaturas?sitioId='+this.value"
+                  style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+            <option value="">Seleccione sitio</option>
+            <option th:each="s : ${sitios}" th:value="${s.id}" th:text="${s.nombre}" th:selected="${sitioIdSeleccionado == s.id}"></option>
+          </select>
+          <select name="salaId" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+            <option value="">Seleccione sala</option>
+            <option th:each="sa : ${salas}" th:value="${sa.id}" th:text="${sa.nombre}" th:selected="${salaIdSeleccionada == sa.id}"></option>
+          </select>
+          <input name="codigo" placeholder="Ej: PT-01" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+          <input name="nombre" placeholder="Ej: Retorno HVAC" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <input type="number" step="0.01" name="temperaturaMinima" placeholder="Min" value="18.00" required style="padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+            <input type="number" step="0.01" name="temperaturaMaxima" placeholder="Max" value="27.00" required style="padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+          </div>
+          <button style="padding:9px 18px; border-radius:8px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; font-weight:700; font-size:13px; border:none; cursor:pointer; width:fit-content;">Guardar Punto</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 4) Registro de Temperaturas -->
+    <div class="dcim-card" style="overflow:hidden;">
+      <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
+      <div style="padding:20px 24px;">
+        <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">4) Registro de Temperaturas</div>
+        <p style="font-size:13px; color:#5b667a; margin:0 0 16px;">El ingreso de temperaturas se realiza en la página dedicada de registro.</p>
+        <a href="/temperaturas/registro" style="display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:8px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; font-weight:700; font-size:13px; text-decoration:none; box-shadow:0 3px 10px rgba(13,148,136,0.25);">
+          → Ir a Registro de Temperaturas
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumen Diario por Sala -->
+  <div th:if="${sitioIdSeleccionado != null}" class="dcim-card" style="overflow:hidden; margin-bottom:20px;">
+    <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
+    <div style="padding:20px 24px;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+        <span style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em;">Resumen Diario por Sala</span>
+      </div>
+      <p style="font-size:12px; color:#5b667a; margin:0 0 14px;" th:text="'Fecha: ' + ${#temporals.format(fechaResumenSalas, 'dd/MM/yyyy')}">Fecha</p>
+      <div th:if="${#lists.isEmpty(resumenSalas)}" style="font-size:13px; color:#5b667a; padding:12px; text-align:center;">El sitio seleccionado aún no tiene salas configuradas.</div>
+      <div th:if="${!#lists.isEmpty(resumenSalas)}" style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+          <thead>
+            <tr style="background:linear-gradient(90deg,#134e4a,#0d9488);">
+              <th style="padding:11px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; text-align:left;">Sala</th>
+              <th style="padding:11px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; text-align:left;">Puntos Configurados</th>
+              <th style="padding:11px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; text-align:left;">Puntos Medidos Hoy</th>
+              <th style="padding:11px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; text-align:left;">Promedio Hoy</th>
+              <th style="padding:11px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; text-align:left;">Alertas Hoy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="r : ${resumenSalas}" style="border-bottom:1px solid #e5e7eb;">
+              <td style="padding:10px 14px; font-weight:600;">
+                <a th:href="@{/temperaturas/registro(sitioId=${sitioIdSeleccionado},salaId=${r.salaId})}"
+                   th:text="${r.salaNombre}" style="color:#0d9488; text-decoration:none; font-weight:700;">Sala A</a>
+              </td>
+              <td style="padding:10px 14px;" th:text="${r.totalPuntos}">0</td>
+              <td style="padding:10px 14px;" th:text="${r.puntosMedidos}">0</td>
+              <td style="padding:10px 14px;" th:text="${r.promedio + ' °C'}">0.00 °C</td>
+              <td style="padding:10px 14px;">
+                <span th:text="${r.alertas}"
+                      th:style="${r.alertas > 0} ? 'background:#fee2e2;color:#7f1d1d;' : 'background:#d1fae5;color:#065f46;'"
+                      style="padding:2px 10px; border-radius:99px; font-size:11px; font-weight:700;">0</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reporte Diario/Mensual -->
+  <div class="dcim-card" style="overflow:hidden;">
+    <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
+    <div style="padding:20px 24px;">
+      <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">Reporte Diario / Mensual por Sitio</div>
+
+      <form method="get" action="/temperaturas" style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; margin-bottom:20px;">
+        <div style="min-width:280px;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Sitio</label>
+          <select name="sitioReporte" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+            <option value="">Seleccione</option>
+            <option th:each="s : ${sitios}" th:value="${s.nombre}" th:text="${s.nombre}" th:selected="${sitioReporte == s.nombre}"></option>
+          </select>
+        </div>
+        <button style="padding:10px 20px; border-radius:8px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; font-weight:700; font-size:13px; border:none; cursor:pointer;">Ver Reporte</button>
+      </form>
+
+      <div th:if="${sitioReporte != null}" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px;">
+        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:16px;">
+          <div style="font-size:11px; font-weight:700; color:#5b667a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;">Promedio Diario</div>
+          <div style="font-size:26px; font-weight:800; color:#134e4a;" th:text="${resumenDiarioTemp.promedio + ' °C'}">0 °C</div>
+        </div>
+        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:16px;">
+          <div style="font-size:11px; font-weight:700; color:#5b667a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;">Promedio Mensual</div>
+          <div style="font-size:26px; font-weight:800; color:#134e4a;" th:text="${resumenMensualTemp.promedio + ' °C'}">0 °C</div>
+        </div>
+        <div style="border:1px solid #e5e7eb; border-radius:10px; padding:16px;">
+          <div style="font-size:11px; font-weight:700; color:#5b667a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;">Estado General</div>
+          <div style="font-size:26px; font-weight:800;"
+               th:text="${resumenDiarioTemp.estadoGeneral}"
+               th:style="${resumenDiarioTemp.estadoGeneral == 'ALERTA'} ? 'color:#dc2626;' : 'color:#059669;'">OK</div>
+        </div>
+      </div>
+
+      <div th:if="${sitioReporte != null}" style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+          <thead>
+            <tr style="background:linear-gradient(90deg,#134e4a,#0d9488);">
+              <th style="padding:11px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; text-align:left;">Fecha/Hora</th>
+              <th style="padding:11px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; text-align:left;">Punto</th>
+              <th style="padding:11px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; text-align:left;">Temperatura</th>
+              <th style="padding:11px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; text-align:left;">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(ultimasMediciones)}">
+              <td colspan="4" style="padding:16px; text-align:center; color:#5b667a; font-size:13px;">Sin mediciones del día.</td>
+            </tr>
+            <tr th:each="m : ${ultimasMediciones}" style="border-bottom:1px solid #e5e7eb;">
+              <td style="padding:10px 14px;" th:text="${#temporals.format(m.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></td>
+              <td style="padding:10px 14px;" th:text="${m.punto.codigo + ' - ' + m.punto.nombre}"></td>
+              <td style="padding:10px 14px; font-weight:600;" th:text="${m.temperaturaCelsius + ' °C'}"></td>
+              <td style="padding:10px 14px;">
+                <span th:text="${m.estado}"
+                      th:style="${m.estado == 'OK'} ? 'background:#d1fae5;color:#065f46;' : 'background:#fee2e2;color:#7f1d1d;'"
+                      style="padding:2px 10px; border-radius:99px; font-size:11px; font-weight:700;"></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

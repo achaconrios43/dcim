@@ -1,0 +1,51 @@
+erDiagram
+    SITIO {
+        BIGINT id PK
+        VARCHAR nombre UK
+        BOOLEAN activo
+    }
+
+    SALA {
+        BIGINT id PK
+        BIGINT sitio_id FK
+        VARCHAR nombre
+        BOOLEAN activo
+    }
+
+    PUNTO_MEDICION {
+        BIGINT id PK
+        BIGINT sala_id FK
+        VARCHAR codigo
+        DECIMAL temperatura_minima
+        DECIMAL temperatura_maxima
+    }
+
+    MEDICION_TEMPERATURA {
+        BIGINT id PK
+        BIGINT punto_id FK
+        DATE fecha_medicion
+        DECIMAL temperatura_celsius
+        VARCHAR estado
+    }
+
+    PLANO_SALA {
+        BIGINT id PK
+        BIGINT sala_id FK
+        INT cantidad_columnas
+        INT cantidad_filas
+        BOOLEAN es_plantilla
+    }
+
+    PLANO_SALA_ELEMENTO {
+        BIGINT id PK
+        BIGINT plano_sala_id FK
+        VARCHAR tipo
+        INT columna_inicio
+        INT fila_inicio
+    }
+
+    SITIO ||--o{ SALA : contiene
+    SALA ||--o{ PUNTO_MEDICION : define
+    PUNTO_MEDICION ||--o{ MEDICION_TEMPERATURA : registra
+    SALA ||--o{ PLANO_SALA : dispone
+    PLANO_SALA ||--o{ PLANO_SALA_ELEMENTO : compone

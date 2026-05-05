@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bosquejo de Páginas — DCIM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --dcim-bg: #e6edf5;
+      --dcim-card: #ffffff;
+      --dcim-text: #172134;
+      --dcim-muted: #5b667a;
+      --dcim-primary: #0b3c75;
+      --dcim-accent: #00a4c8;
+    }
+    body {
+      font-family: 'Barlow', sans-serif;
+      color: var(--dcim-text);
+      background:
+        radial-gradient(circle at 8% 12%, rgba(11, 60, 117, 0.12), transparent 32%),
+        radial-gradient(circle at 94% 5%, rgba(0, 164, 200, 0.18), transparent 28%),
+        linear-gradient(180deg, #edf3f9 0%, var(--dcim-bg) 55%, #dfe9f3 100%);
+      min-height: 100vh;
+    }
+    .page-card {
+      background: var(--dcim-card);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      overflow: hidden;
+      border: 1px solid rgba(11, 60, 117, 0.08);
+      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+    .page-card:hover {
+      box-shadow: 0 10px 30px rgba(9, 30, 66, 0.18);
+      transform: translateY(-3px);
+      border-color: rgba(0, 164, 200, 0.45);
+    }
+    .page-card:hover .card-overlay { opacity: 1; }
+    .card-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,43,92,0.82);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s;
+      border-radius: 0;
+      z-index: 2;
+    }
+    .browser-bar {
+      background: #e5e7eb;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border-bottom: 1px solid #d1d5db;
+    }
+    .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+    .screen-mock {
+      position: relative;
+      height: 130px;
+      overflow: hidden;
+    }
+    /* Mocks visuales de cada página */
+    .mock-index { background: linear-gradient(135deg, #1e3a5f 0%, #003DA5 60%, #00A1E6 100%); }
+    .mock-login { background: linear-gradient(135deg, #1a1a2e 0%, #312e81 60%, #6c5ce7 100%); }
+    .mock-dashboard { background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%); }
+    .mock-usuario { background: linear-gradient(135deg, #065f46 0%, #059669 100%); }
+    .mock-ingreso { background: linear-gradient(135deg, #92400e 0%, #d97706 100%); }
+    .mock-gestion { background: linear-gradient(135deg, #5b21b6 0%, #8b5cf6 100%); }
+    .mock-inventario { background: linear-gradient(135deg, #0f4c75 0%, #1b6ca8 100%); }
+    .mock-temperatura { background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%); }
+    .mock-plano { background: linear-gradient(135deg, #134e4a 0%, #0d9488 100%); }
+    .mock-cliente { background: linear-gradient(135deg, #1e3a5f 0%, #7c3aed 100%); }
+    .mock-db { background: linear-gradient(135deg, #374151 0%, #111827 100%); }
+    .mock-coming { background: linear-gradient(135deg, #6b7280 0%, #374151 100%); }
+
+    .tag-pill {
+      font-size: 10px;
+      padding: 1px 7px;
+      border-radius: 99px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .section-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px; margin-top: 32px;
+    }
+    .section-line { flex: 1; height: 2px; border-radius: 2px; }
+    .checkpoint-card {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(11, 60, 117, 0.12);
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(15, 39, 82, 0.08);
+    }
+    .status-chip {
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 2px 10px;
+      letter-spacing: 0.02em;
+    }
+    /* Modal */
+    #modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.55); align-items: center; justify-content: center; }
+    #modal.open { display: flex; }
+    #modal-content { background: white; border-radius: 16px; max-width: 700px; width: 95vw; max-height: 85vh; overflow-y: auto; padding: 28px; position: relative; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    /* Mermaid */
+    .mermaid { background: white; padding: 24px; border-radius: 12px; }
+    @keyframes revealUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal-up { animation: revealUp 0.45s ease both; }
+    @media (max-width: 768px) {
+      #modal-content { padding: 18px; }
+      .modal-grid { grid-template-columns: 1fr; }
+      .screen-mock { height: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="bg-gradient-to-r from-blue-900 to-blue-700 text-white px-8 py-6 shadow-lg">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">📋 Bosquejo de Páginas</h1>
+      <p class="text-blue-200 mt-1">Sistema DCIM - Data Center Infrastructure Management</p>
+    </div>
+    <div class="text-right text-sm text-blue-200">
+      <div>Total páginas: <span class="font-bold text-white">22</span></div>
+      <div>Módulos: <span class="font-bold text-white">6</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-6 pb-16">
+
+  <!-- IMPLANTACION -->
+  <div class="section-header mt-8 reveal-up">
+    <span class="text-xl font-bold text-gray-700">🚀 Implantación del Proyecto</span>
+    <div class="section-line bg-cyan-300"></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 reveal-up">
+    <div class="checkpoint-card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold text-sm text-slate-700">Fase 1 - Base de datos</h3>
+        <span class="status-chip bg-emerald-100 text-emerald-700">Completado</span>
+      </div>
+      <p class="text-xs text-slate-600">Normalización de usuarios y relaciones base. Estructura preparada para auditoría y seguridad por rol.</p>
+    </div>
+    <div class="checkpoint-card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold text-sm text-slate-700">Fase 2 - Trazabilidad operativa</h3>
+        <span class="status-chip bg-emerald-100 text-emerald-700">Completado</span>
+      </div>
+      <p class="text-xs text-slate-600">Migración de ingreso y gestión hacia claves foráneas de usuario. Se mejora integridad y trazabilidad de acciones.</p>
+    </div>
+    <div class="checkpoint-card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold text-sm text-slate-700">Fase 3 - UX y escalamiento</h3>
+        <span class="status-chip bg-amber-100 text-amber-700">Siguiente</span>
+      </div>
+      <p class="text-xs text-slate-600">Unificar layout, alertas por umbral, caché de dashboard cliente y observabilidad técnica por módulo.</p>
+    </div>
+  </div>
+
+  <!-- ARQUITECTURA OBJETIVO -->
+  <div class="section-header reveal-up">
+    <span class="text-xl font-bold text-gray-700">🏗️ Arquitectura Objetivo</span>
+    <div class="section-line bg-indigo-300"></div>
+  </div>
+  <div class="bg-white rounded-xl shadow p-4 mb-6 overflow-x-auto reveal-up">
+    <div class="mermaid">
+flowchart LR
+    U[Usuarios Web y Móvil] --> V[Spring MVC + Thymeleaf]
+    U --> M[REST APIs /api/*]
+    V --> C[Controladores]
+    M --> C
+    C --> S[Servicios de Dominio]
+    S --> R[Repositorios JPA]
+    R --> DB[(MySQL dcimdb)]
+
+    C --> SEC[Spring Security]
+    SEC --> RBAC[Roles ADMIN USER VIEWER]
+
+    S --> AUD[Auditoria Operativa]
+    AUD --> ING[IngresoAP.usuario_registra_id]
+    AUD --> GES[GestionAcceso.usuario_registra_id]
+
+    S --> OBS[Monitoreo y Logs]
+
+    style DB fill:#0f172a,color:#fff
+    style SEC fill:#0b3c75,color:#fff
+    style AUD fill:#92400e,color:#fff
+    style OBS fill:#134e4a,color:#fff
+    </div>
+  </div>
+
+  <div class="checkpoint-card p-4 mb-8 reveal-up">
+    <h3 class="font-bold text-sm text-slate-700 mb-2">📌 Recomendaciones de mejora (visual + arquitectura)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
+      <div>
+        <div class="font-semibold text-slate-800 mb-1">Visual</div>
+        <ul class="list-disc ml-4 space-y-1">
+          <li>Definir layout maestro único para todos los módulos (header, breadcrumb y acciones).</li>
+          <li>Agregar semáforos de estado consistentes en ingreso, gestión e inventario.</li>
+          <li>Incluir panel de indicadores en dashboard con filtros por fecha/sala/cliente.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-semibold text-slate-800 mb-1">Arquitectura</div>
+        <ul class="list-disc ml-4 space-y-1">
+          <li>Centralizar reglas de negocio en capa servicio para evitar lógica en controladores.</li>
+          <li>Incorporar auditoría transversal (usuario, fecha, origen) en todas las entidades críticas.</li>
+          <li>Preparar capa de consultas para dashboard (agregaciones) para mejorar rendimiento.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATRIZ DE PRIORIZACION -->
+  <div class="section-header reveal-up">
+    <span class="text-xl font-bold text-gray-700">🎯 Matriz Impacto vs Esfuerzo</span>
+    <div class="section-line bg-emerald-300"></div>
+  </div>
+  <div class="bg-white rounded-xl shadow p-4 mb-4 overflow-x-auto reveal-up">
+    <div class="mermaid">
+quadrantChart
+    title Priorizacion de mejoras DCIM
+    x-axis Bajo esfuerzo --> Alto esfuerzo
+    y-axis Bajo impacto --> Alto impacto
+    quadrant-1 Planificar
+    quadrant-2 Mejoras rapidas
+    quadrant-3 Secundario
+    quadrant-4 Postergar
+    "Layout maestro unificado": [0.34, 0.86]
+    "Auditoria transversal en entidades": [0.42, 0.82]
+    "Dashboard con filtros por fecha/sala": [0.46, 0.78]
+    "Consultas agregadas para dashboard": [0.62, 0.76]
+    "Semaforos de estado unificados": [0.30, 0.69]
+    "Cache de vistas cliente": [0.58, 0.64]
+    "Hardening seguridad y trazas API": [0.67, 0.84]
+    "Refactor UI por modulos heredados": [0.78, 0.58]
+    "Editor avanzado de plano sala": [0.82, 0.54]
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 reveal-up">
+    <div class="checkpoint-card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold text-sm text-slate-700">Sprint 1</h3>
+        <span class="status-chip bg-emerald-100 text-emerald-700">Prioridad Alta</span>
+      </div>
+      <ul class="text-xs text-slate-700 list-disc ml-4 space-y-1">
+        <li>Layout maestro unificado para todos los módulos.</li>
+        <li>Semáforos de estado en ingreso, gestión e inventario.</li>
+        <li>Auditoría transversal de usuario, fecha y origen.</li>
+      </ul>
+    </div>
+    <div class="checkpoint-card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold text-sm text-slate-700">Sprint 2</h3>
+        <span class="status-chip bg-sky-100 text-sky-700">Prioridad Media</span>
+      </div>
+      <ul class="text-xs text-slate-700 list-disc ml-4 space-y-1">
+        <li>Consultas agregadas y optimización de dashboard.</li>
+        <li>Filtros avanzados por sala, cliente y rango de tiempo.</li>
+        <li>Métricas operativas y observabilidad por módulo.</li>
+      </ul>
+    </div>
+    <div class="checkpoint-card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold text-sm text-slate-700">Sprint 3</h3>
+        <span class="status-chip bg-violet-100 text-violet-700">Prioridad Evolutiva</span>
+      </div>
+      <ul class="text-xs text-slate-700 list-disc ml-4 space-y-1">
+        <li>Editor de plano sala avanzado con más interacción.</li>
+        <li>Caché de reportes para vistas cliente.</li>
+        <li>Refactor visual de módulos heredados.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DIAGRAMA DE FLUJO -->
+  <div class="section-header mt-8">
+    <span class="text-xl font-bold text-gray-700">🗺️ Mapa de Navegación</span>
+    <div class="section-line bg-blue-200"></div>
+  </div>
+  <div class="bg-white rounded-xl shadow p-4 mb-2 overflow-x-auto">
+    <div class="mermaid">
+flowchart TD
+    A([🌐 /\nIndex]) -->|"Acceder"| B([🔐 /login\nLogin])
+    B -->|"Autenticado"| C([🏠 /dashboard\nDashboard Principal])
+
+    C -->|"Módulo"| D([👥 /user/list\nUsuarios])
+    C -->|"Módulo"| E([📋 /ingresoap\nIngreso AP])
+    C -->|"Módulo"| F([🎫 /gestion/list\nGestión Acceso])
+    C -->|"Módulo"| G([📦 /inventario\nInventario])
+    C -->|"Módulo"| H([🌡️ /temperaturas\nTemperaturas])
+    C -->|"Módulo"| I([🗺️ /plano-sala\nPlano Sala])
+    C -->|"Rol VIEWER"| J([📊 /dashboard/cliente\nDashboard Cliente])
+
+    D --> D1([➕ /user/create])
+    D --> D2([👁️ /user/read/id])
+    D --> D3([✏️ /user/update/id])
+    D --> D4([🗑️ /user/delete/id])
+
+    E --> E1([📜 /user/ingresoap-list])
+    E1 --> E2([👁️ ingresoap-read/id])
+    E1 --> E3([✏️ ingresoap-update/id])
+    E1 --> E4([🗑️ ingresoap-delete/id])
+
+    F --> F1([➕ /gestion/create])
+    F --> F2([👁️ /gestion/view/id])
+    F --> F3([✏️ /gestion/edit/id])
+
+    G --> G1([➕ /inventario/form])
+    G --> G2([👁️ /inventario/view/id])
+    G --> G3([📥 /inventario/import])
+
+    H --> H1([➕ /temperaturas/registro])
+
+    I --> I1([🖼️ /plano-sala/view/id])
+    I --> I2([📄 /plano-sala/plantillas])
+    I2 --> I3([👁️ /plano-sala/plantilla/id])
+
+    J --> J1([📅 /dashboard/cliente/diario])
+    J --> J2([📆 /dashboard/cliente/mensual])
+
+    style A fill:#1e40af,color:#fff
+    style B fill:#4c1d95,color:#fff
+    style C fill:#1e3a5f,color:#fff
+    style D fill:#065f46,color:#fff
+    style E fill:#92400e,color:#fff
+    style F fill:#5b21b6,color:#fff
+    style G fill:#0f4c75,color:#fff
+    style H fill:#7f1d1d,color:#fff
+    style I fill:#134e4a,color:#fff
+    style J fill:#4c1d95,color:#fff
+    </div>
+  </div>
+
+  <!-- ═══ PÁGINAS PÚBLICAS ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">🌐 Páginas Públicas</span>
+    <div class="section-line bg-blue-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+
+    <!-- Index -->
+    <div class="page-card" onclick="openModal('index')">
+      <div class="browser-bar">
+        <span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span>
+        <span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">localhost:8081/</span>
+      </div>
+      <div class="screen-mock mock-index">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-4 text-white">
+          <div class="w-16 h-8 bg-white bg-opacity-20 rounded mb-2"></div>
+          <div class="text-lg font-bold">Sistema de Gestión</div>
+          <div class="text-xs opacity-70 mb-3">Data Center</div>
+          <div class="flex gap-2">
+            <div class="bg-blue-500 text-xs px-3 py-1 rounded">🔐 Acceder</div>
+            <div class="bg-white bg-opacity-20 text-xs px-3 py-1 rounded">📖 Más</div>
+          </div>
+          <div class="mt-3 grid grid-cols-3 gap-1">
+            <div class="bg-white bg-opacity-10 rounded h-8"></div>
+            <div class="bg-white bg-opacity-10 rounded h-8"></div>
+            <div class="bg-white bg-opacity-10 rounded h-8"></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Inicio / Landing</div>
+        <div class="text-xs text-gray-500 mt-0.5">Presentación del sistema DCIM</div>
+        <div class="mt-2 flex gap-1">
+          <span class="tag-pill bg-blue-100 text-blue-700">GET /</span>
+          <span class="tag-pill bg-green-100 text-green-700">Público</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div class="page-card" onclick="openModal('login')">
+      <div class="browser-bar">
+        <span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span>
+        <span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">localhost:8081/login</span>
+      </div>
+      <div class="screen-mock mock-login">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-4 flex justify-center">
+          <div class="bg-white bg-opacity-90 rounded-xl p-4 w-48">
+            <div class="text-xs font-bold text-indigo-700 mb-2">INGRESO DE USUARIO</div>
+            <div class="bg-gray-100 rounded h-5 mb-2 text-xs px-2 flex items-center text-gray-400">Email</div>
+            <div class="bg-gray-100 rounded h-5 mb-3 text-xs px-2 flex items-center text-gray-400">Contraseña</div>
+            <div class="bg-indigo-600 text-white text-xs rounded h-6 flex items-center justify-center">Ingresar</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Login</div>
+        <div class="text-xs text-gray-500 mt-0.5">Autenticación con email y contraseña</div>
+        <div class="mt-2 flex gap-1">
+          <span class="tag-pill bg-blue-100 text-blue-700">GET /login</span>
+          <span class="tag-pill bg-green-100 text-green-700">Público</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">🏠 Dashboard</span>
+    <div class="section-line bg-indigo-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+
+    <!-- Dashboard Principal -->
+    <div class="page-card" onclick="openModal('dashboard')">
+      <div class="browser-bar">
+        <span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span>
+        <span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">localhost:8081/dashboard</span>
+      </div>
+      <div class="screen-mock mock-dashboard">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-sm font-bold mb-2">Panel de Control</div>
+          <div class="grid grid-cols-3 gap-1 mb-2">
+            <div class="bg-white bg-opacity-20 rounded p-1 text-center text-xs">👥<br/>Usuarios</div>
+            <div class="bg-white bg-opacity-20 rounded p-1 text-center text-xs">📋<br/>Ingresos</div>
+            <div class="bg-white bg-opacity-20 rounded p-1 text-center text-xs">🎫<br/>Gestión</div>
+          </div>
+          <div class="grid grid-cols-3 gap-1">
+            <div class="bg-white bg-opacity-20 rounded p-1 text-center text-xs">📦<br/>Inventario</div>
+            <div class="bg-white bg-opacity-20 rounded p-1 text-center text-xs">🌡️<br/>Temp.</div>
+            <div class="bg-white bg-opacity-20 rounded p-1 text-center text-xs">🗺️<br/>Planos</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Dashboard Principal</div>
+        <div class="text-xs text-gray-500 mt-0.5">Panel central con acceso a todos los módulos</div>
+        <div class="mt-2 flex gap-1">
+          <span class="tag-pill bg-blue-100 text-blue-700">GET /dashboard</span>
+          <span class="tag-pill bg-orange-100 text-orange-700">Auth</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cliente -->
+    <div class="page-card" onclick="openModal('dashboard-cliente')">
+      <div class="browser-bar">
+        <span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span>
+        <span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/dashboard/cliente</span>
+      </div>
+      <div class="screen-mock mock-cliente">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-2">Vista Cliente</div>
+          <div class="flex gap-2 mb-2">
+            <div class="bg-white bg-opacity-20 rounded px-2 py-1 text-xs">📅 Diario</div>
+            <div class="bg-white bg-opacity-20 rounded px-2 py-1 text-xs">📆 Mensual</div>
+          </div>
+          <div class="grid grid-cols-2 gap-1">
+            <div class="bg-white bg-opacity-15 rounded h-12 flex items-center justify-center text-xs">Gráfico</div>
+            <div class="bg-white bg-opacity-15 rounded h-12 flex items-center justify-center text-xs">Stats</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Dashboard Cliente</div>
+        <div class="text-xs text-gray-500 mt-0.5">Resumen de actividad para el cliente</div>
+        <div class="mt-2 flex gap-1 flex-wrap">
+          <span class="tag-pill bg-blue-100 text-blue-700">/dashboard/cliente</span>
+          <span class="tag-pill bg-purple-100 text-purple-700">VIEWER</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Diario -->
+    <div class="page-card" onclick="openModal('dashboard-diario')">
+      <div class="browser-bar">
+        <span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span>
+        <span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/dashboard/cliente/diario</span>
+      </div>
+      <div class="screen-mock mock-cliente">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Actividad Diaria</div>
+          <div class="flex gap-1 mb-2">
+            <div class="bg-white bg-opacity-20 rounded px-1 py-0.5 text-xs">◀</div>
+            <div class="bg-white bg-opacity-20 rounded px-2 py-0.5 text-xs flex-1 text-center">04/05/2026</div>
+            <div class="bg-white bg-opacity-20 rounded px-1 py-0.5 text-xs">▶</div>
+          </div>
+          <div class="grid grid-cols-4 gap-0.5">
+            <div class="bg-white bg-opacity-30 rounded h-10"></div>
+            <div class="bg-white bg-opacity-20 rounded h-7"></div>
+            <div class="bg-white bg-opacity-40 rounded h-14"></div>
+            <div class="bg-white bg-opacity-15 rounded h-5"></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Estadísticas Diarias</div>
+        <div class="text-xs text-gray-500 mt-0.5">Actividad del día por cliente</div>
+        <div class="mt-2 flex gap-1">
+          <span class="tag-pill bg-blue-100 text-blue-700">/cliente/diario</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Mensual -->
+    <div class="page-card" onclick="openModal('dashboard-mensual')">
+      <div class="browser-bar">
+        <span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span>
+        <span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/dashboard/cliente/mensual</span>
+      </div>
+      <div class="screen-mock mock-cliente">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Actividad Mensual</div>
+          <div class="grid grid-cols-7 gap-0.5 mb-1">
+            <div class="bg-white bg-opacity-20 rounded h-6 text-center text-xs leading-6">L</div>
+            <div class="bg-white bg-opacity-20 rounded h-6 text-center text-xs leading-6">M</div>
+            <div class="bg-white bg-opacity-20 rounded h-6 text-center text-xs leading-6">M</div>
+            <div class="bg-white bg-opacity-20 rounded h-6 text-center text-xs leading-6">J</div>
+            <div class="bg-white bg-opacity-20 rounded h-6 text-center text-xs leading-6">V</div>
+            <div class="bg-white bg-opacity-20 rounded h-6 text-center text-xs leading-6">S</div>
+            <div class="bg-white bg-opacity-20 rounded h-6 text-center text-xs leading-6">D</div>
+          </div>
+          <div class="grid grid-cols-7 gap-0.5">
+            <div class="bg-blue-400 rounded h-5"></div><div class="bg-blue-300 rounded h-5"></div>
+            <div class="bg-blue-500 rounded h-5"></div><div class="bg-blue-200 rounded h-5"></div>
+            <div class="bg-blue-400 rounded h-5"></div><div class="bg-white bg-opacity-10 rounded h-5"></div>
+            <div class="bg-white bg-opacity-10 rounded h-5"></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Estadísticas Mensuales</div>
+        <div class="text-xs text-gray-500 mt-0.5">Actividad del mes por cliente</div>
+        <div class="mt-2 flex gap-1">
+          <span class="tag-pill bg-blue-100 text-blue-700">/cliente/mensual</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ USUARIOS ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">👥 Módulo Usuarios</span>
+    <div class="section-line bg-green-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+    <div class="page-card" onclick="openModal('user-list')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/user/list</span></div>
+      <div class="screen-mock mock-usuario">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Listado de Usuarios</div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-1 bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><div class="w-4 h-4 bg-white bg-opacity-40 rounded-full"></div> Juan Pérez <span class="ml-auto bg-green-400 rounded px-1 text-xs">ADMIN</span></div>
+            <div class="flex items-center gap-1 bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><div class="w-4 h-4 bg-white bg-opacity-40 rounded-full"></div> Ana López <span class="ml-auto bg-blue-400 rounded px-1 text-xs">USER</span></div>
+            <div class="flex items-center gap-1 bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><div class="w-4 h-4 bg-white bg-opacity-40 rounded-full"></div> Pedro M. <span class="ml-auto bg-gray-400 rounded px-1 text-xs">VIEW</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Lista Usuarios</div>
+        <div class="text-xs text-gray-500 mt-0.5">Tabla con todos los usuarios</div>
+        <div class="mt-2"><span class="tag-pill bg-green-100 text-green-700">GET /user/list</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('user-create')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/user/create</span></div>
+      <div class="screen-mock mock-usuario">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-2">Nuevo Usuario</div>
+          <div class="bg-white bg-opacity-15 rounded p-2 space-y-1">
+            <div class="bg-white bg-opacity-30 rounded h-4 text-xs"></div>
+            <div class="bg-white bg-opacity-30 rounded h-4 text-xs"></div>
+            <div class="bg-white bg-opacity-30 rounded h-4 text-xs"></div>
+            <div class="bg-green-400 rounded h-5 text-xs text-center text-white flex items-center justify-center">Guardar</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Crear Usuario</div>
+        <div class="text-xs text-gray-500 mt-0.5">Formulario de registro de usuario</div>
+        <div class="mt-2 flex gap-1"><span class="tag-pill bg-green-100 text-green-700">GET /user/create</span><span class="tag-pill bg-yellow-100 text-yellow-700">POST</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('user-read')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/user/read/{id}</span></div>
+      <div class="screen-mock mock-usuario">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-10 h-10 bg-white bg-opacity-40 rounded-full flex items-center justify-center text-lg">👤</div>
+            <div><div class="text-xs font-bold">Juan Pérez</div><div class="text-xs opacity-70">juan@email.com</div></div>
+          </div>
+          <div class="space-y-1 text-xs opacity-80">
+            <div>RUT: 12.345.678-9</div><div>Rol: ADMIN</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Ver Usuario</div>
+        <div class="text-xs text-gray-500 mt-0.5">Detalle completo del usuario</div>
+        <div class="mt-2"><span class="tag-pill bg-green-100 text-green-700">GET /user/read/{id}</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('user-update')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/user/update/{id}</span></div>
+      <div class="screen-mock mock-usuario">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-2">✏️ Editar Usuario</div>
+          <div class="bg-white bg-opacity-15 rounded p-2 space-y-1">
+            <div class="bg-white bg-opacity-50 rounded h-4 text-xs"></div>
+            <div class="bg-white bg-opacity-50 rounded h-4 text-xs"></div>
+            <div class="flex gap-1">
+              <div class="bg-yellow-400 rounded h-5 flex-1 text-xs flex items-center justify-center text-white">Actualizar</div>
+              <div class="bg-white bg-opacity-20 rounded h-5 flex-1 text-xs flex items-center justify-center">Cancelar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Editar Usuario</div>
+        <div class="text-xs text-gray-500 mt-0.5">Modificar datos del usuario</div>
+        <div class="mt-2 flex gap-1"><span class="tag-pill bg-green-100 text-green-700">GET</span><span class="tag-pill bg-yellow-100 text-yellow-700">POST /update/{id}</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('user-delete')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/user/delete/{id}</span></div>
+      <div class="screen-mock mock-usuario">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white flex flex-col items-center justify-center h-full">
+          <div class="text-3xl mb-2">⚠️</div>
+          <div class="text-xs font-bold text-center">¿Eliminar usuario?</div>
+          <div class="text-xs opacity-70 text-center mb-2">Juan Pérez</div>
+          <div class="flex gap-2">
+            <div class="bg-red-500 rounded px-2 py-1 text-xs">Eliminar</div>
+            <div class="bg-white bg-opacity-20 rounded px-2 py-1 text-xs">Cancelar</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Eliminar Usuario</div>
+        <div class="text-xs text-gray-500 mt-0.5">Confirmación antes de eliminar</div>
+        <div class="mt-2"><span class="tag-pill bg-red-100 text-red-700">POST /user/delete</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ INGRESO AP ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">📋 Módulo Ingreso AP</span>
+    <div class="section-line bg-yellow-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+    <div class="page-card" onclick="openModal('ingreso-form')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/ingresoap</span></div>
+      <div class="screen-mock mock-ingreso">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-2">📋 Registro de Ingreso</div>
+          <div class="space-y-1">
+            <div class="bg-white bg-opacity-20 rounded h-4 text-xs"></div>
+            <div class="grid grid-cols-2 gap-1">
+              <div class="bg-white bg-opacity-20 rounded h-4"></div>
+              <div class="bg-white bg-opacity-20 rounded h-4"></div>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded h-4 text-xs"></div>
+            <div class="bg-orange-400 rounded h-5 text-xs text-center flex items-center justify-center">Registrar Ingreso</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Formulario Ingreso</div>
+        <div class="text-xs text-gray-500 mt-0.5">Registrar acceso de técnico al DC</div>
+        <div class="mt-2 flex gap-1"><span class="tag-pill bg-yellow-100 text-yellow-700">GET /ingresoap</span><span class="tag-pill bg-yellow-100 text-yellow-700">POST</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('ingreso-list')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/user/ingresoap-list</span></div>
+      <div class="screen-mock mock-ingreso">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Historial de Ingresos</div>
+          <div class="space-y-1">
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>TKT-001</span><span class="opacity-70">01/05</span><span class="bg-green-400 rounded px-1">✓</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>TKT-002</span><span class="opacity-70">02/05</span><span class="bg-yellow-400 rounded px-1">⏳</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>TKT-003</span><span class="opacity-70">03/05</span><span class="bg-green-400 rounded px-1">✓</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Lista Ingresos</div>
+        <div class="text-xs text-gray-500 mt-0.5">Historial de accesos registrados</div>
+        <div class="mt-2"><span class="tag-pill bg-yellow-100 text-yellow-700">GET /ingresoap-list</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('ingreso-read')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/ingresoap-read/{id}</span></div>
+      <div class="screen-mock mock-ingreso">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white text-xs space-y-1">
+          <div class="font-bold">📋 TKT-001</div>
+          <div class="opacity-80">Técnico: Carlos González</div>
+          <div class="opacity-80">Empresa: TechCorp</div>
+          <div class="opacity-80">Sala: SAL-A / Rack: R04</div>
+          <div class="opacity-80">Fecha: 01/05/2026</div>
+          <div class="bg-green-400 rounded px-2 py-0.5 inline-block">Activo</div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Ver Ingreso</div>
+        <div class="text-xs text-gray-500 mt-0.5">Detalle completo del registro</div>
+        <div class="mt-2"><span class="tag-pill bg-yellow-100 text-yellow-700">GET /ingresoap-read/{id}</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('ingreso-update')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/ingresoap-update/{id}</span></div>
+      <div class="screen-mock mock-ingreso">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-2">✏️ Editar Ingreso</div>
+          <div class="space-y-1">
+            <div class="bg-white bg-opacity-40 rounded h-4"></div>
+            <div class="bg-white bg-opacity-40 rounded h-4"></div>
+            <div class="bg-white bg-opacity-40 rounded h-4"></div>
+            <div class="flex gap-1">
+              <div class="bg-orange-400 rounded h-5 flex-1 text-xs flex items-center justify-center">Guardar</div>
+              <div class="bg-white bg-opacity-20 rounded h-5 flex-1 text-xs flex items-center justify-center">Volver</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Editar Ingreso</div>
+        <div class="text-xs text-gray-500 mt-0.5">Modificar datos del registro</div>
+        <div class="mt-2 flex gap-1"><span class="tag-pill bg-yellow-100 text-yellow-700">GET</span><span class="tag-pill bg-yellow-100 text-yellow-700">POST</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('ingreso-delete')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/ingresoap-delete/{id}</span></div>
+      <div class="screen-mock mock-ingreso">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white flex flex-col items-center justify-center h-full">
+          <div class="text-3xl mb-1">⚠️</div>
+          <div class="text-xs font-bold text-center">¿Eliminar registro?</div>
+          <div class="text-xs opacity-70 mb-2">TKT-001</div>
+          <div class="flex gap-2">
+            <div class="bg-red-500 rounded px-2 py-1 text-xs">Eliminar</div>
+            <div class="bg-white bg-opacity-20 rounded px-2 py-1 text-xs">Cancelar</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Eliminar Ingreso</div>
+        <div class="text-xs text-gray-500 mt-0.5">Confirmación antes de eliminar</div>
+        <div class="mt-2"><span class="tag-pill bg-red-100 text-red-700">POST /ingresoap-delete</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ GESTIÓN ACCESO ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">🎫 Módulo Gestión de Acceso</span>
+    <div class="section-line bg-purple-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+    <div class="page-card" onclick="openModal('gestion-list')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/gestion/list</span></div>
+      <div class="screen-mock mock-gestion">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Tickets de Gestión</div>
+          <div class="space-y-1">
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>TKT-G01</span><span class="bg-green-400 rounded px-1">Aprobado</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>TKT-G02</span><span class="bg-yellow-400 rounded px-1">Pendiente</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>TKT-G03</span><span class="bg-red-400 rounded px-1">Rechazado</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Lista Gestiones</div>
+        <div class="text-xs text-gray-500 mt-0.5">Todos los tickets de gestión</div>
+        <div class="mt-2"><span class="tag-pill bg-purple-100 text-purple-700">GET /gestion/list</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('gestion-create')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/gestion/create</span></div>
+      <div class="screen-mock mock-gestion">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-2">➕ Nueva Gestión</div>
+          <div class="bg-white bg-opacity-15 rounded p-2 space-y-1">
+            <div class="bg-white bg-opacity-40 rounded h-4"></div>
+            <div class="bg-white bg-opacity-40 rounded h-4"></div>
+            <div class="bg-white bg-opacity-40 rounded h-4"></div>
+            <div class="bg-purple-400 rounded h-5 flex items-center justify-center text-xs">Crear Ticket</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Crear Gestión</div>
+        <div class="text-xs text-gray-500 mt-0.5">Nuevo ticket de gestión de acceso</div>
+        <div class="mt-2 flex gap-1"><span class="tag-pill bg-purple-100 text-purple-700">GET /gestion/create</span><span class="tag-pill bg-yellow-100 text-yellow-700">POST</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('gestion-view')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/gestion/view/{id}</span></div>
+      <div class="screen-mock mock-gestion">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white text-xs space-y-1">
+          <div class="font-bold">🎫 TKT-G01</div>
+          <div class="opacity-80">Estado: Aprobado</div>
+          <div class="opacity-80">Actividad: Mantenimiento</div>
+          <div class="opacity-80">Sala: SAL-B</div>
+          <div class="opacity-80">Fechas: 01/05 - 02/05</div>
+          <div class="grid grid-cols-2 gap-1 mt-1">
+            <div class="bg-white bg-opacity-20 rounded px-1 text-center">✏️ Editar</div>
+            <div class="bg-white bg-opacity-20 rounded px-1 text-center">⬅ Volver</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Ver Gestión</div>
+        <div class="text-xs text-gray-500 mt-0.5">Detalle completo del ticket</div>
+        <div class="mt-2"><span class="tag-pill bg-purple-100 text-purple-700">GET /gestion/view/{id}</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('gestion-edit')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/gestion/edit/{id}</span></div>
+      <div class="screen-mock mock-gestion">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-2">✏️ Editar Gestión</div>
+          <div class="space-y-1">
+            <div class="bg-white bg-opacity-40 rounded h-4"></div>
+            <div class="bg-white bg-opacity-40 rounded h-4"></div>
+            <div class="bg-white bg-opacity-40 rounded h-8"></div>
+            <div class="flex gap-1">
+              <div class="bg-purple-400 rounded h-5 flex-1 flex items-center justify-center text-xs">Guardar</div>
+              <div class="bg-white bg-opacity-20 rounded h-5 flex-1 flex items-center justify-center text-xs">Cancelar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Editar Gestión</div>
+        <div class="text-xs text-gray-500 mt-0.5">Modificar estado y datos del ticket</div>
+        <div class="mt-2 flex gap-1"><span class="tag-pill bg-purple-100 text-purple-700">GET</span><span class="tag-pill bg-yellow-100 text-yellow-700">POST /edit/{id}</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ INVENTARIO ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">📦 Módulo Inventario</span>
+    <div class="section-line bg-blue-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+    <div class="page-card" onclick="openModal('inventario-list')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/inventario</span></div>
+      <div class="screen-mock mock-inventario">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Inventario de Equipos</div>
+          <div class="space-y-1">
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>SRV-001</span><span class="opacity-70">Dell R740</span><span class="bg-green-400 rounded px-1">Activo</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>SW-045</span><span class="opacity-70">Cisco</span><span class="bg-blue-400 rounded px-1">Activo</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>UPS-12</span><span class="opacity-70">APC</span><span class="bg-yellow-400 rounded px-1">Mant.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Lista Inventario</div>
+        <div class="text-xs text-gray-500 mt-0.5">Catálogo completo de equipos del DC</div>
+        <div class="mt-2"><span class="tag-pill bg-blue-100 text-blue-700">GET /inventario</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('inventario-form')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/inventario/form</span></div>
+      <div class="screen-mock mock-inventario">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-2">➕ Nuevo Equipo</div>
+          <div class="space-y-1">
+            <div class="grid grid-cols-2 gap-1"><div class="bg-white bg-opacity-30 rounded h-4"></div><div class="bg-white bg-opacity-30 rounded h-4"></div></div>
+            <div class="bg-white bg-opacity-30 rounded h-4"></div>
+            <div class="grid grid-cols-2 gap-1"><div class="bg-white bg-opacity-30 rounded h-4"></div><div class="bg-white bg-opacity-30 rounded h-4"></div></div>
+            <div class="bg-blue-400 rounded h-5 flex items-center justify-center text-xs">Guardar Equipo</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Formulario Inventario</div>
+        <div class="text-xs text-gray-500 mt-0.5">Agregar o editar equipo</div>
+        <div class="mt-2 flex gap-1"><span class="tag-pill bg-blue-100 text-blue-700">GET /inventario/form</span><span class="tag-pill bg-yellow-100 text-yellow-700">POST</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('inventario-view')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/inventario/view/{id}</span></div>
+      <div class="screen-mock mock-inventario">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white text-xs space-y-1">
+          <div class="font-bold">🖥️ SRV-001</div>
+          <div class="opacity-80">Marca: Dell / Modelo: R740</div>
+          <div class="opacity-80">Tag: TAG-2024-001</div>
+          <div class="opacity-80">Sala: SAL-A / Rack: R04 U12</div>
+          <div class="opacity-80">IP: 10.10.1.45</div>
+          <div class="bg-green-400 rounded px-2 py-0.5 inline-block">Activo</div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Ver Equipo</div>
+        <div class="text-xs text-gray-500 mt-0.5">Ficha técnica completa del equipo</div>
+        <div class="mt-2"><span class="tag-pill bg-blue-100 text-blue-700">GET /inventario/view/{id}</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('inventario-import')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/inventario/import</span></div>
+      <div class="screen-mock mock-inventario">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white flex flex-col items-center justify-center h-full gap-2">
+          <div class="text-3xl">📥</div>
+          <div class="text-xs font-bold">Importar Inventario</div>
+          <div class="border-2 border-dashed border-white border-opacity-50 rounded-lg px-4 py-2 text-xs text-center opacity-70">Arrastra tu CSV<br/>o Excel aquí</div>
+          <div class="bg-blue-400 rounded px-3 py-1 text-xs">Subir archivo</div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Importar Inventario</div>
+        <div class="text-xs text-gray-500 mt-0.5">Carga masiva desde archivo CSV/Excel</div>
+        <div class="mt-2 flex gap-1"><span class="tag-pill bg-blue-100 text-blue-700">GET /inventario/import</span><span class="tag-pill bg-yellow-100 text-yellow-700">POST</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ TEMPERATURAS ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">🌡️ Módulo Temperaturas</span>
+    <div class="section-line bg-red-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+    <div class="page-card" onclick="openModal('temperaturas')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/temperaturas</span></div>
+      <div class="screen-mock mock-temperatura">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Puntos de Medición</div>
+          <div class="space-y-1">
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>PM-01 - Pasillo A</span><span class="bg-green-400 rounded px-1">22°C</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>PM-02 - Pasillo B</span><span class="bg-yellow-400 rounded px-1">26°C</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>PM-03 - UPS</span><span class="bg-red-400 rounded px-1">31°C</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Temperaturas</div>
+        <div class="text-xs text-gray-500 mt-0.5">Listado de puntos y mediciones</div>
+        <div class="mt-2"><span class="tag-pill bg-red-100 text-red-700">GET /temperaturas</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('temp-registro')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/temperaturas/registro</span></div>
+      <div class="screen-mock mock-temperatura">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-2">🌡️ Registrar Medición</div>
+          <div class="space-y-1">
+            <div class="bg-white bg-opacity-30 rounded h-4 text-xs"></div>
+            <div class="bg-white bg-opacity-30 rounded h-4 text-xs"></div>
+            <div class="flex items-center gap-1 bg-white bg-opacity-15 rounded px-2 py-1">
+              <span class="text-2xl font-bold">24</span><span class="text-xs">°C</span>
+            </div>
+            <div class="bg-red-400 rounded h-5 flex items-center justify-center text-xs">Registrar</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Registrar Temperatura</div>
+        <div class="text-xs text-gray-500 mt-0.5">Nueva lectura de temperatura</div>
+        <div class="mt-2 flex gap-1"><span class="tag-pill bg-red-100 text-red-700">GET /temperaturas/registro</span><span class="tag-pill bg-yellow-100 text-yellow-700">POST</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ PLANOS ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">🗺️ Módulo Plano de Sala</span>
+    <div class="section-line bg-teal-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+    <div class="page-card" onclick="openModal('plano-list')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/plano-sala</span></div>
+      <div class="screen-mock mock-plano">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Planos de Sala</div>
+          <div class="space-y-1">
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>🗺️ Sala Principal</span><span class="bg-teal-400 rounded px-1">Ver</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>🗺️ Sala UPS</span><span class="bg-teal-400 rounded px-1">Ver</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>📄 Plantilla A</span><span class="bg-gray-400 rounded px-1">Tpl</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Lista Planos</div>
+        <div class="text-xs text-gray-500 mt-0.5">Planos de salas del data center</div>
+        <div class="mt-2"><span class="tag-pill bg-teal-100 text-teal-700">GET /plano-sala</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('plano-view')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/plano-sala/view/{id}</span></div>
+      <div class="screen-mock mock-plano">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Sala Principal</div>
+          <div class="grid gap-0.5" style="grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(4, 1fr); height: 80px;">
+            <div class="bg-gray-500 rounded-sm col-span-2 row-span-2 flex items-center justify-center text-xs">R1</div>
+            <div class="bg-gray-500 rounded-sm col-span-2 row-span-2 flex items-center justify-center text-xs">R2</div>
+            <div class="bg-blue-400 rounded-sm col-span-2 row-span-1 flex items-center justify-center text-xs">UPS</div>
+            <div class="bg-white bg-opacity-10 rounded-sm col-span-2"></div>
+            <div class="bg-gray-500 rounded-sm col-span-2 row-span-2 flex items-center justify-center text-xs">R3</div>
+            <div class="bg-gray-500 rounded-sm col-span-2 row-span-2 flex items-center justify-center text-xs">R4</div>
+            <div class="bg-white bg-opacity-10 rounded-sm col-span-2"></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Ver Plano</div>
+        <div class="text-xs text-gray-500 mt-0.5">Visualización interactiva de la sala</div>
+        <div class="mt-2"><span class="tag-pill bg-teal-100 text-teal-700">GET /plano-sala/view/{id}</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('plano-plantillas')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/plano-sala/plantillas</span></div>
+      <div class="screen-mock mock-plano">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Plantillas de Plano</div>
+          <div class="space-y-1">
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>📄 Plantilla Básica</span><span class="bg-teal-400 rounded px-1">Usar</span></div>
+            <div class="flex justify-between bg-white bg-opacity-15 rounded px-1 py-0.5 text-xs"><span>📄 Plantilla Grande</span><span class="bg-teal-400 rounded px-1">Usar</span></div>
+          </div>
+          <div class="mt-2 bg-white bg-opacity-20 rounded px-2 py-1 text-xs text-center">+ Nueva Plantilla</div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Plantillas de Plano</div>
+        <div class="text-xs text-gray-500 mt-0.5">Gestión de plantillas reutilizables</div>
+        <div class="mt-2"><span class="tag-pill bg-teal-100 text-teal-700">GET /plano-sala/plantillas</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('plano-plantilla-view')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/plano-sala/plantilla/{id}</span></div>
+      <div class="screen-mock mock-plano">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white">
+          <div class="text-xs font-bold mb-1">Plantilla: Básica</div>
+          <div class="grid gap-0.5" style="grid-template-columns: repeat(4, 1fr); height: 80px;">
+            <div class="bg-white bg-opacity-30 rounded-sm border border-dashed border-white border-opacity-40"></div>
+            <div class="bg-white bg-opacity-30 rounded-sm border border-dashed border-white border-opacity-40"></div>
+            <div class="bg-white bg-opacity-30 rounded-sm border border-dashed border-white border-opacity-40"></div>
+            <div class="bg-white bg-opacity-30 rounded-sm border border-dashed border-white border-opacity-40"></div>
+            <div class="bg-white bg-opacity-15 rounded-sm border border-dashed border-white border-opacity-20"></div>
+            <div class="bg-white bg-opacity-15 rounded-sm border border-dashed border-white border-opacity-20"></div>
+            <div class="bg-white bg-opacity-15 rounded-sm border border-dashed border-white border-opacity-20"></div>
+            <div class="bg-white bg-opacity-15 rounded-sm border border-dashed border-white border-opacity-20"></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Ver Plantilla</div>
+        <div class="text-xs text-gray-500 mt-0.5">Editar elementos de la plantilla</div>
+        <div class="mt-2"><span class="tag-pill bg-teal-100 text-teal-700">GET /plano-sala/plantilla/{id}</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ OTRAS ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">🔧 Otras Páginas</span>
+    <div class="section-line bg-gray-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+    <div class="page-card" onclick="openModal('database-viewer')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/database-viewer</span></div>
+      <div class="screen-mock mock-db">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white font-mono text-xs">
+          <div class="text-green-400 mb-1">SELECT * FROM usuario;</div>
+          <div class="space-y-0.5 opacity-70">
+            <div class="flex gap-2"><span class="text-yellow-400">id</span><span class="text-blue-400">nombre</span><span class="text-green-400">rol</span></div>
+            <div>1  | Juan  | ADMIN</div>
+            <div>2  | Ana   | USER</div>
+            <div>3  | Pedro | VIEW</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Database Viewer</div>
+        <div class="text-xs text-gray-500 mt-0.5">Explorador de datos (solo admin)</div>
+        <div class="mt-2"><span class="tag-pill bg-gray-100 text-gray-700">ADMIN</span></div>
+      </div>
+    </div>
+
+    <div class="page-card" onclick="openModal('coming-soon')">
+      <div class="browser-bar"><span class="dot bg-red-400"></span><span class="dot bg-yellow-400"></span><span class="dot bg-green-400"></span><span class="ml-2 text-xs text-gray-500 bg-white rounded px-2 py-0.5 flex-1">/coming-soon</span></div>
+      <div class="screen-mock mock-coming">
+        <div class="card-overlay"><span class="text-white font-bold text-sm">Ver detalle</span></div>
+        <div class="p-3 text-white flex flex-col items-center justify-center h-full">
+          <div class="text-4xl mb-2">🚧</div>
+          <div class="text-sm font-bold">Próximamente</div>
+          <div class="text-xs opacity-70 text-center">Esta funcionalidad<br/>está en desarrollo</div>
+        </div>
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-gray-800 text-sm">Coming Soon</div>
+        <div class="text-xs text-gray-500 mt-0.5">Módulos en construcción</div>
+        <div class="mt-2"><span class="tag-pill bg-gray-100 text-gray-700">Placeholder</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ APIs ═══ -->
+  <div class="section-header">
+    <span class="text-xl font-bold text-gray-700">⚡ APIs REST</span>
+    <div class="section-line bg-yellow-300"></div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl shadow p-4 border-l-4 border-blue-500">
+      <div class="font-bold text-sm text-gray-800 mb-1">🔐 Auth API</div>
+      <div class="text-xs text-gray-500 mb-2">Autenticación JWT para apps móviles</div>
+      <div class="text-xs font-mono text-blue-700">POST /api/auth/login</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 border-l-4 border-green-500">
+      <div class="font-bold text-sm text-gray-800 mb-1">👥 Usuarios API</div>
+      <div class="text-xs text-gray-500 mb-2">CRUD de usuarios + validación</div>
+      <div class="text-xs font-mono text-green-700">GET /api/usuarios/{id}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 border-l-4 border-orange-500">
+      <div class="font-bold text-sm text-gray-800 mb-1">📋 Ingresos API</div>
+      <div class="text-xs text-gray-500 mb-2">Consulta y registro de ingresos</div>
+      <div class="text-xs font-mono text-orange-700">GET /api/ingresos/{id}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 border-l-4 border-purple-500">
+      <div class="font-bold text-sm text-gray-800 mb-1">🎫 Gestiones API</div>
+      <div class="text-xs text-gray-500 mb-2">CRUD gestiones + estadísticas</div>
+      <div class="text-xs font-mono text-purple-700">GET /api/gestiones/estadisticas</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal" onclick="closeModal(event)">
+  <div id="modal-content">
+    <button onclick="closeModalBtn()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold">×</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'default', flowchart: { curve: 'basis' } });
+
+  const details = {
+    'index': {
+      title: '🌐 Página de Inicio (Index)', url: '/', color: '#1e40af',
+      desc: 'Landing page pública del sistema DCIM. Presenta las funcionalidades principales: control de acceso de técnicos, monitoreo de temperatura, gestión de inventarios y visualización de planos.',
+      links: ['→ /login (botón Acceder)', '→ #funcionalidades (sección interna)'],
+      campos: ['Hero con descripción del sistema', 'Sección de funcionalidades', 'Tarjetas de módulos', 'Footer con información de contacto'],
+      acceso: 'Público (sin autenticación)'
+    },
+    'login': {
+      title: '🔐 Login', url: '/login', color: '#4c1d95',
+      desc: 'Formulario de autenticación del sistema. Usa Spring Security con email y contraseña. Incluye validación en tiempo real del usuario vía API.',
+      links: ['← desde / (index)', '→ /dashboard (al autenticarse)', '→ /login?error (credenciales incorrectas)'],
+      campos: ['Campo email/usuario', 'Campo contraseña (mostrar/ocultar)', 'Botón Ingresar', 'Validación AJAX de usuario'],
+      acceso: 'Público'
+    },
+    'dashboard': {
+      title: '🏠 Dashboard Principal', url: '/dashboard', color: '#1e3a5f',
+      desc: 'Panel central del sistema. Muestra tarjetas de acceso rápido a todos los módulos disponibles según el rol del usuario. Rol ADMIN ve todos los módulos; VIEWER ve solo el dashboard cliente.',
+      links: ['→ /ingresoap', '→ /user/list', '→ /gestion/list', '→ /inventario', '→ /temperaturas', '→ /plano-sala', '→ /dashboard/cliente (rol VIEWER)'],
+      campos: ['Saludo personalizado con nombre del usuario', 'Tarjetas de módulos (condicional por rol)', 'Acceso rápido a registro de ingreso', 'Información del sistema'],
+      acceso: 'Requiere autenticación'
+    },
+    'dashboard-cliente': {
+      title: '📊 Dashboard Cliente', url: '/dashboard/cliente', color: '#4c1d95',
+      desc: 'Vista resumen de actividad del data center orientada al cliente. Muestra KPIs y estadísticas de ingresos, gestiones e inventario.',
+      links: ['← /dashboard', '→ /dashboard/cliente/diario', '→ /dashboard/cliente/mensual'],
+      campos: ['Resumen de ingresos del período', 'Estado de tickets de gestión', 'Gráficos de actividad'],
+      acceso: 'Rol: VIEWER, ADMIN'
+    },
+    'dashboard-diario': {
+      title: '📅 Dashboard Diario', url: '/dashboard/cliente/diario', color: '#4c1d95',
+      desc: 'Estadísticas de actividad del día. Permite navegar día a día con botones anterior/siguiente.',
+      links: ['← /dashboard/cliente', '◀ día anterior / ▶ día siguiente'],
+      campos: ['Navegación por fecha', 'Ingresos del día', 'Gestiones del día', 'Gráfico de actividad'],
+      acceso: 'Rol: VIEWER, ADMIN'
+    },
+    'dashboard-mensual': {
+      title: '📆 Dashboard Mensual', url: '/dashboard/cliente/mensual', color: '#4c1d95',
+      desc: 'Vista de actividad mensual con calendario de calor y resumen estadístico del mes.',
+      links: ['← /dashboard/cliente'],
+      campos: ['Calendario del mes', 'Total ingresos del mes', 'Total gestiones del mes', 'Comparativa con mes anterior'],
+      acceso: 'Rol: VIEWER, ADMIN'
+    },
+    'user-list': {
+      title: '👥 Lista de Usuarios', url: '/user/list', color: '#065f46',
+      desc: 'Tabla con todos los usuarios registrados en el sistema. Permite buscar, filtrar y acceder a acciones CRUD sobre cada usuario.',
+      links: ['← /dashboard', '→ /user/create (botón Nuevo)', '→ /user/read/{id}', '→ /user/update/{id}', '→ /user/delete/{id}'],
+      campos: ['Tabla: nombre, apellido, email, rol, rut', 'Botones de acción por fila (ver/editar/eliminar)', 'Botón Nuevo Usuario', 'Búsqueda/filtro'],
+      acceso: 'Rol: ADMIN'
+    },
+    'user-create': {
+      title: '➕ Crear Usuario', url: '/user/create', color: '#065f46',
+      desc: 'Formulario para registrar un nuevo usuario en el sistema con validación de campos únicos (email, RUT).',
+      links: ['← /user/list', '→ /dashboard?success=user-created (al guardar)'],
+      campos: ['Nombre y Apellido', 'RUT (validación formato)', 'Email (validación única)', 'Contraseña', 'Rol (ADMIN/USER/VIEWER)'],
+      acceso: 'Rol: ADMIN'
+    },
+    'user-read': {
+      title: '👁️ Ver Usuario', url: '/user/read/{id}', color: '#065f46',
+      desc: 'Ficha de lectura del usuario con todos sus datos. No permite edición.',
+      links: ['← /user/list', '→ /user/update/{id}'],
+      campos: ['Datos personales completos', 'Email y RUT', 'Rol asignado', 'Fechas de creación/modificación'],
+      acceso: 'Rol: ADMIN'
+    },
+    'user-update': {
+      title: '✏️ Editar Usuario', url: '/user/update/{id}', color: '#065f46',
+      desc: 'Formulario pre-relleno para modificar los datos de un usuario existente.',
+      links: ['← /user/list', '→ /user/list (al guardar)'],
+      campos: ['Mismos campos que crear', 'Campo contraseña opcional (vacío = no cambia)'],
+      acceso: 'Rol: ADMIN'
+    },
+    'user-delete': {
+      title: '🗑️ Eliminar Usuario', url: '/user/delete/{id}', color: '#065f46',
+      desc: 'Página de confirmación antes de eliminar definitivamente un usuario del sistema.',
+      links: ['← /user/list', '→ /user/list (al confirmar)'],
+      campos: ['Nombre del usuario a eliminar', 'Botón Confirmar Eliminación', 'Botón Cancelar'],
+      acceso: 'Rol: ADMIN'
+    },
+    'ingreso-form': {
+      title: '📋 Registro de Ingreso', url: '/ingresoap', color: '#92400e',
+      desc: 'Formulario principal para registrar el acceso de un técnico externo al data center. Incluye datos del técnico, ticket de actividad, sala y rack de destino. Asigna automáticamente el usuario registra via FK.',
+      links: ['← /dashboard', '→ /user/ingresoap-list (tras guardar)'],
+      campos: ['Número de ticket / Tipo', 'Nombre y RUT del técnico', 'Empresa contratista / Demandante', 'Motivo de ingreso', 'Sala y rack de destino', 'Aprobador', 'Fecha y hora inicio', 'Escolta', 'Foto del técnico'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'ingreso-list': {
+      title: '📜 Lista de Ingresos', url: '/user/ingresoap-list', color: '#92400e',
+      desc: 'Historial completo de registros de acceso de técnicos. Permite filtrar por estado, fecha y buscar por ticket o nombre.',
+      links: ['← /dashboard', '→ /user/ingresoap-read/{id}', '→ /user/ingresoap-update/{id}', '→ /user/ingresoap-delete/{id}'],
+      campos: ['Tabla: ticket, técnico, empresa, sala, fecha, estado', 'Filtros de búsqueda', 'Indicador activo/inactivo'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'ingreso-read': {
+      title: '👁️ Ver Ingreso', url: '/user/ingresoap-read/{id}', color: '#92400e',
+      desc: 'Vista detallada de un registro de ingreso con toda la información del técnico, actividad y estado.',
+      links: ['← /user/ingresoap-list', '→ /user/ingresoap-update/{id}'],
+      campos: ['Todos los campos del formulario en modo lectura', 'Estado del ingreso', 'Usuario que registró (FK)'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'ingreso-update': {
+      title: '✏️ Editar Ingreso', url: '/user/ingresoap-update/{id}', color: '#92400e',
+      desc: 'Edición de datos de un registro de ingreso existente, incluyendo cierre del turno.',
+      links: ['← /user/ingresoap-list', '→ /user/ingresoap-list (al guardar)'],
+      campos: ['Todos los campos del ingreso', 'Fecha/hora de término', 'Supervisiones'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'ingreso-delete': {
+      title: '🗑️ Eliminar Ingreso', url: '/user/ingresoap-delete/{id}', color: '#92400e',
+      desc: 'Confirmación antes de eliminar un registro de ingreso.',
+      links: ['← /user/ingresoap-list', '→ /user/ingresoap-list (al confirmar)'],
+      campos: ['Resumen del registro a eliminar', 'Confirmación'],
+      acceso: 'Rol: ADMIN'
+    },
+    'gestion-list': {
+      title: '🎫 Lista Gestiones', url: '/gestion/list', color: '#5b21b6',
+      desc: 'Listado de todos los tickets de gestión de acceso con sus estados: Pendiente, Aprobado, Rechazado, Cerrado.',
+      links: ['← /dashboard', '→ /gestion/create', '→ /gestion/view/{id}', '→ /gestion/edit/{id}'],
+      campos: ['Tabla: ticket, actividad, sala, estado, fecha', 'Filtros por estado', 'Búsqueda por ticket'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'gestion-create': {
+      title: '➕ Crear Gestión', url: '/gestion/create', color: '#5b21b6',
+      desc: 'Formulario para abrir un nuevo ticket de gestión de acceso. Asigna automáticamente el usuario que registra.',
+      links: ['← /gestion/list', '→ /gestion/list (al guardar)'],
+      campos: ['Número de ticket', 'Nombre de actividad', 'Sala', 'Fechas y horas', 'Comentario inicial', 'Aprobadores pendientes'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'gestion-view': {
+      title: '👁️ Ver Gestión', url: '/gestion/view/{id}', color: '#5b21b6',
+      desc: 'Detalle completo del ticket de gestión con su historial de estados y comentarios.',
+      links: ['← /gestion/list', '→ /gestion/edit/{id}'],
+      campos: ['Todos los campos del ticket', 'Estado de aprobación', 'Comentarios (inicio, intermedio, final)', 'Fechas Remedy', 'Estado envío procesos'],
+      acceso: 'Rol: ADMIN, USER, VIEWER'
+    },
+    'gestion-edit': {
+      title: '✏️ Editar Gestión', url: '/gestion/edit/{id}', color: '#5b21b6',
+      desc: 'Modificación del estado y datos de un ticket de gestión. Permite avanzar el ciclo de vida del ticket.',
+      links: ['← /gestion/list', '→ /gestion/list (al guardar)'],
+      campos: ['Estado de aprobación', 'Fechas de cierre', 'Comentarios de gestión', 'Envío a procesos', 'Respuesta cliente'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'inventario-list': {
+      title: '📦 Inventario', url: '/inventario', color: '#0f4c75',
+      desc: 'Catálogo completo de equipos del data center (servers, switches, UPS, racks, etc.) con filtros por sala, tipo, cliente y estado.',
+      links: ['← /dashboard', '→ /inventario/form (nuevo)', '→ /inventario/view/{id}', '→ /inventario/import'],
+      campos: ['Tabla de equipos: tag, serie, tipo, sala, cliente, estado', 'Filtros múltiples', 'Buscador'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'inventario-form': {
+      title: '➕ Formulario Inventario', url: '/inventario/form', color: '#0f4c75',
+      desc: 'Alta y edición de equipos del inventario con todos sus atributos técnicos y de ubicación.',
+      links: ['← /inventario', '→ /inventario (al guardar)'],
+      campos: ['TAG y número de serie', 'Tipo, marca, modelo', 'Sala, rack, posición UR', 'Cliente', 'Estado', 'IP, hostname', 'Datos eléctricos (watts, enchufes)', 'Alarmas de hardware'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'inventario-view': {
+      title: '👁️ Ver Equipo', url: '/inventario/view/{id}', color: '#0f4c75',
+      desc: 'Ficha técnica completa del equipo con todos sus atributos, ubicación y alertas activas.',
+      links: ['← /inventario', '→ /inventario/form?id={id} (editar)'],
+      campos: ['Datos técnicos completos', 'Ubicación física', 'Estado de alarmas', 'Observaciones'],
+      acceso: 'Rol: ADMIN, USER, VIEWER'
+    },
+    'inventario-import': {
+      title: '📥 Importar Inventario', url: '/inventario/import', color: '#0f4c75',
+      desc: 'Carga masiva de equipos al inventario desde archivo CSV o Excel. Incluye previsualización y validación de datos.',
+      links: ['← /inventario', '→ /inventario (tras importar)'],
+      campos: ['Selector de archivo CSV/Excel', 'Previsualización de datos', 'Reporte de errores de validación', 'Botón confirmar importación'],
+      acceso: 'Rol: ADMIN'
+    },
+    'temperaturas': {
+      title: '🌡️ Temperaturas', url: '/temperaturas', color: '#7f1d1d',
+      desc: 'Panel de monitoreo de temperatura con listado de puntos de medición y lecturas históricas. Indica visualmente cuando se supera el umbral máximo/mínimo.',
+      links: ['← /dashboard', '→ /temperaturas/registro (nueva lectura)'],
+      campos: ['Lista de puntos de medición por sala', 'Última lectura de cada punto', 'Indicador de estado (OK / ALERTA)', 'Historial de mediciones'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'temp-registro': {
+      title: '🌡️ Registrar Temperatura', url: '/temperaturas/registro', color: '#7f1d1d',
+      desc: 'Formulario para ingresar una nueva medición de temperatura en un punto de medición específico.',
+      links: ['← /temperaturas', '→ /temperaturas (al guardar)'],
+      campos: ['Selector de punto de medición', 'Temperatura en °C', 'Fecha de medición', 'Estado de la lectura'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'plano-list': {
+      title: '🗺️ Planos de Sala', url: '/plano-sala', color: '#134e4a',
+      desc: 'Listado de planos de salas del data center y plantillas disponibles para crear nuevos planos.',
+      links: ['← /dashboard', '→ /plano-sala/view/{id}', '→ /plano-sala/plantillas'],
+      campos: ['Lista de planos por sala', 'Acceso a plantillas', 'Botón crear nuevo plano'],
+      acceso: 'Rol: ADMIN, USER'
+    },
+    'plano-view': {
+      title: '🗺️ Ver Plano', url: '/plano-sala/view/{id}', color: '#134e4a',
+      desc: 'Visualización interactiva del plano de una sala del data center con elementos posicionados en una grilla (racks, UPS, pasillos, etc.).',
+      links: ['← /plano-sala', '→ editar elementos del plano'],
+      campos: ['Grilla interactiva de filas x columnas', 'Elementos con color y tipo', 'Zoom / drag', 'Leyenda de elementos'],
+      acceso: 'Rol: ADMIN, USER, VIEWER'
+    },
+    'plano-plantillas': {
+      title: '📄 Plantillas de Plano', url: '/plano-sala/plantillas', color: '#134e4a',
+      desc: 'Gestión de plantillas base para crear nuevos planos. Las plantillas son planos sin sala asignada que sirven de modelo.',
+      links: ['← /plano-sala', '→ /plano-sala/plantilla/{id}'],
+      campos: ['Lista de plantillas disponibles', 'Crear nueva plantilla', 'Nombre y dimensiones'],
+      acceso: 'Rol: ADMIN'
+    },
+    'plano-plantilla-view': {
+      title: '📄 Ver Plantilla', url: '/plano-sala/plantilla/{id}', color: '#134e4a',
+      desc: 'Editor de plantilla de plano. Permite agregar, mover y eliminar elementos base de la grilla.',
+      links: ['← /plano-sala/plantillas'],
+      campos: ['Grilla editable', 'Agregar elementos (rack, UPS, pasillo, etc.)', 'Propiedades del elemento (color, tamaño, rotación)'],
+      acceso: 'Rol: ADMIN'
+    },
+    'database-viewer': {
+      title: '🗄️ Database Viewer', url: '/database-viewer', color: '#374151',
+      desc: 'Herramienta administrativa para visualizar directamente el contenido de las tablas de la base de datos. Solo accesible por administradores.',
+      links: ['← /dashboard'],
+      campos: ['Selector de tabla', 'Tabla de datos con paginación', 'Exportar a CSV'],
+      acceso: 'Rol: ADMIN'
+    },
+    'coming-soon': {
+      title: '🚧 Próximamente', url: '/coming-soon', color: '#374151',
+      desc: 'Página de marcador para módulos que están en desarrollo. Se utiliza como destino temporal de botones de funcionalidades aún no implementadas.',
+      links: ['← variado'],
+      campos: ['Mensaje de "En construcción"', 'Enlace para volver'],
+      acceso: 'Requiere autenticación'
+    }
+  };
+
+  function openModal(key) {
+    const d = details[key];
+    if (!d) return;
+    document.getElementById('modal-body').innerHTML = `
+      <div style="border-left: 5px solid ${d.color}; padding-left: 14px; margin-bottom: 16px;">
+        <h2 style="font-size:1.3rem; font-weight:700; color:#1a1a1a; margin:0 0 4px 0;">${d.title}</h2>
+        <span style="font-size:12px; font-family:monospace; background:#f3f4f6; padding:2px 8px; border-radius:6px; color:#374151;">${d.url}</span>
+        <span style="font-size:11px; background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:6px; margin-left:6px;">${d.acceso}</span>
+      </div>
+      <p style="color:#4b5563; line-height:1.6; margin-bottom:16px;">${d.desc}</p>
+      <div class="modal-grid">
+        <div>
+          <h3 style="font-size:0.85rem; font-weight:700; color:#374151; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em;">📋 Campos / Secciones</h3>
+          <ul style="list-style:none; padding:0; margin:0; space-y:4px;">
+            ${d.campos.map(c => `<li style="font-size:13px; color:#4b5563; padding:3px 0; border-bottom:1px solid #f3f4f6;">• ${c}</li>`).join('')}
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:0.85rem; font-weight:700; color:#374151; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em;">🔗 Navegación</h3>
+          <ul style="list-style:none; padding:0; margin:0;">
+            ${d.links.map(l => `<li style="font-size:13px; color:#4b5563; padding:3px 0; border-bottom:1px solid #f3f4f6; font-family:monospace;">• ${l}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('modal')) closeModalBtn();
+  }
+  function closeModalBtn() {
+    document.getElementById('modal').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalBtn(); });
+</script>
+</body>
+</html>

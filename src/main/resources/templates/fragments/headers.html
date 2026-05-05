@@ -1,60 +1,374 @@
-<head th:fragment="headers">  
+<head th:fragment="headers">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Iniciar sesión</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+        <title>DCIM — Data Center</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
             tailwind.config = {
                 theme: {
                     extend: {
                         colors: {
-                            'tf-blue': '#003DA5',
-                            'tf-cyan': '#00A1E6',
-                            'tf-dark': '#002B5C',
-                            'accent': '#003DA5'
+                            'dcim-primary': '#0b3c75',
+                            'dcim-accent':  '#00a4c8',
+                            'dcim-dark':    '#172134',
+                            'dcim-muted':   '#5b667a',
+                            'dcim-bg':      '#e6edf5',
+                            'tf-blue':      '#003DA5',
+                            'tf-cyan':      '#00A1E6',
+                            'tf-dark':      '#002B5C'
                         },
                         fontFamily: {
-                            sans: ['Inter', 'ui-sans-serif', 'system-ui']
+                            sans: ['Barlow', 'Inter', 'ui-sans-serif', 'system-ui']
                         }
-                    },
-                },
+                    }
+                }
             }
         </script>
+        <script>
+            (function () {
+                var LAST_ACTIVITY = Date.now();
+                var LAST_PING = 0;
+                var PING_INTERVAL_MS = 60000;
+                var ACTIVE_WINDOW_MS = 70000;
+
+                function isAuthenticatedView() {
+                    return !!document.querySelector('#dcim-nav .auth-pill');
+                }
+
+                function touchActivity() {
+                    LAST_ACTIVITY = Date.now();
+                }
+
+                function sendKeepAlive(force) {
+                    var now = Date.now();
+                    if (!force && now - LAST_PING < PING_INTERVAL_MS) {
+                        return;
+                    }
+                    LAST_PING = now;
+
+                    fetch('/session/keepalive', {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        cache: 'no-store',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(function (response) {
+                        if (response.redirected) {
+                            window.location.href = '/login?expired=true';
+                            return;
+                        }
+                        if (response.status === 401 || response.status === 403) {
+                            window.location.href = '/login?expired=true';
+                        }
+                    })
+                    .catch(function () {
+                        // Ignore transient network errors; next cycle will retry.
+                    });
+                }
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    if (!isAuthenticatedView()) {
+                        return;
+                    }
+
+                    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function (eventName) {
+                        window.addEventListener(eventName, touchActivity, { passive: true });
+                    });
+
+                    document.addEventListener('visibilitychange', function () {
+                        if (document.visibilityState === 'visible') {
+                            touchActivity();
+                            sendKeepAlive(true);
+                        }
+                    });
+
+                    setInterval(function () {
+                        var now = Date.now();
+                        if (now - LAST_ACTIVITY <= ACTIVE_WINDOW_MS) {
+                            sendKeepAlive(false);
+                        }
+                    }, 30000);
+                });
+            })();
+        </script>
         <style>
-            :root{
-                --tf-blue: #003DA5;
-                --tf-cyan: #00A1E6;
+            :root {
+                --dcim-bg:      #e6edf5;
+                --dcim-card:    #ffffff;
+                --dcim-text:    #172134;
+                --dcim-muted:   #5b667a;
+                --dcim-primary: #0b3c75;
+                --dcim-accent:  #00a4c8;
+                /* legacy aliases */
+                --tf-blue:  #003DA5;
+                --tf-cyan:  #00A1E6;
+                --tf-dark:  #002B5C;
             }
-            html,body{ height:100%; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
-            body{ background: linear-gradient(180deg, rgba(234,246,255,1) 0%, rgba(230,242,255,1) 50%, rgba(247,251,255,1) 100%); }
-            /* Static 3D card style used by pages */
-            .card-3d{
-                transform: translateZ(8px) rotateX(2deg) rotateY(-3deg);
+            html, body {
+                height: 100%;
+                font-family: 'Barlow', 'Inter', system-ui, sans-serif;
+                color: var(--dcim-text);
+            }
+            /* ─── Cards ─────────────────────────────── */
+            .dcim-card {
+                background: #ffffff;
+                border-radius: 12px;
+                border: 1px solid rgba(11,60,117,0.08);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+                overflow: hidden;
+                transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+            }
+            .dcim-card:hover {
+                box-shadow: 0 10px 28px rgba(9,30,66,0.15);
+                transform: translateY(-3px);
+                border-color: rgba(0,164,200,0.38);
+            }
+            .card-band { height: 7px; width: 100%; }
+            /* ─── Section headers ────────────────────── */
+            .section-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; margin-top:28px; }
+            .section-line   { flex:1; height:2px; border-radius:2px; }
+            /* ─── Pills & chips ──────────────────────── */
+            .tag-pill   { font-size:10px; padding:2px 8px; border-radius:99px; font-weight:700; letter-spacing:.03em; }
+            .status-chip{ font-size:11px; font-weight:700; border-radius:999px; padding:2px 10px; letter-spacing:.02em; }
+            /* ─── Action buttons ─────────────────────── */
+            .module-link {
+                display:flex; align-items:center; justify-content:space-between;
+                padding:7px 10px; border-radius:8px; font-size:13px; font-weight:600;
+                transition: background 0.15s; border:1px solid transparent;
+            }
+            .module-link:hover { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.07); }
+            .quick-btn {
+                display:flex; align-items:center; gap:8px;
+                padding:9px 14px; border-radius:8px; font-size:13px; font-weight:600;
+                border:1px solid rgba(11,60,117,0.13); background:white; transition:all 0.15s;
+            }
+            .quick-btn:hover { background:#f0f5fc; border-color:rgba(0,164,200,0.38); }
+            /* ─── Legacy 3D card (kept for backward compat) ── */
+            .card-3d {
                 border-radius: 14px;
-                box-shadow: 0 28px 60px rgba(0,29,77,0.14), inset 0 1px 0 rgba(255,255,255,0.8);
+                box-shadow: 0 16px 40px rgba(0,29,77,0.10);
                 background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(240,248,255,0.96));
                 border: 1px solid rgba(0,61,165,0.06);
-                backdrop-filter: blur(8px) saturate(120%);
             }
-            /* Utility: input/select defaults matching 3D look */
-            .input-3d, .select-3d{ background: rgba(255,255,255,0.95); border:1px solid rgba(0,61,165,0.06); border-radius:10px; padding:.6rem .8rem; }
+            .input-3d, .select-3d {
+                background: rgba(255,255,255,0.95);
+                border: 1px solid rgba(0,61,165,0.08);
+                border-radius: 10px; padding: .6rem .8rem;
+            }
+            /* ─── Topbar ─────────────────────────────── */
+            .topbar-3d {
+                display:flex; align-items:center; justify-content:space-between; gap:1rem;
+                padding:12px 18px;
+                background: linear-gradient(90deg, rgba(11,60,117,0.04), rgba(0,164,200,0.04));
+                border-bottom: 1px solid rgba(11,60,117,0.07);
+                box-shadow: 0 4px 16px rgba(0,29,77,0.05);
+            }
+            .topbar-logo { display:flex; align-items:center; gap:.75rem; }
+            .topbar-logo .mark {
+                width:44px; height:44px; border-radius:10px;
+                display:flex; align-items:center; justify-content:center;
+                background: linear-gradient(135deg,#0b3c75,#00a4c8);
+            }
+            .topbar-address { text-align:right; }
+            .topbar-address h4 { margin:0; color:var(--dcim-primary); font-weight:700; }
+            .topbar-address p  { margin:0; color:var(--dcim-muted); font-size:0.85rem; }
+            /* ─── Reveal animation ───────────────────── */
+            @keyframes revealUp {
+                from { opacity:0; transform:translateY(8px); }
+                to   { opacity:1; transform:translateY(0); }
+            }
+            .reveal { animation: revealUp 0.35s ease both; }
 
-            /* Topbar 3D address style */
-            .topbar-3d{
-                display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:12px 18px; 
-                background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(240,248,255,0.5));
-                border-bottom: 1px solid rgba(0,61,165,0.06);
-                box-shadow: 0 8px 30px rgba(0,29,77,0.06);
-                transform: translateZ(6px);
+            /* ═══════════════════════════════════════════
+               RESPONSIVE — adapta toda la aplicación
+               a móvil, tablet, notebook y escritorio
+            ═══════════════════════════════════════════ */
+
+            /* ─── Pantalla completa en todos los dispositivos ── */
+            html, body { width:100%; max-width:100vw; overflow-x:hidden; }
+
+            /* ─── Hero (index.html) ─────────────────────── */
+            @media (max-width: 640px) {
+                section h1 { font-size: 1.75rem !important; }
+                section p  { font-size: 0.9rem !important; margin-bottom:24px !important; }
+                section    { padding: 44px 16px 52px !important; }
+                section > div > div { padding: 0 4px; }
             }
-            .topbar-logo{
-                display:flex; align-items:center; gap:.75rem;
+            @media (min-width: 641px) and (max-width: 1024px) {
+                section h1 { font-size: 2.2rem !important; }
             }
-            .topbar-logo .mark{ width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,#e6f7ff,#f0fbff); border:1px solid rgba(0,61,165,0.06); box-shadow:0 10px 30px rgba(0,61,165,0.06); }
-            .topbar-address{ text-align:right; transform: translateZ(6px); }
-            .topbar-address h4{ margin:0; color:var(--tf-dark); font-weight:700; text-shadow:0 6px 14px rgba(0,29,77,0.06); }
-            .topbar-address p{ margin:0; color:var(--tf-blue); font-size:0.9rem; }
+
+            /* ─── Módulos grid (index) ──────────────────── */
+            @media (max-width: 640px) {
+                [style*="grid-template-columns:repeat(auto-fill,minmax(300px"] {
+                    grid-template-columns: 1fr !important;
+                }
+                [style*="grid-template-columns:repeat(auto-fill,minmax(200px"] {
+                    grid-template-columns: 1fr 1fr !important;
+                }
+            }
+
+            /* ─── Page header bars ──────────────────────── */
+            .page-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 12px;
+                padding: 18px 24px;
+            }
+            @media (max-width: 640px) {
+                .page-header { padding: 14px 16px !important; flex-direction: column; align-items: flex-start !important; }
+                .page-header > div:last-child { width: 100%; display: flex; flex-wrap: wrap; gap: 8px; }
+                .page-header a, .page-header button { font-size: 12px !important; padding: 7px 12px !important; }
+            }
+
+            /* ─── Main content padding ──────────────────── */
+            @media (max-width: 640px) {
+                main { padding: 16px 12px !important; }
+            }
+            @media (min-width: 641px) and (max-width: 1024px) {
+                main { padding: 24px 16px !important; }
+            }
+
+            /* ─── dcim-card padding ─────────────────────── */
+            @media (max-width: 640px) {
+                .dcim-card > div { padding: 16px !important; }
+            }
+
+            /* ─── 2-col form grids → 1-col mobile ──────── */
+            @media (max-width: 640px) {
+                [style*="grid-template-columns:1fr 1fr"],
+                [style*="grid-template-columns: 1fr 1fr"] {
+                    grid-template-columns: 1fr !important;
+                }
+                [style*="grid-template-columns:1fr 1fr 1fr"],
+                [style*="grid-template-columns: 1fr 1fr 1fr"] {
+                    grid-template-columns: 1fr !important;
+                }
+                [style*="grid-template-columns:repeat(3"],
+                [style*="grid-template-columns: repeat(3"] {
+                    grid-template-columns: 1fr !important;
+                }
+                [style*="grid-template-columns:repeat(4"],
+                [style*="grid-template-columns: repeat(4"] {
+                    grid-template-columns: 1fr 1fr !important;
+                }
+            }
+            @media (min-width: 641px) and (max-width: 900px) {
+                [style*="grid-template-columns:1fr 1fr 1fr"],
+                [style*="grid-template-columns: 1fr 1fr 1fr"],
+                [style*="grid-template-columns:repeat(3"],
+                [style*="grid-template-columns: repeat(3"] {
+                    grid-template-columns: 1fr 1fr !important;
+                }
+                [style*="grid-template-columns:repeat(4"],
+                [style*="grid-template-columns: repeat(4"] {
+                    grid-template-columns: 1fr 1fr !important;
+                }
+            }
+
+            /* ─── Tablas responsivas ────────────────────── */
+            .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            @media (max-width: 768px) {
+                table { min-width: 540px; }
+                th, td { padding: 8px 10px !important; font-size: 12px !important; }
+            }
+
+            /* ─── Inputs / selects full width mobile ────── */
+            @media (max-width: 640px) {
+                input[type="text"], input[type="number"], input[type="date"],
+                input[type="email"], input[type="password"], select, textarea {
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                }
+            }
+
+            /* ─── Botones hero apilados en móvil ────────── */
+            @media (max-width: 480px) {
+                section [style*="display:flex"] {
+                    flex-direction: column !important;
+                    align-items: center !important;
+                }
+                section a[href] {
+                    width: 100% !important;
+                    text-align: center !important;
+                    max-width: 320px;
+                }
+            }
+
+            /* ─── Nav responsivo ────────────────────────── */
+            @media (max-width: 768px) {
+                nav [style*="max-width:1200px"] { padding: 0 12px !important; }
+                nav a { font-size: 12px !important; padding: 6px 8px !important; }
+            }
+            @media (min-width: 1400px) {
+                nav [style*="max-width:1200px"] { max-width: 100% !important; padding: 0 40px !important; }
+            }
+
+            /* ─── Pantallas grandes: contenido llena la pantalla ── */
+            /* 1080p / 1440p (≥1400px) */
+            @media (min-width: 1400px) {
+                [style*="max-width:1100px"],
+                [style*="max-width: 1100px"] { max-width: calc(100vw - 80px) !important; }
+                [style*="max-width:960px"],
+                [style*="max-width: 960px"]  { max-width: calc(100vw - 80px) !important; }
+                [style*="max-width:1200px"],
+                [style*="max-width: 1200px"] { max-width: calc(100vw - 80px) !important; }
+                [style*="max-width:780px"],
+                [style*="max-width: 780px"]  { max-width: 980px !important; }
+                main { padding-left: 48px !important; padding-right: 48px !important; }
+            }
+            /* 2K (≥2560px) */
+            @media (min-width: 2560px) {
+                [style*="max-width:1100px"],
+                [style*="max-width: 1100px"],
+                [style*="max-width:960px"],
+                [style*="max-width: 960px"],
+                [style*="max-width:1200px"],
+                [style*="max-width: 1200px"] { max-width: calc(100vw - 120px) !important; }
+                [style*="max-width:780px"],
+                [style*="max-width: 780px"]  { max-width: 1400px !important; }
+                section h1 { font-size: 4rem !important; }
+                section p  { font-size: 1.3rem !important; max-width: 900px !important; }
+                main { padding-left: 72px !important; padding-right: 72px !important; }
+                th, td { padding: 14px 18px !important; font-size: 15px !important; }
+                .dcim-card > div { padding: 28px !important; }
+            }
+            /* 4K (≥3840px) */
+            @media (min-width: 3840px) {
+                [style*="max-width:1100px"],
+                [style*="max-width: 1100px"],
+                [style*="max-width:960px"],
+                [style*="max-width: 960px"],
+                [style*="max-width:1200px"],
+                [style*="max-width: 1200px"] { max-width: calc(100vw - 160px) !important; }
+                [style*="max-width:780px"],
+                [style*="max-width: 780px"]  { max-width: 2200px !important; }
+                section { padding: 160px 100px 180px !important; }
+                section h1 { font-size: 7.5rem !important; }
+                section p  { font-size: 2.2rem !important; max-width: 1800px !important; }
+                section a  { font-size: 1.6rem !important; padding: 22px 52px !important; border-radius: 14px !important; }
+                main { padding-left: 100px !important; padding-right: 100px !important; }
+                th, td { padding: 22px 28px !important; font-size: 22px !important; }
+                thead th { font-size: 16px !important; padding: 16px 22px !important; }
+                .dcim-card { border-radius: 22px !important; }
+                .dcim-card > div { padding: 44px !important; }
+                .card-band { height: 13px !important; }
+                h1 { font-size: 3.5rem !important; }
+                h2 { font-size: 2.8rem !important; }
+                h3 { font-size: 2rem !important; }
+                h4 { font-size: 1.6rem !important; }
+                p, li, span, label { font-size: 1.3rem !important; line-height: 1.7 !important; }
+                input, select, textarea { font-size: 1.3rem !important; padding: 18px 22px !important; border-radius: 12px !important; }
+                button[type="submit"], button[type="button"] { font-size: 1.3rem !important; padding: 18px 36px !important; }
+                .status-chip, .tag-pill { font-size: 1rem !important; padding: 6px 18px !important; }
+                .dcim-card:hover { transform: translateY(-6px) !important; }
+            }
         </style>
     </head>
 
@@ -69,8 +383,8 @@
             </svg>
           </div>
           <div>
-            <div style="font-weight:700; color:var(--tf-dark);">INELCOM</div>
-            <div style="font-size:0.85rem; color:var(--tf-blue);">DATA CENTER & MEGACENTRALES</div>
+            <div style="font-weight:700; color:var(--tf-dark);">TELEFONICA</div>
+            <div style="font-size:0.85rem; color:var(--tf-blue);">DATA CENTER COMMODITIES</div>
           </div>
         </div>
         <div class="topbar-address">

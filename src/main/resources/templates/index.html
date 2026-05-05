@@ -1,176 +1,162 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="fragments/headers :: headers"></head>
-  <body class="min-h-screen flex flex-col">
-    <nav th:replace="fragments/navdar :: nav"></nav>
-    
-    <main class="flex-1">
-      <!-- Hero Section -->
-      <div class="relative overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900">
-        <div class="absolute inset-0 bg-black opacity-20"></div>
-        <div class="relative max-w-7xl mx-auto px-6 py-16">
-          <div class="text-center text-white">
-            <div class="mb-6">
-              <img src="https://via.placeholder.com/120x80/003DA5/FFFFFF?text=INELCOM" alt="INELCOM Logo" class="mx-auto mb-4 rounded-lg shadow-lg">
-            </div>
-            <h1 class="text-5xl font-bold mb-6 leading-tight">
-              Sistema de Gestión de <span class="text-blue-300">Data Center</span>
-            </h1>
-            <p class="text-xl mb-8 max-w-3xl mx-auto leading-relaxed">
-              Plataforma integral para el control de acceso de técnicos, monitoreo de temperatura de pasillos, 
-              gestión de inventarios de racks y equipos de red/servers, y visualización de layouts de salas técnicas.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/login" class="btn-3d text-lg px-8 py-4" style="background:linear-gradient(90deg,#003DA5,#00A1E6);">
-                🔐 Acceso de Técnicos
-              </a>
-              <a href="#funcionalidades" class="btn-3d text-lg px-8 py-4" style="background:rgba(255,255,255,0.1); border: 2px solid white;">
-                📖 Conocer más
-              </a>
-            </div>
-          </div>
+<head th:replace="fragments/headers :: headers"></head>
+<body class="min-h-screen flex flex-col" style="font-family:'Barlow',sans-serif; color:#172134;">
+
+<nav th:replace="fragments/navdar :: nav"></nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────── -->
+<section style="
+  background: linear-gradient(135deg, #0b3c75 0%, #1e3a5f 50%, #0f4c75 80%, #00a4c8 100%);
+  padding: 72px 5% 80px;
+  text-align: center;
+  position: relative;
+">
+  <div style="position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(0,164,200,0.18),transparent 45%),radial-gradient(circle at 80% 10%,rgba(11,60,117,0.3),transparent 40%);pointer-events:none;"></div>
+  <div style="position:relative; z-index:1; max-width:min(3400px, 92%); margin:0 auto;">
+    <span style="display:inline-block; background:rgba(0,164,200,0.22); border:1px solid rgba(0,164,200,0.5); color:#7dd3fc; font-size:20px; font-weight:800; letter-spacing:.12em; padding:4px 14px; border-radius:99px; margin-bottom:20px;">SISTEMA DCIM</span>
+    <h1 style="color:#ffffff; font-size:3.8rem; font-weight:800; line-height:1.15; margin-bottom:16px;">
+      Gestión Commodities de<br><span style="color:#00a4c8;">Data Center</span>
+    </h1>
+    <p style="color:rgba(255,255,255,0.75); font-size:1.5rem; max-width:min(3000px, 85%); margin:0 auto 36px; line-height:1.6;">
+      Plataforma para el control de acceso de técnicos, monitoreo ambiental, inventario de racks y visualización de layouts de salas técnicas.
+    </p>
+    <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+      <a href="/login" style="
+        background:linear-gradient(135deg,#00a4c8,#0b3c75);
+        color:#fff; font-weight:800; font-size:15px;
+        padding:13px 32px; border-radius:8px; text-decoration:none;
+        box-shadow:0 6px 20px rgba(0,0,0,0.25); transition:opacity 0.2s;
+      " onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        🔐 Acceder al Sistema
+      </a>
+      <a href="#modulos" style="
+        background:rgba(255,255,255,0.1); color:#fff; font-weight:700; font-size:15px;
+        padding:13px 32px; border-radius:8px; text-decoration:none;
+        border:1.5px solid rgba(255,255,255,0.3);
+      ">
+        📖 Ver Módulos
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Módulos ────────────────────────────────────────────────────────── -->
+<main class="flex-1" style="
+  background:
+    radial-gradient(circle at 8% 12%, rgba(11,60,117,0.08), transparent 32%),
+    radial-gradient(circle at 94% 5%,  rgba(0,164,200,0.12), transparent 28%),
+    linear-gradient(180deg, #edf3f9 0%, #e6edf5 55%, #dfe9f3 100%);
+  padding: 48px 24px;
+">
+  <div style="max-width:min(3400px, 92%); margin:0 auto;">
+
+    <!-- Section header -->
+    <div id="modulos" style="display:flex; align-items:center; gap:10px; margin-bottom:28px;">
+      <span style="font-size:15px; font-weight:800; color:#5b667a; text-transform:uppercase; letter-spacing:.1em;">Módulos del Sistema</span>
+      <div style="flex:1; height:2px; background:linear-gradient(90deg,#00a4c8,transparent); border-radius:2px;"></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px;">
+
+      <!-- Registro de Técnicos -->
+      <div class="dcim-card">
+        <div class="card-band" style="background:linear-gradient(90deg,#92400e,#d97706)"></div>
+        <div style="padding:22px;">
+          <div style="font-size:28px; margin-bottom:10px;">📝</div>
+          <h3 style="font-weight:800; font-size:1.5rem; color:#172134; margin-bottom:6px;">Registro de Técnicos</h3>
+          <p style="font-size:1.05REM; color:#5b667a; line-height:1.5;">Control de acceso y registro de técnicos que ingresan a las salas del Data Center.</p>
+          <a href="/login" style="display:inline-block; margin-top:14px; color:#d97706; font-size:13px; font-weight:700; text-decoration:none;">Ingresar →</a>
         </div>
       </div>
 
-      <!-- Funcionalidades Section -->
-      <section id="funcionalidades" class="py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-4xl font-bold mb-4" style="color:#002B5C;">Funcionalidades del Data Center</h2>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-              Herramientas especializadas para la gestión integral de salas técnicas de Data Center
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Gestión de Personal -->
-            <div class="card-3d p-8 text-center hover:scale-105 transition-transform">
-              <div class="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center" style="background:linear-gradient(90deg,#003DA5,#00A1E6);">
-                <span class="text-3xl text-white">👥</span>
-              </div>
-              <h3 class="text-xl font-bold mb-4" style="color:#002B5C;">Registro de Técnicos</h3>
-              <p class="text-gray-600 mb-6">Control de acceso y registro de técnicos especializados que ingresan a realizar trabajos en las salas técnicas del Data Center.</p>
-              <a href="/login" class="btn-3d" style="background:linear-gradient(90deg,#003DA5,#00A1E6);">Ver Personal</a>
-            </div>
-
-            <!-- Inventario de Salas -->
-            <div class="card-3d p-8 text-center hover:scale-105 transition-transform">
-              <div class="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center" style="background:linear-gradient(90deg,#28a745,#20c997);">
-                <span class="text-3xl text-white">📦</span>
-              </div>
-              <h3 class="text-xl font-bold mb-4" style="color:#002B5C;">Inventario de Racks y Equipos</h3>
-              <p class="text-gray-600 mb-6">Registro completo de todos los racks, equipos de network y servers disponibles en cada sala técnica del Data Center.</p>
-              <a href="/login" class="btn-3d" style="background:linear-gradient(90deg,#28a745,#20c997);">Gestionar Inventario</a>
-            </div>
-
-            <!-- Monitoreo Ambiental -->
-            <div class="card-3d p-8 text-center hover:scale-105 transition-transform">
-              <div class="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center" style="background:linear-gradient(90deg,#fd7e14,#ffc107);">
-                <span class="text-3xl text-white">🌡️</span>
-              </div>
-              <h3 class="text-xl font-bold mb-4" style="color:#002B5C;">Temperatura de Pasillos</h3>
-              <p class="text-gray-600 mb-6">Registro y monitoreo de temperaturas en los pasillos de las salas técnicas para garantizar condiciones óptimas del Data Center.</p>
-              <a href="/login" class="btn-3d" style="background:linear-gradient(90deg,#fd7e14,#ffc107);">Ver Temperatura</a>
-            </div>
-
-            <!-- Diseño de Salas -->
-            <div class="card-3d p-8 text-center hover:scale-105 transition-transform">
-              <div class="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center" style="background:linear-gradient(90deg,#6f42c1,#e83e8c);">
-                <span class="text-3xl text-white">📐</span>
-              </div>
-              <h3 class="text-xl font-bold mb-4" style="color:#002B5C;">Layout de Salas Técnicas</h3>
-              <p class="text-gray-600 mb-6">Planos y layouts visuales de las salas técnicas del Data Center con ubicación de racks y distribución de equipos.</p>
-              <a href="/login" class="btn-3d" style="background:linear-gradient(90deg,#6f42c1,#e83e8c);">Ver Diseños</a>
-            </div>
-
-            <!-- Estadísticas -->
-            <div class="card-3d p-8 text-center hover:scale-105 transition-transform">
-              <div class="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center" style="background:linear-gradient(90deg,#dc3545,#fd7e14);">
-                <span class="text-3xl text-white">📊</span>
-              </div>
-              <h3 class="text-xl font-bold mb-4" style="color:#002B5C;">Estadísticas y Reportes</h3>
-              <p class="text-gray-600 mb-6">Análisis de datos, tendencias de uso, reportes de mantenimiento y métricas de rendimiento.</p>
-              <a href="/login" class="btn-3d" style="background:linear-gradient(90deg,#dc3545,#fd7e14);">Ver Estadísticas</a>
-            </div>
-
-            <!-- Configuración -->
-            <div class="card-3d p-8 text-center hover:scale-105 transition-transform">
-              <div class="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center" style="background:linear-gradient(90deg,#6c757d,#495057);">
-                <span class="text-3xl text-white">⚙️</span>
-              </div>
-              <h3 class="text-xl font-bold mb-4" style="color:#002B5C;">Configuración</h3>
-              <p class="text-gray-600 mb-6">Gestión de usuarios, permisos, parámetros del sistema y configuraciones de seguridad.</p>
-              <a href="/login" class="btn-3d" style="background:linear-gradient(90deg,#6c757d,#495057);">Configurar</a>
-            </div>
-          </div>
+      <!-- Inventario -->
+      <div class="dcim-card">
+        <div class="card-band" style="background:linear-gradient(90deg,#0f4c75,#1b6ca8)"></div>
+        <div style="padding:22px;">
+          <div style="font-size:28px; margin-bottom:10px;">📦</div>
+          <h3 style="font-weight:800; font-size:1.5rem; color:#172134; margin-bottom:6px;">Inventario de Racks</h3>
+          <p style="font-size:1.05REM; color:#5b667a; line-height:1.5;">Registro completo de racks, equipos de red y servidores en cada sala técnica.</p>
+          <a href="/login" style="display:inline-block; margin-top:14px; color:#1b6ca8; font-size:13px; font-weight:700; text-decoration:none;">Ver inventario →</a>
         </div>
-      </section>
+      </div>
 
-      <!-- Información Institucional -->
-      <section class="py-16" style="background:linear-gradient(135deg,#f8f9ff,#e8f4f8);">
-        <div class="max-w-7xl mx-auto px-6">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 class="text-4xl font-bold mb-6" style="color:#002B5C;">
-                Gestión Integral de Data Center
-              </h2>
-              <p class="text-lg text-gray-700 mb-6 leading-relaxed">
-                Nuestro sistema está diseñado específicamente para la gestión de salas técnicas de Data Center, 
-                garantizando el control total sobre técnicos, equipamiento, condiciones ambientales y 
-                distribución física de la infraestructura crítica.
-              </p>
-              <div class="space-y-4">
-                <div class="flex items-center">
-                  <span class="w-6 h-6 rounded-full mr-3" style="background:#003DA5;"></span>
-                  <span class="text-gray-700">Registro y control de acceso de técnicos</span>
-                </div>
-                <div class="flex items-center">
-                  <span class="w-6 h-6 rounded-full mr-3" style="background:#003DA5;"></span>
-                  <span class="text-gray-700">Monitoreo de temperatura en pasillos del Data Center</span>
-                </div>
-                <div class="flex items-center">
-                  <span class="w-6 h-6 rounded-full mr-3" style="background:#003DA5;"></span>
-                  <span class="text-gray-700">Inventario completo de racks, networks y servers</span>
-                </div>
-                <div class="flex items-center">
-                  <span class="w-6 h-6 rounded-full mr-3" style="background:#003DA5;"></span>
-                  <span class="text-gray-700">Visualización de layouts y planos de salas técnicas</span>
-                </div>
-              </div>
-            </div>
-            <div class="text-center">
-              <div class="inline-block p-8 rounded-2xl shadow-2xl" style="background:linear-gradient(135deg,#003DA5,#00A1E6);">
-                <div class="text-white">
-                  <h3 class="text-2xl font-bold mb-4">Sistema Especializado</h3>
-                  <p class="text-blue-100 mb-6">Cumplimiento de estándares de Data Center y mejores prácticas de la industria</p>
-                  <div class="grid grid-cols-2 gap-4 text-center">
-                    <div class="bg-white/20 rounded-lg p-4">
-                      <div class="text-2xl font-bold">24/7</div>
-                      <div class="text-sm text-blue-100">Monitoreo</div>
-                    </div>
-                    <div class="bg-white/20 rounded-lg p-4">
-                      <div class="text-2xl font-bold">100%</div>
-                      <div class="text-sm text-blue-100">Trazabilidad</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <!-- Temperatura -->
+      <div class="dcim-card">
+        <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
+        <div style="padding:22px;">
+          <div style="font-size:28px; margin-bottom:10px;">🌡️</div>
+          <h3 style="font-weight:800; font-size:1.5rem; color:#172134; margin-bottom:6px;">Monitoreo de Temperatura</h3>
+          <p style="font-size:1.05REM; color:#5b667a; line-height:1.5;">Registro y seguimiento de temperaturas en pasillos para garantizar condiciones óptimas.</p>
+          <a href="/login" style="display:inline-block; margin-top:14px; color:#0d9488; font-size:13px; font-weight:700; text-decoration:none;">Ver mediciones →</a>
         </div>
-      </section>
-    </main>
+      </div>
 
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
+      <!-- Layout de Salas -->
+      <div class="dcim-card">
+        <div class="card-band" style="background:linear-gradient(90deg,#7f1d1d,#dc2626)"></div>
+        <div style="padding:22px;">
+          <div style="font-size:28px; margin-bottom:10px;">🗺️</div>
+          <h3 style="font-weight:800; font-size:1.5rem; color:#172134; margin-bottom:6px;">Layout de Salas</h3>
+          <p style="font-size:1.05REM; color:#5b667a; line-height:1.5;">Planos visuales de las salas técnicas con ubicación de racks y distribución de equipos.</p>
+          <a href="/login" style="display:inline-block; margin-top:14px; color:#dc2626; font-size:13px; font-weight:700; text-decoration:none;">Ver layouts →</a>
+        </div>
+      </div>
 
-    <script>
-      // Smooth scrolling para el botón "Conocer más"
-      document.querySelector('a[href="#funcionalidades"]').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.querySelector('#funcionalidades').scrollIntoView({
-          behavior: 'smooth'
-        });
-      });
-    </script>
-  </body>
+      <!-- Gestión de Acceso -->
+      <div class="dcim-card">
+        <div class="card-band" style="background:linear-gradient(90deg,#5b21b6,#8b5cf6)"></div>
+        <div style="padding:22px;">
+          <div style="font-size:28px; margin-bottom:10px;">🎫</div>
+          <h3 style="font-weight:800; font-size:1.5rem; color:#172134; margin-bottom:6px;">Gestión de Acceso</h3>
+          <p style="font-size:1.05REM; color:#5b667a; line-height:1.5;">Tickets y actividades programadas para actividades técnicas planificadas.</p>
+          <a href="/login" style="display:inline-block; margin-top:14px; color:#8b5cf6; font-size:13px; font-weight:700; text-decoration:none;">Ver gestiones →</a>
+        </div>
+      </div>
+
+      <!-- Reportes -->
+      <div class="dcim-card">
+        <div class="card-band" style="background:linear-gradient(90deg,#1e3a5f,#7c3aed)"></div>
+        <div style="padding:22px;">
+          <div style="font-size:28px; margin-bottom:10px;">📊</div>
+          <h3 style="font-weight:800; font-size:1.05rem; color:#172134; margin-bottom:6px;">Dashboard y Reportes</h3>
+          <p style="font-size:1.5REM; color:#5b667a; line-height:1.5;">Estadísticas, métricas de rendimiento y reportes diarios y mensuales.</p>
+          <a href="/login" style="display:inline-block; margin-top:14px; color:#7c3aed; font-size:13PX; font-weight:700; text-decoration:none;">Ver reportes →</a>
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+
+    <!-- KPI strip -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-top:36px; justify-items:center; justify-content:center;">
+      <div style="background:white; border-radius:12px; padding:20px; text-align:center; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="font-size:2rem; font-weight:800; color:#0b3c75;">24/7</div>
+        <div style="font-size:12px; color:#5b667a; font-weight:600;">Monitoreo continuo</div>
+      </div>
+      <div style="background:white; border-radius:12px; padding:20px; text-align:center; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="font-size:2rem; font-weight:800; color:#0b3c75;">100%</div>
+        <div style="font-size:12px; color:#5b667a; font-weight:600;">Trazabilidad de accesos</div>
+      </div>
+      <div style="background:white; border-radius:12px; padding:20px; text-align:center; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="font-size:2rem; font-weight:800; color:#00a4c8;">DCIM</div>
+        <div style="font-size:12px; color:#5b667a; font-weight:600;">Estándar de industria</div>
+      </div>
+      <div style="background:white; border-radius:12px; padding:20px; text-align:center; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="font-size:2rem; font-weight:800; color:#0b3c75;">3 roles</div>
+        <div style="font-size:12px; color:#5b667a; font-weight:600;">Admin · User · Viewer</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script>
+  document.querySelector('a[href="#modulos"]').addEventListener('click', function(e){
+    e.preventDefault();
+    document.getElementById('modulos').scrollIntoView({ behavior:'smooth' });
+  });
+</script>
+</body>
 </html>

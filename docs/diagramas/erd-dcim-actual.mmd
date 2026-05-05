@@ -1,0 +1,224 @@
+erDiagram
+    %% ─── NUCLEO DE USUARIOS ───────────────────────────────────────
+    USUARIO {
+        BIGINT id PK
+        VARCHAR rut UK
+        VARCHAR email UK
+        VARCHAR nombre
+        VARCHAR apellido
+        VARCHAR password
+        VARCHAR rol
+        DATETIME creat_at
+        DATETIME update_at
+    }
+
+    TIPO_USUARIO {
+        BIGINT id PK
+        VARCHAR codigo UK
+        VARCHAR descripcion
+    }
+
+    USUARIO_TIPO_USUARIO {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT tipo_usuario_id FK
+    }
+
+    %% ─── INFRAESTRUCTURA FISICA ────────────────────────────────────
+    SITIO {
+        BIGINT id PK
+        VARCHAR nombre UK
+        VARCHAR descripcion
+        BIT activo
+        DATETIME fecha_creacion
+        DATETIME fecha_modificacion
+    }
+
+    SALA {
+        BIGINT id PK
+        VARCHAR nombre
+        VARCHAR descripcion
+        BIT activo
+        BIGINT sitio_id FK
+        DATETIME fecha_creacion
+        DATETIME fecha_modificacion
+    }
+
+    %% ─── OPERACIONES ───────────────────────────────────────────────
+    INGRESOAP {
+        BIGINT id PK
+        VARCHAR numero_ticket
+        VARCHAR tipo_ticket
+        VARCHAR nombre_usuario
+        VARCHAR aprobador
+        VARCHAR nombre_tecnico
+        VARCHAR rut_tecnico
+        VARCHAR cargo_tecnico
+        VARCHAR empresa_contratista
+        VARCHAR empresa_demandante
+        VARCHAR motivo_ingreso
+        VARCHAR sala_ingresa
+        VARCHAR rack_ingresa
+        VARCHAR sitio_ingreso
+        VARCHAR escolta
+        DATE fecha_inicio
+        TIME hora_inicio
+        DATE fecha_termino
+        TIME hora_termino
+        DATE fecha_registro
+        BIT activo
+        BIGINT sala_id FK
+        BIGINT sitio_id FK
+        BIGINT usuario_registra_id FK
+        BIGINT aprobador_id FK
+    }
+
+    GESTION_ACCESO {
+        BIGINT id PK
+        VARCHAR numero_ticket
+        VARCHAR usuario_ingresa
+        VARCHAR estado_aprobacion
+        VARCHAR sitio
+        VARCHAR nombre_actividad
+        DATE fecha_registro
+        TIME hora_registro
+        DATE fecha_inicio_actividad
+        TIME hora_inicio_actividad
+        DATE fecha_termino_actividad
+        TIME hora_termino_actividad
+        DATE fecha_cierre_gestion
+        TIME hora_cierre_gestion
+        BIT gestion_realizada
+        BIT ticket_cerrado
+        BIGINT sala_id FK
+        BIGINT sitio_id FK
+        BIGINT usuario_registra_id FK
+    }
+
+    %% ─── INVENTARIO ─────────────────────────────────────────────────
+    INVENTARIO {
+        BIGINT id PK
+        VARCHAR numero_serie UK
+        VARCHAR tag UK
+        VARCHAR sala
+        VARCHAR sitio
+        VARCHAR tipo
+        VARCHAR marca
+        VARCHAR modelo
+        VARCHAR cliente
+        VARCHAR estado
+        VARCHAR nombre_rack
+        VARCHAR ubicacion_ur
+        VARCHAR direccion_ip
+        BIT alarma_hardware
+        DECIMAL potencia_consumo_watts
+        DATETIME fecha_creacion
+        DATETIME fecha_modificacion
+        BIGINT sala_id FK
+        BIGINT sitio_id FK
+    }
+
+    %% ─── TEMPERATURAS ───────────────────────────────────────────────
+    PUNTO_MEDICION {
+        BIGINT id PK
+        VARCHAR codigo
+        VARCHAR nombre
+        DECIMAL temperatura_minima
+        DECIMAL temperatura_maxima
+        BIT activo
+        BIGINT sala_id FK
+        DATETIME fecha_creacion
+        DATETIME fecha_modificacion
+    }
+
+    MEDICION_TEMPERATURA {
+        BIGINT id PK
+        DATE fecha_medicion
+        DATETIME fecha_registro
+        DECIMAL temperatura_celsius
+        VARCHAR estado
+        BIGINT punto_id FK
+    }
+
+    %% ─── PLANOS ─────────────────────────────────────────────────────
+    PLANO_SALA {
+        BIGINT id PK
+        INT cantidad_filas
+        INT cantidad_columnas
+        VARCHAR descripcion
+        BIT es_plantilla
+        VARCHAR nombre_plantilla
+        DATETIME fecha_creacion
+        BIGINT sala_id FK
+    }
+
+    PLANO_SALA_ELEMENTO {
+        BIGINT id PK
+        VARCHAR nombre
+        VARCHAR tipo
+        VARCHAR color
+        INT fila_inicio
+        INT columna_inicio
+        INT largo_cm
+        INT ancho_cm
+        BIT rotado_90
+        DATETIME fecha_creacion
+        BIGINT plano_sala_id FK
+    }
+
+    %% ─── RELACIONES USUARIO-MODULO (Fase 1) ────────────────────────
+    USUARIO_GESTION_REL {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT gestion_acceso_id FK
+    }
+
+    USUARIO_INGRESOAP_REL {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT ingresoap_id FK
+    }
+
+    USUARIO_INVENTARIO_REL {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT inventario_id FK
+    }
+
+    %% ─── RELACIONES ─────────────────────────────────────────────────
+
+    %% Usuarios y tipos
+    USUARIO ||--o{ USUARIO_TIPO_USUARIO : "tiene tipo"
+    TIPO_USUARIO ||--o{ USUARIO_TIPO_USUARIO : "clasifica"
+
+    %% Infraestructura fisica
+    SITIO ||--o{ SALA : "contiene"
+    SITIO ||--o{ INGRESOAP : "sitio de ingreso"
+    SITIO ||--o{ GESTION_ACCESO : "sitio de gestion"
+    SITIO ||--o{ INVENTARIO : "ubicacion"
+    SALA ||--o{ INGRESOAP : "sala de ingreso"
+    SALA ||--o{ GESTION_ACCESO : "sala de gestion"
+    SALA ||--o{ INVENTARIO : "sala de inventario"
+    SALA ||--o{ PUNTO_MEDICION : "tiene puntos"
+    SALA ||--o{ PLANO_SALA : "tiene plano"
+
+    %% IngresoAP - FK directas a usuario (Fase 2)
+    USUARIO ||--o{ INGRESOAP : "registra (FK)"
+    USUARIO ||--o{ INGRESOAP : "aprueba (FK)"
+
+    %% GestionAcceso - FK directa a usuario (Fase 2)
+    USUARIO ||--o{ GESTION_ACCESO : "registra (FK)"
+
+    %% Relaciones many-to-many (Fase 1)
+    USUARIO ||--o{ USUARIO_GESTION_REL : "vincula"
+    GESTION_ACCESO ||--o{ USUARIO_GESTION_REL : "vincula"
+    USUARIO ||--o{ USUARIO_INGRESOAP_REL : "vincula"
+    INGRESOAP ||--o{ USUARIO_INGRESOAP_REL : "vincula"
+    USUARIO ||--o{ USUARIO_INVENTARIO_REL : "vincula"
+    INVENTARIO ||--o{ USUARIO_INVENTARIO_REL : "vincula"
+
+    %% Temperaturas
+    PUNTO_MEDICION ||--o{ MEDICION_TEMPERATURA : "registra"
+
+    %% Planos
+    PLANO_SALA ||--o{ PLANO_SALA_ELEMENTO : "contiene"

@@ -102,6 +102,11 @@ public class SecurityConfig {
                 .permitAll()
             )
 
+            // Configuración de sesión para aplicación web
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            )
+
             // Configuración del logout
             .logout(logout -> logout
                 .logoutUrl("/logout")

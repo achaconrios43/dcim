@@ -18,8 +18,8 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addViewControllers(@NonNull ViewControllerRegistry registry) {
-        // Mapea /login directamente a la vista login.html
-        // Sin pasar por un controlador personalizado
-        registry.addViewController("/login").setViewName("login");
+        // Sin mapeos estáticos por ahora.
+        // /login y / son manejados en MainController para redirigir
+        // automáticamente al dashboard cuando ya existe sesión activa.
     }
 }

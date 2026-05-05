@@ -1,366 +1,409 @@
 <!DOCTYPE html>
 <html lang="es">
-<head th:replace="fragments/headers :: headers"></head>
-<body class="min-h-screen flex flex-col bg-gray-50">
-    <nav th:replace="fragments/navdar :: nav"></nav>
-        
-    <main class="flex-1 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Mensaje de error para acceso denegado -->
-            <div th:if="${error != null}" 
-                 class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 shadow-sm">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    <span class="font-medium" th:text="${error}">Mensaje de error</span>
-                </div>
-            </div>
-            
-            <!-- Mensaje de éxito para creación de usuario -->
-            <div th:if="${param.success != null and param.success[0] == 'user-created'}" 
-                 class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 shadow-sm">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span class="font-medium">¡Usuario creado exitosamente!</span> El nuevo técnico ha sido registrado en el sistema.
-                </div>
-            </div>
-            
-            <!-- Header del Dashboard -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Panel de Control</h1>
-                        <p class="text-gray-600 mt-1">Sistema de Gestión del Data Center</p>
-                    <!-- Modulo Temperaturas -->
-                    <div th:if="${usuario.rol != 'VIEWER'}"
-                         class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-emerald-500">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="bg-emerald-100 p-3 rounded-full">
-                                <i class="fas fa-temperature-half text-emerald-600 text-2xl"></i>
-                            </div>
-                            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full">nuevo</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Sitios, Salas y Temperatura</h3>
-                        <p class="text-gray-600 mb-4">Administra puntos de medicion y reportes diarios/mensuales.</p>
-                        <a href="/temperaturas" class="inline-flex items-center text-emerald-600 hover:text-emerald-700 font-semibold">
-                            Ir al modulo
-                            <i class="fas fa-arrow-right ml-2"></i>
-                        </a>
-                    </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-sm text-gray-500">Bienvenido</div>
-                        <div class="font-semibold text-gray-900" th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre Usuario</div>
-                        <div class="text-xs text-gray-500" th:text="${usuario.email}">Email</div>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                                             th:class="${usuario.rol == 'ADMIN'} ? 'bg-red-100 text-red-800' : (${usuario.rol == 'VIEWER'} ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800')"
-                              th:text="${usuario.rol}">ROL</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Menu Principal -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <!-- Data Center Menu -->
-                    <div th:if="${usuario.rol != 'VIEWER'}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <div class="p-2 bg-blue-100 rounded-lg">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Data Center</h3>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4">Gestión de infraestructura y equipamiento del data center</p>
-                    <div class="space-y-2">
-                        <a th:href="@{/inventario}" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            🏢 Inventario Racks
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a href="/temperaturas/registro" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            🌡️ Monitoreo Temperatura
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a href="/plano-sala" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            🗺️ Layout de Salas
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a href="/plano-sala/plantillas" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            📐 Plantillas de Salas
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            📊 Reportes y Estadísticas
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+<head th:replace="fragments/headers :: headers">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen flex flex-col" style="
+  font-family: 'Barlow', 'Inter', sans-serif;
+  color: #172134;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(11,60,117,0.10), transparent 30%),
+    radial-gradient(circle at 94% 5%,  rgba(0,164,200,0.14), transparent 26%),
+    linear-gradient(180deg, #edf3f9 0%, #e6edf5 55%, #dfe9f3 100%);
+">
 
-                <!-- Registro Técnicos -->
-                <div th:if="${usuario.rol != 'VIEWER'}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <div class="p-2 bg-green-100 rounded-lg">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Técnicos</h3>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4">Control de accesos y registro de personal técnico</p>
-                    <div class="space-y-2">
-                        <a th:href="@{/ingresoap}" class="flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
-                            📝 Registro de Ingresos
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a th:href="@{/user/ingresoap-list}" class="flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
-                            📋 Lista de Accesos
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a href="#" class="flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
-                            ⏰ Control de Horarios
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a href="#" class="flex items-center text-green-600 hover:text-green-800 text-sm font-medium">
-                            🔒 Auditoría de Accesos
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+<style>
+  .dcim-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid rgba(11,60,117,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  }
+  .dcim-card:hover {
+    box-shadow: 0 10px 28px rgba(9,30,66,0.16);
+    transform: translateY(-3px);
+    border-color: rgba(0,164,200,0.40);
+  }
+  .card-band {
+    height: 7px;
+    width: 100%;
+    border-radius: 0;
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; margin-top: 32px;
+  }
+  .section-line { flex: 1; height: 2px; border-radius: 2px; }
+  .tag-pill {
+    font-size: 10px; padding: 2px 8px; border-radius: 99px;
+    font-weight: 700; letter-spacing: 0.03em;
+  }
+  .status-chip {
+    font-size: 11px; font-weight: 700; border-radius: 999px;
+    padding: 2px 10px; letter-spacing: 0.02em;
+  }
+  .module-link {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 10px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+  .module-link:hover { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.07); }
+  .quick-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    border: 1px solid rgba(11,60,117,0.14);
+    background: white; transition: all 0.15s;
+  }
+  .quick-btn:hover { background: #f0f5fc; border-color: rgba(0,164,200,0.4); }
+  @keyframes revealUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .reveal { animation: revealUp 0.4s ease both; }
+</style>
 
-                <!-- Gestión de Usuarios (solo para ADMIN) -->
-                <div th:if="${usuario.rol == 'ADMIN'}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <div class="p-2 bg-purple-100 rounded-lg">
-                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Usuarios</h3>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4">Administración de usuarios del sistema</p>
-                    <div class="space-y-2">
-                        <a th:href="@{/user/list}" class="flex items-center text-purple-600 hover:text-purple-800 text-sm font-medium">
-                            👥 Lista de Usuarios
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a th:href="@{/user/create}" class="flex items-center text-purple-600 hover:text-purple-800 text-sm font-medium">
-                            ➕ Crear Usuario
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a href="#" class="flex items-center text-purple-600 hover:text-purple-800 text-sm font-medium">
-                            🛡️ Permisos y Roles
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+<nav th:replace="fragments/navdar :: nav"></nav>
 
-                <!-- Gestión de Acceso -->
-                <div th:if="${usuario.rol != 'VIEWER'}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <div class="p-2 bg-indigo-100 rounded-lg">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Gestión de Acceso</h3>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4">Control de tickets y actividades programadas</p>
-                    <div class="space-y-2">
-                        <a th:href="@{/gestion/list}" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                            📋 Lista de Gestiones
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a th:href="@{/gestion/create}" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                            ➕ Registrar Gestión
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a th:href="@{/dashboard/cliente}" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                            📊 Ver Estadísticas
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a href="#" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                            ✅ Gestiones Aprobadas
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+<main class="flex-1 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                <!-- Dashboard Cliente (SOLO ADMIN) -->
-                <div th:if="${usuarioLogueado != null and (usuarioLogueado.rol == 'ADMIN' or usuarioLogueado.rol == 'VIEWER')}" 
-                     class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <div class="p-2 bg-yellow-100 rounded-lg">
-                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Dashboard Cliente <span th:class="${usuarioLogueado.rol == 'ADMIN'} ? 'text-xs bg-red-100 text-red-800 px-2 py-1 rounded' : 'text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded'" th:text="${usuarioLogueado.rol}">ROL</span></h3>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4">Estadísticas y reportes del mes actual (Acceso restringido)</p>
-                    <div class="space-y-2">
-                        <a th:href="@{/dashboard/cliente/mensual}" class="flex items-center text-yellow-600 hover:text-yellow-800 text-sm font-medium">
-                            📊 Dashboard Mensual
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a th:href="@{/dashboard/cliente/diario}" class="flex items-center text-yellow-600 hover:text-yellow-800 text-sm font-medium">
-                            📅 Dashboard Diario
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a th:href="@{/dashboard/cliente}" class="flex items-center text-yellow-600 hover:text-yellow-800 text-sm font-medium">
-                            📈 Dashboard Anterior
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        <a th:href="@{/dashboard/cliente/mensual}" class="flex items-center text-yellow-600 hover:text-yellow-800 text-sm font-medium">
-                            🏢 Por Tipo de Sala
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+  <!-- ── Alertas ── -->
+  <div th:if="${error != null}"
+       class="mb-5 px-4 py-3 rounded-xl border border-red-300 bg-red-50 text-red-700 flex items-center gap-2 reveal">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+    </svg>
+    <span class="font-semibold" th:text="${error}">Error</span>
+  </div>
+  <div th:if="${param.success != null and param.success[0] == 'user-created'}"
+       class="mb-5 px-4 py-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-700 flex items-center gap-2 reveal">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+    </svg>
+    <span><strong>¡Usuario creado!</strong> El nuevo técnico ha sido registrado en el sistema.</span>
+  </div>
 
-                <!-- Plantillas de Salas (visible para VIEWER) -->
-                <div th:if="${usuario.rol == 'VIEWER'}" class="bg-white rounded-xl shadow-sm border border-indigo-200 p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center mb-4">
-                        <div class="p-2 bg-indigo-100 rounded-lg">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Plantillas de Salas</h3>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4">Consulta los layouts de salas guardados como plantilla reutilizable.</p>
-                    <a href="/plano-sala/plantillas" class="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                        📐 Ver plantillas
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-                </div>
+  <!-- ── Hero Header ── -->
+  <div class="reveal" style="
+    background: linear-gradient(135deg, #0b3c75 0%, #1e3a5f 50%, #00a4c8 100%);
+    border-radius: 16px; padding: 28px 32px; margin-bottom: 8px;
+    box-shadow: 0 8px 24px rgba(11,60,117,0.22);
+  ">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-white tracking-tight">Panel de Control</h1>
+        <p class="text-blue-200 mt-1 text-sm">Sistema DCIM — Data Center Infrastructure Management</p>
+      </div>
+      <div class="text-right" th:if="${usuario != null}">
+        <div class="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-1">Sesión activa</div>
+        <div class="text-white font-bold text-lg" th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre</div>
+        <div class="text-blue-200 text-xs" th:text="${usuario.email}">email</div>
+        <span class="inline-block mt-1 status-chip"
+          th:class="${usuario.rol == 'ADMIN'} ? 'bg-red-500 text-white' : (usuario.rol == 'VIEWER' ? 'bg-amber-400 text-amber-900' : 'bg-sky-400 text-sky-900')"
+          th:text="${usuario.rol}">ROL</span>
+      </div>
+    </div>
+  </div>
 
-                <!-- Estadísticas Rápidas -->                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="p-2 bg-indigo-100 rounded-lg">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Estadísticas</h3>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                            <span class="text-sm text-gray-600">Técnicos Hoy</span>
-                            <span class="font-semibold text-gray-900">--</span>
-                        </div>
-                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                            <span class="text-sm text-gray-600">Temp. Promedio</span>
-                            <span class="font-semibold text-gray-900">22°C</span>
-                        </div>
-                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                            <span class="text-sm text-gray-600">Racks Activos</span>
-                            <span class="font-semibold text-gray-900">--</span>
-                        </div>
-                    </div>
-                </div>
+  <!-- ── Sección: Módulos Operativos ── -->
+  <div class="section-header reveal">
+    <span class="text-base font-bold text-slate-600 uppercase tracking-wider">Módulos Operativos</span>
+    <div class="section-line" style="background: linear-gradient(90deg,#00a4c8,transparent)"></div>
+  </div>
 
-                <!-- Accesos Rápidos -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="p-2 bg-indigo-100 rounded-lg">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 ml-3">Accesos Rápidos</h3>
-                    </div>
-                    <div class="space-y-2">
-                        <a th:href="@{/ingresoap}" class="flex items-center justify-between p-2 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
-                            <span class="text-sm font-medium">📝 Nuevo Registro</span>
-                        </a>
-                        <a th:href="@{/gestion/create}" class="flex items-center justify-between p-2 border border-indigo-200 rounded hover:bg-indigo-50 transition-colors">
-                            <span class="text-sm font-medium text-indigo-600">📋 Nueva Gestión</span>
-                        </a>
-                        <a th:href="@{/database-viewer}" class="flex items-center justify-between p-2 border border-green-200 rounded hover:bg-green-50 transition-colors">
-                            <span class="text-sm font-medium text-green-700">💾 Ver Base de Datos Local</span>
-                        </a>
-                        <a href="#" class="flex items-center justify-between p-2 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
-                            <span class="text-sm font-medium">📊 Reportes</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 reveal">
 
-            <!-- Actividad Reciente -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-8">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Actividad Reciente</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                        <div class="flex items-center">
-                            <span class="text-green-600">✅</span>
-                            <span class="text-sm text-gray-600 ml-2">Sistema iniciado correctamente</span>
-                        </div>
-                        <span class="text-xs text-gray-400">Hace unos minutos</span>
-                    </div>
-                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                        <div class="flex items-center">
-                            <span class="text-blue-600">💾</span>
-                            <span class="text-sm text-gray-600 ml-2">Base de datos MySQL local conectada</span>
-                        </div>
-                        <span class="text-xs text-gray-400">Hace unos minutos</span>
-                    </div>
-                    <div class="flex items-center justify-between py-2">
-                        <div class="flex items-center">
-                            <span class="text-purple-600">👤</span>
-                            <span class="text-sm text-gray-600 ml-2" th:text="'Usuario ' + ${usuario.nombre} + ' ha iniciado sesión'">Usuario conectado</span>
-                        </div>
-                        <span class="text-xs text-gray-400">Ahora</span>
-                    </div>
-                </div>
-            </div>
+    <!-- Data Center -->
+    <div class="dcim-card" th:if="${usuario != null and usuario.rol != 'VIEWER'}">
+      <div class="card-band" style="background: linear-gradient(90deg,#0f4c75,#1b6ca8)"></div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+               style="background:rgba(15,76,117,0.10)">🏢</div>
+          <div>
+            <h3 class="font-bold text-slate-800">Data Center</h3>
+            <p class="text-xs text-slate-500">Infraestructura y equipamiento</p>
+          </div>
         </div>
-    </main>
+        <div class="space-y-1 mt-3">
+          <a th:href="@{/inventario}" class="module-link text-blue-700">
+            <span>📦 Inventario de Racks</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a href="/temperaturas/registro" class="module-link text-blue-700">
+            <span>🌡️ Monitoreo de Temperatura</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a href="/plano-sala" class="module-link text-blue-700">
+            <span>🗺️ Layout de Salas</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a href="/plano-sala/plantillas" class="module-link text-blue-700">
+            <span>📐 Plantillas de Salas</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
 
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <!-- Técnicos / Ingresos -->
+    <div class="dcim-card" th:if="${usuario != null and usuario.rol != 'VIEWER'}">
+      <div class="card-band" style="background: linear-gradient(90deg,#92400e,#d97706)"></div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+               style="background:rgba(146,64,14,0.10)">📋</div>
+          <div>
+            <h3 class="font-bold text-slate-800">Registro de Técnicos</h3>
+            <p class="text-xs text-slate-500">Control de accesos e ingresos AP</p>
+          </div>
+        </div>
+        <div class="space-y-1 mt-3">
+          <a th:href="@{/ingresoap}" class="module-link text-amber-700">
+            <span>📝 Nuevo Registro de Ingreso</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a th:href="@{/user/ingresoap-list}" class="module-link text-amber-700">
+            <span>📄 Lista de Accesos</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gestión de Acceso -->
+    <div class="dcim-card" th:if="${usuario != null and usuario.rol != 'VIEWER'}">
+      <div class="card-band" style="background: linear-gradient(90deg,#5b21b6,#8b5cf6)"></div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+               style="background:rgba(91,33,182,0.10)">🎫</div>
+          <div>
+            <h3 class="font-bold text-slate-800">Gestión de Acceso</h3>
+            <p class="text-xs text-slate-500">Tickets y actividades programadas</p>
+          </div>
+        </div>
+        <div class="space-y-1 mt-3">
+          <a th:href="@{/gestion/list}" class="module-link text-violet-700">
+            <span>📋 Lista de Gestiones</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a th:href="@{/gestion/create}" class="module-link text-violet-700">
+            <span>➕ Registrar Gestión</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a th:href="@{/dashboard/cliente}" class="module-link text-violet-700">
+            <span>📊 Ver Estadísticas</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Temperaturas -->
+    <div class="dcim-card" th:if="${usuario != null and usuario.rol != 'VIEWER'}">
+      <div class="card-band" style="background: linear-gradient(90deg,#134e4a,#0d9488)"></div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+               style="background:rgba(19,78,74,0.10)">🌡️</div>
+          <div>
+            <h3 class="font-bold text-slate-800">Sitios, Salas y Temperatura</h3>
+            <p class="text-xs text-slate-500">Mediciones y reportes ambientales</p>
+          </div>
+          <span class="ml-auto tag-pill bg-emerald-100 text-emerald-700">nuevo</span>
+        </div>
+        <div class="space-y-1 mt-3">
+          <a href="/temperaturas" class="module-link text-teal-700">
+            <span>🌡️ Ir al módulo</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a href="/temperaturas/registro" class="module-link text-teal-700">
+            <span>➕ Registrar Medición</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Usuarios (solo ADMIN) -->
+    <div class="dcim-card" th:if="${usuario != null and usuario.rol == 'ADMIN'}">
+      <div class="card-band" style="background: linear-gradient(90deg,#065f46,#059669)"></div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+               style="background:rgba(6,95,70,0.10)">👥</div>
+          <div>
+            <h3 class="font-bold text-slate-800">Administración de Usuarios</h3>
+            <p class="text-xs text-slate-500">Solo ADMIN</p>
+          </div>
+          <span class="ml-auto tag-pill bg-red-100 text-red-700">ADMIN</span>
+        </div>
+        <div class="space-y-1 mt-3">
+          <a th:href="@{/user/list}" class="module-link text-emerald-700">
+            <span>👥 Lista de Usuarios</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a th:href="@{/user/create}" class="module-link text-emerald-700">
+            <span>➕ Crear Usuario</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cliente (ADMIN + VIEWER) -->
+    <div class="dcim-card" th:if="${usuarioLogueado != null and (usuarioLogueado.rol == 'ADMIN' or usuarioLogueado.rol == 'VIEWER')}">
+      <div class="card-band" style="background: linear-gradient(90deg,#1e3a5f,#7c3aed)"></div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+               style="background:rgba(30,58,95,0.10)">📊</div>
+          <div>
+            <h3 class="font-bold text-slate-800">Dashboard Cliente</h3>
+            <p class="text-xs text-slate-500">Reportes y estadísticas</p>
+          </div>
+          <span class="ml-auto status-chip"
+                th:class="${usuarioLogueado.rol == 'ADMIN'} ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'"
+                th:text="${usuarioLogueado.rol}">ROL</span>
+        </div>
+        <div class="space-y-1 mt-3">
+          <a th:href="@{/dashboard/cliente/mensual}" class="module-link text-indigo-700">
+            <span>📆 Dashboard Mensual</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a th:href="@{/dashboard/cliente/diario}" class="module-link text-indigo-700">
+            <span>📅 Dashboard Diario</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a th:href="@{/dashboard/cliente}" class="module-link text-indigo-700">
+            <span>📈 Vista General</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plantillas (VIEWER) -->
+    <div class="dcim-card" th:if="${usuario != null and usuario.rol == 'VIEWER'}">
+      <div class="card-band" style="background: linear-gradient(90deg,#0f4c75,#00a4c8)"></div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+               style="background:rgba(0,164,200,0.10)">📐</div>
+          <div>
+            <h3 class="font-bold text-slate-800">Plantillas de Salas</h3>
+            <p class="text-xs text-slate-500">Layouts guardados, solo lectura</p>
+          </div>
+        </div>
+        <a href="/plano-sala/plantillas" class="module-link text-sky-700 mt-3">
+          <span>📐 Ver Plantillas</span>
+          <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /grid módulos -->
+
+  <!-- ── Sección: Accesos Rápidos + Estadísticas ── -->
+  <div class="section-header reveal">
+    <span class="text-base font-bold text-slate-600 uppercase tracking-wider">Accesos Rápidos</span>
+    <div class="section-line" style="background: linear-gradient(90deg,#7c3aed,transparent)"></div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 reveal">
+
+    <!-- Accesos rápidos -->
+    <div class="dcim-card">
+      <div class="card-band" style="background: linear-gradient(90deg,#0b3c75,#00a4c8)"></div>
+      <div class="p-5">
+        <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2">
+          <span>⚡</span> Acciones Frecuentes
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <a th:href="@{/ingresoap}" class="quick-btn">
+            <span>📝</span><span>Nuevo Ingreso</span>
+          </a>
+          <a th:href="@{/gestion/create}" class="quick-btn">
+            <span>📋</span><span>Nueva Gestión</span>
+          </a>
+          <a th:href="@{/inventario/form}" class="quick-btn">
+            <span>📦</span><span>Agregar Equipo</span>
+          </a>
+          <a th:href="@{/database-viewer}" class="quick-btn">
+            <span>💾</span><span>Ver Base de Datos</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs / Estadísticas -->
+    <div class="dcim-card">
+      <div class="card-band" style="background: linear-gradient(90deg,#374151,#111827)"></div>
+      <div class="p-5">
+        <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2">
+          <span>📊</span> Indicadores del Sistema
+        </h3>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center p-3 rounded-lg"
+               style="background:rgba(11,60,117,0.05); border:1px solid rgba(11,60,117,0.08)">
+            <span class="text-sm text-slate-600 font-medium">🧑‍🔧 Técnicos registrados hoy</span>
+            <span class="font-bold text-slate-800 text-lg">--</span>
+          </div>
+          <div class="flex justify-between items-center p-3 rounded-lg"
+               style="background:rgba(19,78,74,0.05); border:1px solid rgba(19,78,74,0.08)">
+            <span class="text-sm text-slate-600 font-medium">🌡️ Temperatura promedio</span>
+            <span class="font-bold text-teal-700 text-lg">22°C</span>
+          </div>
+          <div class="flex justify-between items-center p-3 rounded-lg"
+               style="background:rgba(15,76,117,0.05); border:1px solid rgba(15,76,117,0.08)">
+            <span class="text-sm text-slate-600 font-medium">🏢 Racks activos en inventario</span>
+            <span class="font-bold text-slate-800 text-lg">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid rápidos -->
+
+  <!-- ── Actividad Reciente ── -->
+  <div class="section-header reveal">
+    <span class="text-base font-bold text-slate-600 uppercase tracking-wider">Actividad Reciente</span>
+    <div class="section-line" style="background: linear-gradient(90deg,#059669,transparent)"></div>
+  </div>
+
+  <div class="dcim-card p-5 reveal">
+    <div class="space-y-2">
+      <div class="flex items-center justify-between py-2 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-sm">✅</span>
+          <span class="text-sm text-slate-600">Sistema iniciado correctamente</span>
+        </div>
+        <span class="tag-pill bg-gray-100 text-gray-500">Hace unos minutos</span>
+      </div>
+      <div class="flex items-center justify-between py-2 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-sm">💾</span>
+          <span class="text-sm text-slate-600">Base de datos MySQL conectada</span>
+        </div>
+        <span class="tag-pill bg-gray-100 text-gray-500">Hace unos minutos</span>
+      </div>
+      <div class="flex items-center justify-between py-2">
+        <div class="flex items-center gap-2">
+          <span class="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-sm">👤</span>
+          <span class="text-sm text-slate-600"
+                th:text="${usuario != null} ? ('Sesión iniciada por ' + usuario.nombre + ' ' + usuario.apellido) : 'Sesión iniciada'">Usuario conectado</span>
+        </div>
+        <span class="tag-pill bg-emerald-100 text-emerald-700">Ahora</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

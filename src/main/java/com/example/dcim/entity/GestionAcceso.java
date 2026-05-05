@@ -105,6 +105,11 @@ public class GestionAcceso {
     @JoinColumn(name = "sala_id")
     private Sala salaRef;
 
+    /** FK al usuario del sistema que crea/registra la gestión */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_registra_id")
+    private Usuario usuarioRegistra;
+
     /** Indica si la gestión/actividad ya fue realizada físicamente */
     @Column(name = "gestion_realizada")
     private Boolean gestionRealizada;
@@ -469,6 +474,14 @@ public class GestionAcceso {
 
     public void setHoraRespuestaCliente(LocalTime horaRespuestaCliente) {
         this.horaRespuestaCliente = horaRespuestaCliente;
+    }
+
+    public Usuario getUsuarioRegistra() {
+        return usuarioRegistra;
+    }
+
+    public void setUsuarioRegistra(Usuario usuarioRegistra) {
+        this.usuarioRegistra = usuarioRegistra;
     }
 
     // ==================== MÉTODOS UTILITARIOS ====================

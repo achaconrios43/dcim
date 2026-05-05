@@ -1,0 +1,44 @@
+flowchart TB
+    A[DCIM Spring Boot App] --> B[UI Thymeleaf]
+    A --> C[Controllers]
+    A --> D[Services]
+    A --> E[Repositories]
+    A --> F[Entities]
+    A --> G[(MySQL dcimdb)]
+
+    B --> B1[gestion]
+    B --> B2[ingresoap]
+    B --> B3[inventario]
+    B --> B4[temperaturas]
+    B --> B5[plano sala]
+    B --> B6[dashboard]
+
+    C --> C1[GestionAccesoController]
+    C --> C2[IngresoController]
+    C --> C3[InventarioController]
+    C --> C4[TemperaturaController]
+    C --> C5[PlanoSalaController]
+    C --> C6[UsuarioController]
+
+    D --> D1[GestionAccesoService]
+    D --> D2[IngresoAPService]
+    D --> D3[InventarioService]
+    D --> D4[TemperaturaService]
+    D --> D5[UsuarioService]
+
+    E --> E1[UsuarioRepository]
+    E --> E2[GestionAccesoRepository]
+    E --> E3[IngresoAPRepository]
+    E --> E4[InventarioRepository]
+    E --> E5[Temperatura repos]
+
+    F --> F1[Usuario]
+    F --> F2[GestionAcceso]
+    F --> F3[IngresoAP]
+    F --> F4[Inventario]
+    F --> F5[Sitio/Sala]
+    F --> F6[PuntoMedicion/MedicionTemperatura]
+    F --> F7[PlanoSala/PlanoSalaElemento]
+
+    E -. ORM .-> G
+    F -. JPA .-> G

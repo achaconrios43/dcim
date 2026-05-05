@@ -1,212 +1,227 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/headers :: headers}"></head>
-<body>
-  <nav th:replace="~{fragments/navdar :: nav}"></nav>
+<body class="min-h-screen flex flex-col" style="font-family:'Barlow',sans-serif; color:#172134;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(11,60,117,0.08), transparent 32%),
+    radial-gradient(circle at 94% 5%, rgba(0,164,200,0.12), transparent 28%),
+    linear-gradient(180deg,#edf3f9 0%,#e6edf5 55%,#dfe9f3 100%);">
 
-  <div class="container mx-auto py-8 px-4 max-w-4xl">
-    <h1 class="text-3xl font-bold mb-6" th:text="${editar} ? 'Editar Inventario' : 'Nuevo Inventario'"></h1>
+<nav th:replace="~{fragments/navdar :: nav}"></nav>
 
-    <!-- Alertas -->
-    <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-      <span th:text="${error}"></span>
-    </div>
+<!-- Page Header -->
+<div style="background:linear-gradient(90deg,#0f4c75,#1b6ca8); padding:22px 32px; display:flex; align-items:center; gap:16px;">
+  <a href="/inventario" style="color:rgba(255,255,255,0.75); font-size:13px; text-decoration:none; font-weight:600;">← Inventario</a>
+  <span style="color:rgba(255,255,255,0.4);">/</span>
+  <span style="color:#ffffff; font-weight:800; font-size:15px;" th:text="${editar} ? '✏️ Editar Inventario' : '+ Nuevo Inventario'">Inventario</span>
+</div>
+
+<main class="flex-1" style="padding:32px 24px; max-width:900px; margin:0 auto; width:100%;">
+
+  <div th:if="${error}" style="background:#fee2e2; border:1px solid #fca5a5; border-radius:8px; padding:12px 16px; margin-bottom:16px; color:#7f1d1d; font-weight:600; font-size:14px;">
+    ✗ <span th:text="${error}"></span>
+  </div>
+
+  <div class="dcim-card" style="overflow:hidden;">
+    <div class="card-band" style="background:linear-gradient(90deg,#0f4c75,#1b6ca8)"></div>
 
     <form th:action="${editar} ? @{/inventario/actualizar/{id}(id=${inventario.id})} : @{/inventario/guardar}"
-          method="POST" class="bg-white rounded-lg shadow p-6">
-      
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <!-- Fila 1 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Sitio</label>
-          <select name="sitio" class="w-full px-3 py-2 border rounded">
-            <option value="">Seleccione sitio</option>
-            <option th:each="sitioItem : ${sitiosCatalogo}"
-                    th:value="${sitioItem.nombre}"
-                    th:text="${sitioItem.nombre}"
-                    th:selected="${inventario?.sitio == sitioItem.nombre}"></option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Sala</label>
-          <select name="sala" class="w-full px-3 py-2 border rounded">
-            <option value="">Seleccione sala</option>
-            <option th:each="salaItem : ${salasCatalogo}"
-                    th:value="${salaItem.nombre}"
-                    th:text="${salaItem.sitio.nombre + ' - ' + salaItem.nombre}"
-                    th:selected="${inventario?.sala == salaItem.nombre}"></option>
-          </select>
-        </div>
+          method="POST" style="padding:24px 28px;">
 
-        <!-- Fila 2 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Tipo</label>
-          <input type="text" name="tipo" th:value="${inventario?.tipo}" class="w-full px-3 py-2 border rounded">
+      <!-- Ubicación -->
+      <div style="margin-bottom:20px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+          <span style="font-size:15px;">📍</span>
+          <span style="font-weight:800; font-size:13px; color:#0f4c75; text-transform:uppercase; letter-spacing:.06em;">Ubicación</span>
+          <div style="flex:1; height:1px; background:#e5e7eb;"></div>
         </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Marca</label>
-          <input type="text" name="marca" th:value="${inventario?.marca}" class="w-full px-3 py-2 border rounded">
-        </div>
-
-        <!-- Fila 3 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Modelo</label>
-          <input type="text" name="modelo" th:value="${inventario?.modelo}" class="w-full px-3 py-2 border rounded">
-        </div>
-
-        <!-- Fila 3 - Únicos -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Número de Serie <span class="text-red-600">*</span></label>
-          <input type="text" name="numeroSerie" th:value="${inventario?.numeroSerie}" required class="w-full px-3 py-2 border rounded">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">TAG <span class="text-red-600">*</span></label>
-          <input type="text" name="tag" th:value="${inventario?.tag}" required class="w-full px-3 py-2 border rounded">
-        </div>
-
-        <!-- Fila 4 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Cliente</label>
-          <input type="text" name="cliente" th:value="${inventario?.cliente}" class="w-full px-3 py-2 border rounded">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Coordenadas</label>
-          <input type="text" name="coordenadas" th:value="${inventario?.coordenadas}" class="w-full px-3 py-2 border rounded">
-        </div>
-
-        <!-- Fila 5 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Nombre Rack</label>
-          <input type="text" name="nombreRack" th:value="${inventario?.nombreRack}" class="w-full px-3 py-2 border rounded">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Ubicación UR</label>
-          <input type="text" name="ubicacionUr" th:value="${inventario?.ubicacionUr}" class="w-full px-3 py-2 border rounded">
-        </div>
-
-        <!-- Fila 6 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">UR Utilizada</label>
-          <input type="text" name="urUtilizada" th:value="${inventario?.urUtilizada}" class="w-full px-3 py-2 border rounded">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Número Temporal</label>
-          <input type="text" name="numeroTemporal" th:value="${inventario?.numeroTemporal}" class="w-full px-3 py-2 border rounded">
-        </div>
-
-        <!-- Fila 7 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Hotname</label>
-          <input type="text" name="hotname" th:value="${inventario?.hotname}" class="w-full px-3 py-2 border rounded">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Estado</label>
-          <select name="estado" class="w-full px-3 py-2 border rounded">
-            <option value="">Seleccionar</option>
-            <option value="Operativo" th:selected="${inventario?.estado == 'Operativo'}">Operativo</option>
-            <option value="Apagado" th:selected="${inventario?.estado == 'Apagado'}">Apagado</option>
-            <option value="STAND BY" th:selected="${inventario?.estado == 'STAND BY'}">STAND BY</option>
-            <option value="Retirado" th:selected="${inventario?.estado == 'Retirado'}">Retirado</option>
-            <option value="Alarmado" th:selected="${inventario?.estado == 'Alarmado'}">Alarmado</option>
-          </select>
-        </div>
-
-        <!-- Fila 8 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Fecha Alarma</label>
-          <input type="date" name="fechaAlarma" th:value="${inventario?.fechaAlarma}" class="w-full px-3 py-2 border rounded">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Ticket Relación</label>
-          <input type="text" name="ticketRelacion" th:value="${inventario?.ticketRelacion}" class="w-full px-3 py-2 border rounded">
-        </div>
-        
-
-        <!-- Fila 9 - Checkboxes -->
-        <div>
-          <label class="flex items-center">
-            <input type="checkbox" name="alarmaHardware" th:checked="${inventario?.alarmaHardware}" class="mr-2">
-            <span class="text-sm">Alarma Hardware</span>
-          </label>
-        </div>
-        <div>
-          <label class="flex items-center">
-            <input type="checkbox" name="alarmaVentilador" th:checked="${inventario?.alarmaVentilador}" class="mr-2">
-            <span class="text-sm">Alarma Ventilador</span>
-          </label>
-        </div>
-
-        <!-- Fila 10 - Checkboxes -->
-        <div>
-          <label class="flex items-center">
-            <input type="checkbox" name="alarmaFuentePoder" th:checked="${inventario?.alarmaFuentePoder}" class="mr-2">
-            <span class="text-sm">Alarma Fuente de Poder</span>
-          </label>
-        </div>
-        <div>
-          <label class="flex items-center">
-            <input type="checkbox" name="alarmaHdd" th:checked="${inventario?.alarmaHdd}" class="mr-2">
-            <span class="text-sm">Alarma HDD</span>
-          </label>
-        </div>
-
-        <!-- Fila 11 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Peso Equipo (KG)</label>
-          <input type="number" name="pesoEquipoKg" step="0.01" th:value="${inventario?.pesoEquipoKg}" class="w-full px-3 py-2 border rounded">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Potencia Consumo (WATTS)</label>
-          <input type="number" name="potenciaConsumoWatts" step="0.01" th:value="${inventario?.potenciaConsumoWatts}" class="w-full px-3 py-2 border rounded">
-        </div>
-
-        <!-- Fila 12 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Flujo de Aire</label>
-          <input type="text" name="flujoAire" th:value="${inventario?.flujoAire}" class="w-full px-3 py-2 border rounded">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Fuentes de Poder</label>
-          <input type="text" name="fuentesPoder" th:value="${inventario?.fuentesPoder}" class="w-full px-3 py-2 border rounded">
-        </div>
-
-        <!-- Fila 13 -->
-        <div>
-          <label class="block text-sm font-semibold mb-2">Tipos de Enchufe</label>
-          <input type="text" name="tiposEnchufe" th:value="${inventario?.tiposEnchufe}" class="w-full px-3 py-2 border rounded">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold mb-2">Dirección IP</label>
-          <input type="text" name="direccionIp" th:value="${inventario?.direccionIp}" placeholder="192.168.1.1" class="w-full px-3 py-2 border rounded">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Sitio</label>
+            <select name="sitio" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+              <option value="">Seleccione sitio</option>
+              <option th:each="sitioItem : ${sitiosCatalogo}"
+                      th:value="${sitioItem.nombre}"
+                      th:text="${sitioItem.nombre}"
+                      th:selected="${inventario?.sitio == sitioItem.nombre}"></option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Sala</label>
+            <select name="sala" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+              <option value="">Seleccione sala</option>
+              <option th:each="salaItem : ${salasCatalogo}"
+                      th:value="${salaItem.nombre}"
+                      th:text="${salaItem.sitio.nombre + ' - ' + salaItem.nombre}"
+                      th:selected="${inventario?.sala == salaItem.nombre}"></option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Coordenadas</label>
+            <input type="text" name="coordenadas" th:value="${inventario?.coordenadas}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Nombre Rack</label>
+            <input type="text" name="nombreRack" th:value="${inventario?.nombreRack}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Ubicación UR</label>
+            <input type="text" name="ubicacionUr" th:value="${inventario?.ubicacionUr}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">UR Utilizada</label>
+            <input type="text" name="urUtilizada" th:value="${inventario?.urUtilizada}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
         </div>
       </div>
 
-      <!-- Campos full-width -->
-      <div class="mb-4">
-        <label class="block text-sm font-semibold mb-2">Comentarios Alarma</label>
-        <textarea name="comentariosAlarma" rows="2" class="w-full px-3 py-2 border rounded" th:text="${inventario?.comentariosAlarma}"></textarea>
+      <!-- Identificación -->
+      <div style="margin-bottom:20px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+          <span style="font-size:15px;">🔖</span>
+          <span style="font-weight:800; font-size:13px; color:#0f4c75; text-transform:uppercase; letter-spacing:.06em;">Identificación del Equipo</span>
+          <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Número de Serie <span style="color:#dc2626;">*</span></label>
+            <input type="text" name="numeroSerie" th:value="${inventario?.numeroSerie}" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; font-family:monospace; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">TAG <span style="color:#dc2626;">*</span></label>
+            <input type="text" name="tag" th:value="${inventario?.tag}" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; font-family:monospace; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Tipo</label>
+            <input type="text" name="tipo" th:value="${inventario?.tipo}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Marca</label>
+            <input type="text" name="marca" th:value="${inventario?.marca}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Modelo</label>
+            <input type="text" name="modelo" th:value="${inventario?.modelo}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Cliente</label>
+            <input type="text" name="cliente" th:value="${inventario?.cliente}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Número Temporal</label>
+            <input type="text" name="numeroTemporal" th:value="${inventario?.numeroTemporal}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Hotname</label>
+            <input type="text" name="hotname" th:value="${inventario?.hotname}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Dirección IP</label>
+            <input type="text" name="direccionIp" th:value="${inventario?.direccionIp}" placeholder="192.168.1.1" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; font-family:monospace; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Estado</label>
+            <select name="estado" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+              <option value="">Seleccionar</option>
+              <option value="Operativo" th:selected="${inventario?.estado == 'Operativo'}">Operativo</option>
+              <option value="Apagado"   th:selected="${inventario?.estado == 'Apagado'}">Apagado</option>
+              <option value="STAND BY"  th:selected="${inventario?.estado == 'STAND BY'}">STAND BY</option>
+              <option value="Retirado"  th:selected="${inventario?.estado == 'Retirado'}">Retirado</option>
+              <option value="Alarmado"  th:selected="${inventario?.estado == 'Alarmado'}">Alarmado</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      <div class="mb-4">
-        <label class="block text-sm font-semibold mb-2">Observación Tipo Enchufe</label>
-        <textarea name="observacionTipoEnchufe" rows="2" class="w-full px-3 py-2 border rounded" th:text="${inventario?.observacionTipoEnchufe}"></textarea>
+      <!-- Alarmas -->
+      <div style="margin-bottom:20px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+          <span style="font-size:15px;">🚨</span>
+          <span style="font-weight:800; font-size:13px; color:#0f4c75; text-transform:uppercase; letter-spacing:.06em;">Alarmas</span>
+          <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Fecha Alarma</label>
+            <input type="date" name="fechaAlarma" th:value="${inventario?.fechaAlarma}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Ticket Relación</label>
+            <input type="text" name="ticketRelacion" th:value="${inventario?.ticketRelacion}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fff7ed; border:1px solid #fed7aa; border-radius:8px;">
+            <input type="checkbox" name="alarmaHardware" th:checked="${inventario?.alarmaHardware}" id="alarmaHardware" style="width:15px; height:15px;">
+            <label for="alarmaHardware" style="font-size:13px; font-weight:600; color:#92400e; cursor:pointer;">Alarma Hardware</label>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fff7ed; border:1px solid #fed7aa; border-radius:8px;">
+            <input type="checkbox" name="alarmaVentilador" th:checked="${inventario?.alarmaVentilador}" id="alarmaVentilador" style="width:15px; height:15px;">
+            <label for="alarmaVentilador" style="font-size:13px; font-weight:600; color:#92400e; cursor:pointer;">Alarma Ventilador</label>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fff7ed; border:1px solid #fed7aa; border-radius:8px;">
+            <input type="checkbox" name="alarmaFuentePoder" th:checked="${inventario?.alarmaFuentePoder}" id="alarmaFuentePoder" style="width:15px; height:15px;">
+            <label for="alarmaFuentePoder" style="font-size:13px; font-weight:600; color:#92400e; cursor:pointer;">Alarma Fuente de Poder</label>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fff7ed; border:1px solid #fed7aa; border-radius:8px;">
+            <input type="checkbox" name="alarmaHdd" th:checked="${inventario?.alarmaHdd}" id="alarmaHdd" style="width:15px; height:15px;">
+            <label for="alarmaHdd" style="font-size:13px; font-weight:600; color:#92400e; cursor:pointer;">Alarma HDD</label>
+          </div>
+        </div>
+        <div style="margin-top:14px;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Comentarios Alarma</label>
+          <textarea name="comentariosAlarma" rows="2" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box; resize:vertical;" th:text="${inventario?.comentariosAlarma}"></textarea>
+        </div>
       </div>
 
-      <div class="mb-6">
-        <label class="block text-sm font-semibold mb-2">Observaciones</label>
-        <textarea name="observaciones" rows="3" class="w-full px-3 py-2 border rounded" th:text="${inventario?.observaciones}"></textarea>
+      <!-- Especificaciones -->
+      <div style="margin-bottom:20px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+          <span style="font-size:15px;">⚙️</span>
+          <span style="font-weight:800; font-size:13px; color:#0f4c75; text-transform:uppercase; letter-spacing:.06em;">Especificaciones Técnicas</span>
+          <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Peso Equipo (KG)</label>
+            <input type="number" name="pesoEquipoKg" step="0.01" th:value="${inventario?.pesoEquipoKg}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Potencia Consumo (WATTS)</label>
+            <input type="number" name="potenciaConsumoWatts" step="0.01" th:value="${inventario?.potenciaConsumoWatts}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Flujo de Aire</label>
+            <input type="text" name="flujoAire" th:value="${inventario?.flujoAire}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Fuentes de Poder</label>
+            <input type="text" name="fuentesPoder" th:value="${inventario?.fuentesPoder}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Tipos de Enchufe</label>
+            <input type="text" name="tiposEnchufe" th:value="${inventario?.tiposEnchufe}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="margin-top:14px;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Observación Tipo Enchufe</label>
+          <textarea name="observacionTipoEnchufe" rows="2" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box; resize:vertical;" th:text="${inventario?.observacionTipoEnchufe}"></textarea>
+        </div>
+        <div style="margin-top:14px;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Observaciones</label>
+          <textarea name="observaciones" rows="3" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box; resize:vertical;" th:text="${inventario?.observaciones}"></textarea>
+        </div>
       </div>
 
       <!-- Botones -->
-      <div class="flex gap-2">
-        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-          <span th:text="${editar} ? 'Actualizar' : 'Guardar'"></span>
+      <div style="display:flex; justify-content:flex-end; gap:12px; padding-top:8px;">
+        <a href="/inventario" style="padding:11px 24px; border-radius:8px; background:#f3f4f6; color:#374151; font-weight:700; font-size:14px; text-decoration:none; border:1px solid #d1d5db;">Cancelar</a>
+        <button type="submit" style="padding:11px 28px; border-radius:8px; background:linear-gradient(90deg,#0f4c75,#1b6ca8); color:#fff; font-weight:800; font-size:14px; border:none; cursor:pointer; box-shadow:0 4px 12px rgba(15,76,117,0.25);">
+          <span th:text="${editar} ? '✓ Actualizar' : '✓ Guardar'">Guardar</span>
         </button>
-        <a href="/inventario" class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700">Cancelar</a>
       </div>
     </form>
   </div>
+</main>
 
-  <footer th:replace="~{fragments/footer :: footer}"></footer>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

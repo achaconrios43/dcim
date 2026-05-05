@@ -1,0 +1,155 @@
+erDiagram
+    SITIO {
+        BIGINT id PK
+        VARCHAR nombre UK
+        VARCHAR descripcion
+        BOOLEAN activo
+        DATETIME fecha_creacion
+        DATETIME fecha_modificacion
+    }
+
+    SALA {
+        BIGINT id PK
+        BIGINT sitio_id FK
+        VARCHAR nombre
+        VARCHAR descripcion
+        BOOLEAN activo
+    }
+
+    PUNTO_MEDICION {
+        BIGINT id PK
+        BIGINT sala_id FK
+        VARCHAR codigo
+        VARCHAR nombre
+        DECIMAL temperatura_minima
+        DECIMAL temperatura_maxima
+        BOOLEAN activo
+    }
+
+    MEDICION_TEMPERATURA {
+        BIGINT id PK
+        BIGINT punto_id FK
+        DATE fecha_medicion
+        DECIMAL temperatura_celsius
+        VARCHAR estado
+        DATETIME fecha_registro
+    }
+
+    PLANO_SALA {
+        BIGINT id PK
+        BIGINT sala_id FK
+        INT cantidad_columnas
+        INT cantidad_filas
+        BOOLEAN es_plantilla
+        VARCHAR nombre_plantilla
+        DATETIME fecha_creacion
+    }
+
+    PLANO_SALA_ELEMENTO {
+        BIGINT id PK
+        BIGINT plano_sala_id FK
+        VARCHAR tipo
+        VARCHAR nombre
+        INT columna_inicio
+        INT fila_inicio
+        INT ancho_cm
+        INT largo_cm
+        BOOLEAN rotado_90
+    }
+
+    USUARIO {
+        BIGINT id PK
+        VARCHAR rut UK
+        VARCHAR email UK
+        VARCHAR nombre
+        VARCHAR apellido
+        VARCHAR rol
+    }
+
+    TIPO_USUARIO {
+        BIGINT id PK
+        VARCHAR codigo UK
+        VARCHAR descripcion
+    }
+
+    USUARIO_TIPO_USUARIO {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT tipo_usuario_id FK
+    }
+
+    GESTION_ACCESO {
+        BIGINT id PK
+        VARCHAR numero_ticket
+        BIGINT sitio_id FK
+        BIGINT sala_id FK
+        VARCHAR estado_aprobacion
+    }
+
+    INGRESOAP {
+        BIGINT id PK
+        VARCHAR numero_ticket
+        BIGINT sitio_id FK
+        BIGINT sala_id FK
+        VARCHAR tipo_ticket
+        BOOLEAN activo
+    }
+
+    INVENTARIO {
+        BIGINT id PK
+        VARCHAR numero_serie UK
+        VARCHAR tag UK
+        BIGINT sitio_id FK
+        BIGINT sala_id FK
+        VARCHAR tipo
+        VARCHAR estado
+    }
+
+    USUARIO_GESTION_REL {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT gestion_acceso_id FK
+        VARCHAR tipo_relacion
+    }
+
+    USUARIO_INGRESOAP_REL {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT ingresoap_id FK
+        VARCHAR tipo_relacion
+    }
+
+    USUARIO_INVENTARIO_REL {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT inventario_id FK
+        VARCHAR tipo_relacion
+    }
+
+    SITIO ||--o{ SALA : contiene
+    SALA ||--o{ PUNTO_MEDICION : define
+    PUNTO_MEDICION ||--o{ MEDICION_TEMPERATURA : registra
+
+    SALA ||--o{ PLANO_SALA : dispone
+    PLANO_SALA ||--o{ PLANO_SALA_ELEMENTO : compone
+
+    SITIO ||--o{ GESTION_ACCESO : ubica
+    SALA ||--o{ GESTION_ACCESO : contextualiza
+
+    SITIO ||--o{ INGRESOAP : ubica
+    SALA ||--o{ INGRESOAP : contextualiza
+
+    SITIO ||--o{ INVENTARIO : agrupa
+    SALA ||--o{ INVENTARIO : agrupa
+
+    USUARIO ||--o{ USUARIO_TIPO_USUARIO : asignado
+    TIPO_USUARIO ||--o{ USUARIO_TIPO_USUARIO : clasifica
+
+    USUARIO ||--o{ USUARIO_GESTION_REL : vincula
+    GESTION_ACCESO ||--o{ USUARIO_GESTION_REL : vincula
+
+    USUARIO ||--o{ USUARIO_INGRESOAP_REL : vincula
+    INGRESOAP ||--o{ USUARIO_INGRESOAP_REL : vincula
+
+    USUARIO ||--o{ USUARIO_INVENTARIO_REL : vincula
+    INVENTARIO ||--o{ USUARIO_INVENTARIO_REL : vincula

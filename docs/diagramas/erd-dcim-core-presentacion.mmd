@@ -1,0 +1,74 @@
+erDiagram
+    USUARIO {
+        BIGINT id PK
+        VARCHAR rut UK
+        VARCHAR email UK
+        VARCHAR rol
+    }
+
+    TIPO_USUARIO {
+        BIGINT id PK
+        VARCHAR codigo UK
+    }
+
+    USUARIO_TIPO_USUARIO {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT tipo_usuario_id FK
+    }
+
+    GESTION_ACCESO {
+        BIGINT id PK
+        VARCHAR numero_ticket
+        VARCHAR estado_aprobacion
+        DATE fecha_registro
+    }
+
+    INGRESOAP {
+        BIGINT id PK
+        VARCHAR numero_ticket
+        VARCHAR tipo_ticket
+        DATE fecha_inicio
+        BOOLEAN activo
+    }
+
+    INVENTARIO {
+        BIGINT id PK
+        VARCHAR numero_serie UK
+        VARCHAR tag UK
+        VARCHAR tipo
+        VARCHAR estado
+    }
+
+    USUARIO_GESTION_REL {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT gestion_acceso_id FK
+        VARCHAR tipo_relacion
+    }
+
+    USUARIO_INGRESOAP_REL {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT ingresoap_id FK
+        VARCHAR tipo_relacion
+    }
+
+    USUARIO_INVENTARIO_REL {
+        BIGINT id PK
+        BIGINT usuario_id FK
+        BIGINT inventario_id FK
+        VARCHAR tipo_relacion
+    }
+
+    USUARIO ||--o{ USUARIO_TIPO_USUARIO : asignado
+    TIPO_USUARIO ||--o{ USUARIO_TIPO_USUARIO : clasifica
+
+    USUARIO ||--o{ USUARIO_GESTION_REL : vincula
+    GESTION_ACCESO ||--o{ USUARIO_GESTION_REL : vincula
+
+    USUARIO ||--o{ USUARIO_INGRESOAP_REL : vincula
+    INGRESOAP ||--o{ USUARIO_INGRESOAP_REL : vincula
+
+    USUARIO ||--o{ USUARIO_INVENTARIO_REL : vincula
+    INVENTARIO ||--o{ USUARIO_INVENTARIO_REL : vincula

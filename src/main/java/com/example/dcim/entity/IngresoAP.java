@@ -178,6 +178,16 @@ public class IngresoAP {
     @Column(name = "coordenadas_gps", columnDefinition = "TEXT")
     private String coordenadasGps;
 
+    /** FK al usuario del sistema que registra el ingreso (puede ser null para externos) */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_registra_id")
+    private Usuario usuarioRegistra;
+
+    /** FK al usuario del sistema que aprueba el ingreso (puede ser null para externos) */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aprobador_id")
+    private Usuario aprobadorRef;
+
     // Constructor vacío
     public IngresoAP() {
         this.fechaRegistro = new Date();
@@ -292,4 +302,10 @@ public class IngresoAP {
 
     public String getCoordenadasGps() { return coordenadasGps; }
     public void setCoordenadasGps(String coordenadasGps) { this.coordenadasGps = coordenadasGps; }
+
+    public Usuario getUsuarioRegistra() { return usuarioRegistra; }
+    public void setUsuarioRegistra(Usuario usuarioRegistra) { this.usuarioRegistra = usuarioRegistra; }
+
+    public Usuario getAprobadorRef() { return aprobadorRef; }
+    public void setAprobadorRef(Usuario aprobadorRef) { this.aprobadorRef = aprobadorRef; }
 }

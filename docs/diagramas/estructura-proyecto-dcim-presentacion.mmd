@@ -1,0 +1,59 @@
+flowchart LR
+    APP[DCIM Spring Boot App]
+    DB[(MySQL dcimdb)]
+
+    subgraph UI[Frontend - Thymeleaf]
+      B1[gestion]
+      B2[ingresoap]
+      B3[inventario]
+      B4[temperaturas]
+      B5[plano sala]
+      B6[dashboard]
+    end
+
+    subgraph CTRL[Controllers]
+      C1[GestionAccesoController]
+      C2[IngresoController]
+      C3[InventarioController]
+      C4[TemperaturaController]
+      C5[PlanoSalaController]
+      C6[UsuarioController]
+    end
+
+    subgraph SRV[Services]
+      D1[GestionAccesoService]
+      D2[IngresoAPService]
+      D3[InventarioService]
+      D4[TemperaturaService]
+      D5[UsuarioService]
+    end
+
+    subgraph REP[Repositories]
+      E1[UsuarioRepository]
+      E2[GestionAccesoRepository]
+      E3[IngresoAPRepository]
+      E4[InventarioRepository]
+      E5[Repos de Temperaturas]
+    end
+
+    subgraph ENT[Entities]
+      F1[Usuario]
+      F2[GestionAcceso]
+      F3[IngresoAP]
+      F4[Inventario]
+      F5[Sitio y Sala]
+      F6[PuntoMedicion y MedicionTemperatura]
+      F7[PlanoSala y PlanoSalaElemento]
+    end
+
+    APP --> UI
+    APP --> CTRL
+    APP --> SRV
+    APP --> REP
+    APP --> ENT
+
+    UI --> CTRL
+    CTRL --> SRV
+    SRV --> REP
+    REP --> DB
+    ENT --> DB

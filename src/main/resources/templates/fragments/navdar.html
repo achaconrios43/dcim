@@ -1,38 +1,156 @@
-<nav th:fragment="nav" class="w-full bg-transparent">
-  <div class="max-w-6xl mx-auto px-4">
-    <div class="flex items-center justify-between h-20">
-      <div class="flex items-center gap-4">
-        <!-- INELCOM: simple SVG mark + name -->
-        <a th:href="@{/}" class="flex items-center gap-3 no-underline">
-          <div style="width:56px; height:56px; border-radius:10px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,#e6f7ff,#f0fbff); border:1px solid rgba(0,61,165,0.08); box-shadow:0 10px 30px rgba(0,61,165,0.08);">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="24" height="24" rx="5" fill="#003DA5" />
-              <text x="12" y="16" text-anchor="middle" font-family="Inter, Arial" font-size="7" fill="#ffffff" font-weight="700">INELCOM</text>
-            </svg>
-          </div>
-          <div class="leading-tight">
-            <div style="font-weight:700; color:#003DA5; font-size:1rem;">INELCOM</div>
-            <div style="font-size:0.85rem; color:#004a99;">DATA CENTER & MEGA CENTRALES</div>
-          </div>
-        </a>
+<nav th:fragment="nav" id="dcim-nav" style="
+  background: linear-gradient(135deg, #0b3c75 0%, #1e3a5f 60%, #00a4c8 100%);
+  box-shadow: 0 4px 20px rgba(11,60,117,0.28);
+  width: 100%;
+">
+  <style>
+    #dcim-nav .nav-inner {
+      width: 100%;
+      padding: 0 24px;
+      box-sizing: border-box;
+    }
+    #dcim-nav .nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+    #dcim-nav .nav-links a {
+      color: rgba(255,255,255,0.85);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 13px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    #dcim-nav .nav-links a:hover { background: rgba(255,255,255,0.12); }
+    #dcim-nav .nav-links { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; }
+    #dcim-nav .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: rgba(11,60,117,0.97);
+      padding: 12px 16px 16px;
+      gap: 4px;
+    }
+    #dcim-nav .mobile-menu a {
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: block;
+    }
+    #dcim-nav .mobile-menu a:hover { background: rgba(255,255,255,0.12); }
+    #dcim-nav .mobile-menu.open { display: flex; }
+    /* ─── 4K / 2K: escala fuentes y altura ─── */
+    @media (min-width: 3840px) {
+      #dcim-nav .nav-inner { padding: 0 100px; }
+      #dcim-nav .nav-row   { height: 120px; }
+      #dcim-nav .nav-links a { font-size: 1.65rem !important; padding: 16px 32px !important; border-radius: 12px !important; }
+      #dcim-nav .nav-logo-name  { font-size: 2.2rem !important; }
+      #dcim-nav .nav-logo-sub   { font-size: 1.4rem !important; letter-spacing: 0.1em !important; }
+      #dcim-nav .nav-logo-icon  { width: 88px !important; height: 88px !important; }
+      #dcim-nav .nav-logo-icon svg { width: 56px !important; height: 56px !important; }
+      #dcim-nav .auth-pill { font-size: 1.4rem !important; padding: 12px 26px !important; }
+      #dcim-nav .auth-btn  { font-size: 1.4rem !important; padding: 14px 36px !important; border-radius: 10px !important; }
+    }
+    @media (min-width: 2560px) and (max-width: 3839px) {
+      #dcim-nav .nav-inner { padding: 0 60px; }
+      #dcim-nav .nav-row   { height: 72px; }
+      #dcim-nav .nav-links a { font-size: 16px !important; padding: 8px 16px !important; }
+      #dcim-nav .nav-logo-name  { font-size: 1.2rem !important; }
+      #dcim-nav .nav-logo-sub   { font-size: 0.9rem !important; }
+      #dcim-nav .nav-logo-icon  { width: 52px !important; height: 52px !important; }
+    }
+    @media (min-width: 1400px) and (max-width: 2559px) {
+      #dcim-nav .nav-inner { padding: 0 40px; }
+    }
+    /* ─── Móvil: ocultar links, mostrar burger ─── */
+    @media (max-width: 768px) {
+      #dcim-nav .nav-links { display: none; }
+      #dcim-nav .burger-btn { display: flex !important; }
+      #dcim-nav .nav-inner { padding: 0 14px; }
+    }
+  </style>
+
+  <div class="nav-inner">
+    <div class="nav-row">
+
+      <!-- Logo -->
+      <a th:href="@{/}" style="display:flex; align-items:center; gap:12px; text-decoration:none;">
+        <div class="nav-logo-icon" style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+                    background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); flex-shrink:0;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="4" fill="rgba(255,255,255,0.15)"/>
+            <text x="12" y="16" text-anchor="middle" font-family="Barlow, Arial" font-size="6" fill="#ffffff" font-weight="700">DCIM</text>
+          </svg>
+        </div>
+        <div style="line-height:1.2;">
+          <div class="nav-logo-name" style="font-weight:800; color:#ffffff; font-size:1rem; letter-spacing:0.02em; font-family:Barlow,sans-serif;">TELEFONICA</div>
+          <div class="nav-logo-sub" style="font-size:0.72rem; color:rgba(255,255,255,0.7); letter-spacing:0.06em; font-family:Barlow,sans-serif;">DATA CENTER COMMODITIES</div>
+        </div>
+      </a>
+
+      <!-- Nav links (desktop) -->
+      <div style="display:flex; align-items:center; gap:8px; flex:1; justify-content:center; padding:0 24px;">
+        <div class="nav-links">
+          <a th:href="@{/dashboard}">Dashboard</a>
+          <a th:href="@{/inventario}">Inventario</a>
+          <a th:href="@{/ingresoap}">Ingresos</a>
+          <a th:href="@{/gestion/list}">Gestión</a>
+          <a th:href="@{/temperaturas}">Temperatura</a>
+          <a th:href="@{/plano-sala}">Planos</a>
+        </div>
       </div>
 
-      <div class="flex items-center gap-6">
-        <div class="hidden md:flex items-center gap-6">
-          <a th:href="@{/}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Servicio</a>
-          <a th:href="@{/login}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Login</a>
-          <a th:href="@{/user/create}" class="text-[#003DA5] hover:underline px-3 py-2 rounded" th:unless="${#authentication?.name}">Register</a>
-          <span th:if="${#authentication?.name}" class="text-[#004a99] font-semibold px-3">Usuario: <span th:text="${#authentication.name}"></span></span>
-          <a th:href="@{/logout}" th:if="${#authentication?.name}" class="text-[#003DA5] hover:underline px-3 py-2 rounded">Logout</a>
-        </div>
+      <!-- Auth + burger -->
+      <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+        <span th:if="${#authentication?.name}" class="auth-pill"
+              style="color:rgba(255,255,255,0.65); font-size:12px; font-weight:600; padding:4px 10px; border-radius:99px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); white-space:nowrap;"
+              th:text="${#authentication.name}">user</span>
+        <a th:href="@{/logout}" th:if="${#authentication?.name}" class="auth-btn"
+           style="color:#ffffff; font-size:12px; font-weight:700; padding:6px 14px; border-radius:6px; background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.22); text-decoration:none; transition:background 0.15s; white-space:nowrap;"
+           onmouseover="this.style.background='rgba(255,255,255,0.22)'" onmouseout="this.style.background='rgba(255,255,255,0.14)'">Salir</a>
+        <a th:href="@{/login}" th:unless="${#authentication?.name}" class="auth-btn"
+           style="color:#ffffff; font-size:12px; font-weight:700; padding:6px 14px; border-radius:6px; background:rgba(0,164,200,0.85); text-decoration:none; white-space:nowrap;">Iniciar sesión</a>
 
-        
-
-        <!-- mobile menu toggle placeholder -->
-        <div class="md:hidden">
-          <button type="button" style="background:transparent; border:1px solid rgba(0,61,165,0.06); padding:8px 10px; border-radius:8px; color:#003DA5;">☰</button>
-        </div>
+        <!-- Burger (mobile) -->
+        <button class="burger-btn" type="button" id="dcim-burger"
+                style="display:none; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:8px 10px; border-radius:6px; color:#fff; cursor:pointer; font-size:18px; line-height:1;">
+          ☰
+        </button>
       </div>
     </div>
   </div>
+
+  <!-- Mobile dropdown menu -->
+  <div class="mobile-menu" id="dcim-mobile-menu">
+    <a th:href="@{/dashboard}">📊 Dashboard</a>
+    <a th:href="@{/inventario}">📦 Inventario</a>
+    <a th:href="@{/ingresoap}">📝 Ingresos</a>
+    <a th:href="@{/gestion/list}">🎫 Gestión</a>
+    <a th:href="@{/temperaturas}">🌡️ Temperatura</a>
+    <a th:href="@{/plano-sala}">🗺️ Planos</a>
+    <div style="border-top:1px solid rgba(255,255,255,0.15); margin:8px 0; padding-top:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <span th:if="${#authentication?.name}" style="color:rgba(255,255,255,0.6); font-size:13px;" th:text="${#authentication.name}">user</span>
+      <a th:href="@{/logout}" th:if="${#authentication?.name}" style="color:#fff; font-size:13px; font-weight:700; background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:6px; text-decoration:none;">Salir</a>
+      <a th:href="@{/login}" th:unless="${#authentication?.name}" style="color:#fff; font-size:13px; font-weight:700; background:rgba(0,164,200,0.85); padding:6px 14px; border-radius:6px; text-decoration:none;">Iniciar sesión</a>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      var btn = document.getElementById('dcim-burger');
+      var menu = document.getElementById('dcim-mobile-menu');
+      if(btn && menu){
+        btn.addEventListener('click', function(){
+          menu.classList.toggle('open');
+          btn.textContent = menu.classList.contains('open') ? '✕' : '☰';
+        });
+      }
+    })();
+  </script>
 </nav>
