@@ -107,6 +107,10 @@ public class TemperaturaService {
     }
 
     public MedicionTemperatura registrarMedicion(Long puntoId, LocalDate fecha, BigDecimal temperatura) throws Exception {
+        return registrarMedicion(puntoId, fecha, temperatura, null);
+    }
+
+    public MedicionTemperatura registrarMedicion(Long puntoId, LocalDate fecha, BigDecimal temperatura, String horario) throws Exception {
         if (puntoId == null) {
             throw new Exception("Debe seleccionar un punto");
         }
@@ -133,6 +137,7 @@ public class TemperaturaService {
         medicion.setFechaMedicion(fecha != null ? fecha : LocalDate.now());
         medicion.setTemperaturaCelsius(temperatura.setScale(2, RoundingMode.HALF_UP));
         medicion.setEstado(calcularEstado(temperatura, tMin, tMax));
+        medicion.setHorario(horario);
 
         return medicionTemperaturaRepository.save(medicion);
     }
@@ -157,11 +162,38 @@ public class TemperaturaService {
         return salaRepository.findBySitioIdOrderByNombreAsc(sitioId);
     }
 
+    public PuntoMedicion actualizarPunto(Long puntoId, String codigo, String nombre, BigDecimal min, BigDecimal max)
+            throws Exception {
+        if (puntoId == null) throw new Exception("ID de punto inválido");
+        PuntoMedicion punto = puntoMedicionRepository.findById(puntoId)
+                .orElseThrow(() -> new Exception("Punto no encontrado"));
+        if (codigo != null && !codigo.trim().isEmpty()) punto.setCodigo(codigo.trim().toUpperCase());
+        if (nombre != null && !nombre.trim().isEmpty()) punto.setNombre(nombre.trim());
+        if (min != null) punto.setTemperaturaMinima(min);
+        if (max != null) punto.setTemperaturaMaxima(max);
+        if (punto.getTemperaturaMinima().compareTo(punto.getTemperaturaMaxima()) >= 0)
+            throw new Exception("La temperatura mínima debe ser menor que la máxima");
+        return puntoMedicionRepository.save(punto);
+    }
+
+    public void eliminarPunto(Long puntoId) throws Exception {
+        if (puntoId == null) throw new Exception("ID de punto inválido");
+        PuntoMedicion punto = puntoMedicionRepository.findById(puntoId)
+                .orElseThrow(() -> new Exception("Punto no encontrado"));
+        punto.setActivo(false);
+        puntoMedicionRepository.save(punto);
+    }
+
+    public List<PuntoMedicion> listarTodosPuntosPorSala(Long salaId) {
+        if (salaId == null) return List.of();
+        return puntoMedicionRepository.findBySalaIdOrderByIdAsc(salaId);
+    }
+
     public List<PuntoMedicion> listarPuntosPorSala(Long salaId) {
         if (salaId == null) {
             return List.of();
         }
-        return puntoMedicionRepository.findBySalaIdAndActivoTrueOrderByNombreAsc(salaId);
+        return puntoMedicionRepository.findBySalaIdAndActivoTrueOrderByIdAsc(salaId);
     }
 
         /**
@@ -173,11 +205,19 @@ public class TemperaturaService {
                 return List.of();
             }
             LocalDate fechaConsulta = fecha != null ? fecha : LocalDate.now();
-            List<PuntoMedicion> todos = puntoMedicionRepository.findBySalaIdAndActivoTrueOrderByNombreAsc(salaId);
+            List<PuntoMedicion> todos = puntoMedicionRepository.findBySalaIdAndActivoTrueOrderByIdAsc(salaId);
             List<Long> yaRegistrados = medicionTemperaturaRepository.findPuntoIdsRegistradosEnFecha(salaId, fechaConsulta);
             return todos.stream()
                     .filter(p -> !yaRegistrados.contains(p.getId()))
                     .collect(Collectors.toList());
+        }
+
+        public List<PuntoMedicion> listarPuntosPendientesPorSalaYHorario(Long salaId, LocalDate fecha, String horario) {
+            if (salaId == null) return List.of();
+            LocalDate fechaConsulta = fecha != null ? fecha : LocalDate.now();
+            List<PuntoMedicion> todos = puntoMedicionRepository.findBySalaIdAndActivoTrueOrderByIdAsc(salaId);
+            List<Long> yaRegistrados = medicionTemperaturaRepository.findPuntoIdsRegistradosEnFechaYHorario(salaId, fechaConsulta, horario);
+            return todos.stream().filter(p -> !yaRegistrados.contains(p.getId())).collect(Collectors.toList());
         }
 
         public long contarPuntosTotalesPorSala(Long salaId) {
@@ -189,6 +229,12 @@ public class TemperaturaService {
             if (salaId == null) return 0;
             LocalDate fechaConsulta = fecha != null ? fecha : LocalDate.now();
             return medicionTemperaturaRepository.findPuntoIdsRegistradosEnFecha(salaId, fechaConsulta).size();
+        }
+
+        public long contarPuntosRegistradosHoyHorario(Long salaId, LocalDate fecha, String horario) {
+            if (salaId == null) return 0;
+            LocalDate fechaConsulta = fecha != null ? fecha : LocalDate.now();
+            return medicionTemperaturaRepository.findPuntoIdsRegistradosEnFechaYHorario(salaId, fechaConsulta, horario).size();
         }
 
     public RegistroLoteResultado registrarMedicionesPorSala(Long salaId, LocalDate fecha, Map<Long, BigDecimal> temperaturasPorPunto)
@@ -242,6 +288,38 @@ public class TemperaturaService {
         if (totalGuardadas == 0) {
             throw new Exception("Debe ingresar al menos una temperatura para guardar");
         }
+
+        BigDecimal promedio = suma.divide(BigDecimal.valueOf(totalGuardadas), 2, RoundingMode.HALF_UP);
+        return new RegistroLoteResultado(totalGuardadas, promedio, fechaRegistro);
+    }
+
+    public RegistroLoteResultado registrarMedicionesPorSalaConHorario(Long salaId, LocalDate fecha, String horario, Map<Long, BigDecimal> temperaturasPorPunto)
+            throws Exception {
+        if (salaId == null) throw new Exception("Debe seleccionar una sala");
+        if (horario == null || horario.isBlank()) throw new Exception("Debe seleccionar un horario");
+
+        List<PuntoMedicion> puntosSala = listarPuntosPorSala(salaId);
+        if (puntosSala.isEmpty()) throw new Exception("La sala no tiene puntos de medición activos");
+
+        Map<Long, PuntoMedicion> puntosPorId = puntosSala.stream()
+                .collect(Collectors.toMap(PuntoMedicion::getId, p -> p, (a, b) -> a, LinkedHashMap::new));
+
+        int totalGuardadas = 0;
+        BigDecimal suma = BigDecimal.ZERO;
+        LocalDate fechaRegistro = fecha != null ? fecha : LocalDate.now();
+
+        for (Map.Entry<Long, BigDecimal> entry : temperaturasPorPunto.entrySet()) {
+            Long puntoId = entry.getKey();
+            BigDecimal temperatura = entry.getValue();
+            if (puntoId == null || temperatura == null) continue;
+            PuntoMedicion punto = puntosPorId.get(puntoId);
+            if (punto == null) throw new Exception("Punto no pertenece a la sala seleccionada");
+            registrarMedicion(punto.getId(), fechaRegistro, temperatura, horario);
+            totalGuardadas++;
+            suma = suma.add(temperatura);
+        }
+
+        if (totalGuardadas == 0) throw new Exception("Debe ingresar al menos una temperatura");
 
         BigDecimal promedio = suma.divide(BigDecimal.valueOf(totalGuardadas), 2, RoundingMode.HALF_UP);
         return new RegistroLoteResultado(totalGuardadas, promedio, fechaRegistro);
@@ -317,7 +395,7 @@ public class TemperaturaService {
         Double promedio = medicionTemperaturaRepository.promedioDiarioPorSitio(sitio, fechaConsulta);
         Long alertas = medicionTemperaturaRepository.alertasDiariasPorSitio(sitio, fechaConsulta);
 
-        List<PuntoMedicion> puntos = puntoMedicionRepository.findBySalaSitioNombreIgnoreCaseOrderByNombreAsc(sitio);
+        List<PuntoMedicion> puntos = puntoMedicionRepository.findBySalaSitioNombreIgnoreCaseOrderByIdAsc(sitio);
         long puntosConAlerta = puntos.stream()
                 .map(p -> medicionTemperaturaRepository.findTopByPuntoIdOrderByFechaRegistroDesc(p.getId()).orElse(null))
                 .filter(m -> m != null && !"OK".equalsIgnoreCase(m.getEstado()))

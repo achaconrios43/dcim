@@ -62,48 +62,56 @@ public class DashboardClienteMensualController {
         LocalDate now = LocalDate.now();
         LocalDate primerDiaMes = now.withDayOfMonth(1);
         LocalDate ultimoDiaMes = now.withDayOfMonth(now.lengthOfMonth());
-        model.addAttribute("sitiosDisponibles", temperaturaService.listarSitiosActivos());
+
+        // Dropdown pobla desde los sitios reales de IngresoAP
+        model.addAttribute("sitiosDisponibles", ingresoAPService.listarSitiosIngresoAP());
         
         model.addAttribute("sitioSeleccionado", sitio);
         model.addAttribute("mesActual", now.getMonth().toString());
         model.addAttribute("anioActual", now.getYear());
         
-        if (sitio == null || sitio.trim().isEmpty()) {
-            model.addAttribute("ingresosTotalesMes", 0L);
-            model.addAttribute("ticketsUnicos", 0L);
-            model.addAttribute("cantidadCRQ", 0L);
-            model.addAttribute("cantidadINC", 0L);
-            model.addAttribute("cantidadInspeccionRonda", 0L);
-            model.addAttribute("salasTI", 0L);
-            model.addAttribute("salasRED", 0L);
-            model.addAttribute("gestionesTotalesMes", 0L);
-            model.addAttribute("ticketsAprobadosMes", 0L);
-            model.addAttribute("ticketsRechazadosMes", 0L);
-            model.addAttribute("ticketsDevueltosMes", 0L);
-            return "dashboard-cliente-mensual";
-        }
-        
+        boolean filtrarPorSitio = sitio != null && !sitio.trim().isEmpty() && !sitio.equals("TODOS");
+
         // === ESTADÍSTICAS DE INGRESOS TÉCNICOS ===
-        Long ingresosTotalesMes = ingresoAPService.contarIngresosPorSitio(sitio, primerDiaMes, ultimoDiaMes);
-        Long ticketsUnicos = ingresoAPService.contarTicketsUnicosPorSitio(sitio, primerDiaMes, ultimoDiaMes);
-        
+        Long ingresosTotalesMes = filtrarPorSitio
+                ? ingresoAPService.contarIngresosPorSitio(sitio, primerDiaMes, ultimoDiaMes)
+                : ingresoAPService.contarIngresosPorRango(primerDiaMes, ultimoDiaMes);
+
+        Long ticketsUnicos = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorSitio(sitio, primerDiaMes, ultimoDiaMes)
+                : ingresoAPService.contarTicketsUnicos(primerDiaMes, ultimoDiaMes);
+
         // Tipos de tickets
-        Long cantidadCRQ = ingresoAPService.contarTicketsUnicosPorTipoYSitio("CRQ", sitio, primerDiaMes, ultimoDiaMes);
-        Long cantidadINC = ingresoAPService.contarTicketsUnicosPorTipoYSitio("INC", sitio, primerDiaMes, ultimoDiaMes);
-        
-        Long cantidadVisitaInspectiva = ingresoAPService.contarTicketsUnicosPorTipoYSitio("Visita Inspectiva", sitio, primerDiaMes, ultimoDiaMes);
-        Long cantidadRondaRutinaria = ingresoAPService.contarTicketsUnicosPorTipoYSitio("Ronda Rutinaria", sitio, primerDiaMes, ultimoDiaMes);
-        Long cantidadInspeccionRonda = (cantidadVisitaInspectiva != null ? cantidadVisitaInspectiva : 0L) + 
+        Long cantidadCRQ = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorTipoYSitio("CRQ", sitio, primerDiaMes, ultimoDiaMes)
+                : ingresoAPService.contarTicketsUnicosPorTipo("CRQ", primerDiaMes, ultimoDiaMes);
+        Long cantidadINC = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorTipoYSitio("INC", sitio, primerDiaMes, ultimoDiaMes)
+                : ingresoAPService.contarTicketsUnicosPorTipo("INC", primerDiaMes, ultimoDiaMes);
+
+        Long cantidadVisitaInspectiva = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorTipoYSitio("Visita Inspectiva", sitio, primerDiaMes, ultimoDiaMes)
+                : ingresoAPService.contarTicketsUnicosPorTipo("Visita Inspectiva", primerDiaMes, ultimoDiaMes);
+        Long cantidadRondaRutinaria = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorTipoYSitio("Ronda Rutinaria", sitio, primerDiaMes, ultimoDiaMes)
+                : ingresoAPService.contarTicketsUnicosPorTipo("Ronda Rutinaria", primerDiaMes, ultimoDiaMes);
+        Long cantidadInspeccionRonda = (cantidadVisitaInspectiva != null ? cantidadVisitaInspectiva : 0L) +
                                         (cantidadRondaRutinaria != null ? cantidadRondaRutinaria : 0L);
-        
+
         // Salas
-        Long salasTI = ingresoAPService.contarPorSalaRemedyYSitio("Salas TI", sitio, primerDiaMes, ultimoDiaMes);
-        Long salasRED = ingresoAPService.contarPorSalaRemedyYSitio("Salas de RED", sitio, primerDiaMes, ultimoDiaMes);
-        Long salasTIyRED = ingresoAPService.contarPorSalaRemedyYSitio("Salas TI & RED", sitio, primerDiaMes, ultimoDiaMes);
-        
+        Long salasTI = filtrarPorSitio
+                ? ingresoAPService.contarPorSalaRemedyYSitio("Salas TI", sitio, primerDiaMes, ultimoDiaMes)
+                : ingresoAPService.contarPorSalaRemedy("Salas TI", primerDiaMes, ultimoDiaMes);
+        Long salasRED = filtrarPorSitio
+                ? ingresoAPService.contarPorSalaRemedyYSitio("Salas de RED", sitio, primerDiaMes, ultimoDiaMes)
+                : ingresoAPService.contarPorSalaRemedy("Salas de RED", primerDiaMes, ultimoDiaMes);
+        Long salasTIyRED = filtrarPorSitio
+                ? ingresoAPService.contarPorSalaRemedyYSitio("Salas TI & RED", sitio, primerDiaMes, ultimoDiaMes)
+                : ingresoAPService.contarPorSalaRemedy("Salas TI & RED", primerDiaMes, ultimoDiaMes);
+
         Long salasTITotal = (salasTI != null ? salasTI : 0L) + (salasTIyRED != null ? salasTIyRED : 0L);
         Long salasREDTotal = (salasRED != null ? salasRED : 0L) + (salasTIyRED != null ? salasTIyRED : 0L);
-        
+
         model.addAttribute("ingresosTotalesMes", ingresosTotalesMes != null ? ingresosTotalesMes : 0L);
         model.addAttribute("ticketsUnicos", ticketsUnicos != null ? ticketsUnicos : 0L);
         model.addAttribute("cantidadCRQ", cantidadCRQ != null ? cantidadCRQ : 0L);

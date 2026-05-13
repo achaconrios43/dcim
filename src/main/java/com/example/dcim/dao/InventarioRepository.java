@@ -22,6 +22,7 @@ public interface InventarioRepository extends JpaRepository<Inventario, Long> {
     List<Inventario> findByEstado(String estado);
     List<Inventario> findBySala(String sala);
     List<Inventario> findByMarca(String marca);
+    long countBySala(String sala);
     List<Inventario> findByTipo(String tipo);
     
     // Búsquedas complejas

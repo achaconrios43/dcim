@@ -72,6 +72,7 @@ public interface IngresoAPService {
     // Métodos para estadísticas del dashboard de cliente
     Long contarIngresosMesActual();
     Long contarTicketsUnicos(LocalDate fechaInicio, LocalDate fechaFin);
+    Long contarIngresosPorRango(LocalDate fechaInicio, LocalDate fechaFin);
     Long contarPorTipoTicket(String tipoTicket, LocalDate fechaInicio, LocalDate fechaFin);
     Long contarPorSalaRemedy(String salaRemedy, LocalDate fechaInicio, LocalDate fechaFin);
     List<IngresoAP> obtenerRegistrosActivosRecientes(int limite);
@@ -85,4 +86,7 @@ public interface IngresoAPService {
     Long contarTicketsUnicosPorTipoYSitio(String tipoTicket, String sitio, LocalDate fechaInicio, LocalDate fechaFin);
     Long contarPorSalaRemedyYSitio(String salaRemedy, String sitio, LocalDate fechaInicio, LocalDate fechaFin);
     List<IngresoAP> obtenerRegistrosActivosRecientesPorSitio(String sitio, int limite);
+
+    // Sitios distintos registrados en IngresoAP
+    List<String> listarSitiosIngresoAP();
 }

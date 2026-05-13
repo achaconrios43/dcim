@@ -103,6 +103,7 @@
           <a th:href="@{/gestion/list}">Gestión</a>
           <a th:href="@{/temperaturas}">Temperatura</a>
           <a th:href="@{/plano-sala}">Planos</a>
+          <a th:href="@{/salas}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">🏢 Salas</a>
         </div>
       </div>
 
@@ -134,6 +135,7 @@
     <a th:href="@{/gestion/list}">🎫 Gestión</a>
     <a th:href="@{/temperaturas}">🌡️ Temperatura</a>
     <a th:href="@{/plano-sala}">🗺️ Planos</a>
+    <a th:href="@{/salas}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">🏢 Salas</a>
     <div style="border-top:1px solid rgba(255,255,255,0.15); margin:8px 0; padding-top:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
       <span th:if="${#authentication?.name}" style="color:rgba(255,255,255,0.6); font-size:13px;" th:text="${#authentication.name}">user</span>
       <a th:href="@{/logout}" th:if="${#authentication?.name}" style="color:#fff; font-size:13px; font-weight:700; background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:6px; text-decoration:none;">Salir</a>

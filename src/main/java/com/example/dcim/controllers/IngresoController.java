@@ -2,8 +2,12 @@ package com.example.dcim.controllers;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -155,6 +159,41 @@ public class IngresoController {
             model.addAttribute("errorMessage", "Error al registrar ingreso: " + e.getMessage());
             return "ingresoap";
         }
+    }
+
+    // Verificar si existe al menos un ingreso de técnico para un número de ticket (API JSON)
+    @GetMapping("/ingreso/api/tiene-tecnicos")
+    @ResponseBody
+    public Map<String, Object> tieneTecnicosIngresados(@RequestParam("ticket") String ticket) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            boolean tiene = ingresoAPService.obtenerIngresoPorTicket(ticket).isPresent();
+            result.put("tieneTecnicos", tiene);
+        } catch (Exception e) {
+            result.put("tieneTecnicos", false);
+        }
+        return result;
+    }
+
+    // Marcar ronda de supervisión intermedia como realizada
+    @PostMapping("/ingreso/ap/marcar-segunda-supervision/{id}")
+    public String marcarSegundaSupervision(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            Optional<IngresoAP> ingresoOpt = ingresoAPService.obtenerIngresoPorId(id);
+            if (ingresoOpt.isPresent()) {
+                IngresoAP ingreso = ingresoOpt.get();
+                ingreso.setSegundaSupervisionRealizada(true);
+                ingreso.setFechaSegundaSupervision(LocalDate.now());
+                ingreso.setHoraSegundaSupervision(LocalTime.now());
+                ingresoAPService.actualizarIngreso(ingreso);
+                redirectAttributes.addFlashAttribute("successMessage", "Ronda de supervisión marcada correctamente.");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Registro no encontrado.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al marcar la ronda: " + e.getMessage());
+        }
+        return "redirect:/user/ingresoap-list";
     }
 
     // Listar todos los ingresos

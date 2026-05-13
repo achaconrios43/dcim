@@ -8,13 +8,13 @@ import com.example.dcim.entity.PuntoMedicion;
 
 public interface PuntoMedicionRepository extends JpaRepository<PuntoMedicion, Long> {
 
-    List<PuntoMedicion> findBySalaIdOrderByNombreAsc(Long salaId);
+    List<PuntoMedicion> findBySalaIdOrderByIdAsc(Long salaId);
 
-    List<PuntoMedicion> findBySalaIdAndActivoTrueOrderByNombreAsc(Long salaId);
+    List<PuntoMedicion> findBySalaIdAndActivoTrueOrderByIdAsc(Long salaId);
 
     long countBySalaId(Long salaId);
 
-    List<PuntoMedicion> findBySalaSitioNombreIgnoreCaseOrderByNombreAsc(String sitio);
+    List<PuntoMedicion> findBySalaSitioNombreIgnoreCaseOrderByIdAsc(String sitio);
 
     long countBySalaSitioNombreIgnoreCaseAndActivoTrue(String sitio);
 }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nueva Gestión de Acceso</title>
+    <title>Gestión de Accesos</title>
     <div th:replace="fragments/headers :: headers"></div>
   </head>
   <body class="bg-gray-100">
@@ -16,10 +16,10 @@
         <!-- Encabezado -->
         <div class="mb-6">
           <h1 class="text-3xl font-bold text-gray-800">
-            <i class="fas fa-plus-circle mr-2 text-accent"></i>
-            Nueva Gestión de Acceso
+            <i class="fas fa-shield-alt mr-2 text-accent"></i>
+            Gestión de Accesos
           </h1>
-          <p class="text-gray-600 mt-2">Complete el formulario para registrar una nueva gestión de acceso al data center</p>
+          <p class="text-gray-600 mt-2">Complete el formulario para registrar una gestión de acceso al data center</p>
         </div>
 
         <!-- Formulario -->
@@ -115,9 +115,68 @@
             </div>
           </div>
 
+          <!-- ─── Gestión en Ejecución ─── -->
+          <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h3 class="text-md font-bold text-green-800">
+                  <i class="fas fa-hard-hat mr-2"></i>Gestión en Ejecución
+                </h3>
+                <p class="text-sm text-green-700 mt-1">
+                  Cuando los técnicos ingresen a trabajar, regístrelos en el <strong>Registro de Técnico</strong>.
+                  El seguimiento y comentarios estará disponible una vez que haya un registro de ingreso asociado a este ticket.
+                </p>
+              </div>
+              <a id="btnRegistroTecnico" href="/ingreso/ap"
+                 target="_blank"
+                 class="inline-flex items-center px-5 py-2 bg-gradient-to-r from-green-600 to-emerald-500 text-white text-sm font-bold rounded-lg shadow hover:shadow-md transition-all">
+                <i class="fas fa-sign-in-alt mr-2"></i>Registrar Ingreso de Técnico
+              </a>
+            </div>
+            <div class="mt-3 pt-3 border-t border-green-200 text-xs text-green-700">
+              <i class="fas fa-info-circle mr-1"></i>
+              El número de ticket ingresado arriba se vinculará automáticamente con el Registro de Técnico al hacer clic.
+            </div>
+          </div>
+
+          <!-- ─── Importar planilla Excel de técnicos autorizados ─── -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 class="text-md font-bold text-blue-800 mb-2">
+              <i class="fas fa-file-excel mr-2 text-green-600"></i>Técnicos Autorizados — Importar Planilla Excel
+            </h3>
+            <p class="text-sm text-blue-700 mb-3">
+              Suba una planilla Excel con los técnicos autorizados. Los datos se mostrarán aquí de forma visual, sin registrarse en el sistema.
+            </p>
+            <div class="flex items-center gap-4 flex-wrap">
+              <label class="cursor-pointer">
+                <span class="inline-flex items-center px-4 py-2 bg-white border-2 border-blue-400 text-blue-700 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-all">
+                  <i class="fas fa-upload mr-2"></i>Seleccionar archivo .xlsx / .xls
+                </span>
+                <input type="file" id="excelInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="cargarExcel(this)">
+              </label>
+              <span id="excelFileName" class="text-sm text-gray-500 italic">Ningún archivo seleccionado</span>
+              <button type="button" id="limpiarExcel" onclick="limpiarTablaExcel()" class="hidden px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded border border-red-300 hover:bg-red-200">
+                <i class="fas fa-times mr-1"></i>Limpiar
+              </button>
+            </div>
+            <div id="excelPreview" class="hidden mt-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-bold text-blue-800">
+                  <i class="fas fa-users mr-1"></i>Técnicos en la planilla: <span id="excelCount" class="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs">0</span>
+                </span>
+              </div>
+              <div class="overflow-x-auto max-h-60 rounded-lg border border-blue-200">
+                <table id="excelTable" class="min-w-full text-xs bg-white">
+                  <thead id="excelThead" class="bg-blue-700 text-white sticky top-0"></thead>
+                  <tbody id="excelTbody"></tbody>
+                </table>
+              </div>
+              <p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle mr-1"></i>Solo visualización — no se registra ningún dato.</p>
+            </div>
+          </div>
+
           <!-- Programación de Actividad -->
           <div class="bg-teal-50 p-4 rounded-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">
               <i class="fas fa-calendar-alt mr-2"></i>Programación de Actividad
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -180,7 +239,25 @@
           </div>
 
           <!-- Comentarios del Ticket -->
-          <div class="bg-purple-50 p-4 rounded-lg mb-6">
+          <!-- Aviso cuando la sección está bloqueada -->
+          <div id="avisoSeguimiento" class="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6">
+            <div class="flex items-start gap-3">
+              <i class="fas fa-lock text-gray-400 mt-0.5 text-lg"></i>
+              <div>
+                <p class="text-sm font-semibold text-gray-600">Seguimiento y Comentarios — No disponible</p>
+                <p class="text-xs text-gray-500 mt-1">
+                  Esta sección se habilitará automáticamente cuando:
+                </p>
+                <ul class="text-xs text-gray-500 mt-1 ml-4 list-disc space-y-0.5">
+                  <li>La hora actual esté dentro de la <strong>ventana horaria de la Programación de Actividad</strong></li>
+                  <li>La hora actual esté dentro de la <strong>ventana horaria de Remedy</strong></li>
+                  <li>Exista al menos un <strong>Registro de Ingreso de Técnico</strong> para el número de ticket ingresado</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div id="seccionSeguimiento" class="hidden bg-purple-50 p-4 rounded-lg mb-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-3">
               <i class="fas fa-comments mr-2"></i>Seguimiento y Comentarios
             </h3>
@@ -388,6 +465,189 @@
           });
         });
       });
+    </script>
+
+    <!-- SheetJS para parseo Excel client-side -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script>
+      // ─── Vínculo ticket → botón Registro de Técnico ───────────────────
+      document.addEventListener('DOMContentLoaded', function () {
+        var ticketInput = document.querySelector('input[name="numeroTicket"]');
+        var btnReg = document.getElementById('btnRegistroTecnico');
+        if (ticketInput && btnReg) {
+          function actualizarLink() {
+            var ticket = ticketInput.value.trim();
+            if (ticket) {
+              btnReg.href = '/ingreso/ap?ticket=' + encodeURIComponent(ticket);
+            } else {
+              btnReg.href = '/ingreso/ap';
+            }
+          }
+          ticketInput.addEventListener('input', actualizarLink);
+          ticketInput.addEventListener('change', actualizarLink);
+          actualizarLink();
+        }
+      });
+
+      // ─── Visibilidad de Seguimiento y Comentarios ─────────────────────
+      // Se muestra SOLO si: ventana horaria actividad ✓ + ventana Remedy ✓ + técnico ingresado ✓
+      (function () {
+        var _debounceTimer = null;
+
+        function mostrarAviso() {
+          document.getElementById('avisoSeguimiento').classList.remove('hidden');
+          document.getElementById('seccionSeguimiento').classList.add('hidden');
+        }
+
+        function mostrarSeccion() {
+          document.getElementById('avisoSeguimiento').classList.add('hidden');
+          document.getElementById('seccionSeguimiento').classList.remove('hidden');
+        }
+
+        function parseFechaHora(fecha, hora) {
+          if (!fecha || !hora) return null;
+          return new Date(fecha + 'T' + hora);
+        }
+
+        function verificar() {
+          var fIA = document.getElementById('fechaInicioActividad')  ? document.getElementById('fechaInicioActividad').value  : '';
+          var hIA = document.getElementById('horaInicioActividad')   ? document.getElementById('horaInicioActividad').value   : '';
+          var fTA = document.getElementById('fechaTerminoActividad') ? document.getElementById('fechaTerminoActividad').value : '';
+          var hTA = document.getElementById('horaTerminoActividad')  ? document.getElementById('horaTerminoActividad').value  : '';
+          var fIR = document.getElementById('fechaInicioRemedy')     ? document.getElementById('fechaInicioRemedy').value     : '';
+          var hIR = document.getElementById('horaInicioRemedy')      ? document.getElementById('horaInicioRemedy').value      : '';
+          var fFR = document.getElementById('fechaFinRemedy')        ? document.getElementById('fechaFinRemedy').value        : '';
+          var hFR = document.getElementById('horaFinRemedy')         ? document.getElementById('horaFinRemedy').value         : '';
+          var ticket = (document.querySelector('input[name="numeroTicket"]') || {}).value || '';
+          ticket = ticket.trim();
+
+          // Condición 1: ventana de Programación de Actividad (campos obligatorios)
+          var inicioAct = parseFechaHora(fIA, hIA);
+          var finAct    = parseFechaHora(fTA, hTA);
+          if (!inicioAct || !finAct) { mostrarAviso(); return; }
+          var ahora = new Date();
+          if (ahora < inicioAct || ahora > finAct) { mostrarAviso(); return; }
+
+          // Condición 2: ventana de Remedy (si están completos los 4 campos)
+          if (fIR && hIR && fFR && hFR) {
+            var inicioRem = parseFechaHora(fIR, hIR);
+            var finRem    = parseFechaHora(fFR, hFR);
+            if (inicioRem && finRem && (ahora < inicioRem || ahora > finRem)) {
+              mostrarAviso(); return;
+            }
+          }
+
+          // Condición 3: técnico ingresado (AJAX)
+          if (!ticket) { mostrarAviso(); return; }
+
+          fetch('/ingreso/api/tiene-tecnicos?ticket=' + encodeURIComponent(ticket))
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              if (data.tieneTecnicos) {
+                mostrarSeccion();
+              } else {
+                mostrarAviso();
+              }
+            })
+            .catch(function () { mostrarAviso(); });
+        }
+
+        function verificarConDebounce() {
+          clearTimeout(_debounceTimer);
+          _debounceTimer = setTimeout(verificar, 600);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+          var campos = [
+            'fechaInicioActividad', 'horaInicioActividad',
+            'fechaTerminoActividad', 'horaTerminoActividad',
+            'fechaInicioRemedy', 'horaInicioRemedy',
+            'fechaFinRemedy', 'horaFinRemedy'
+          ];
+          campos.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) { el.addEventListener('change', verificarConDebounce); }
+          });
+          var tkt = document.querySelector('input[name="numeroTicket"]');
+          if (tkt) { tkt.addEventListener('input', verificarConDebounce); }
+
+          // Evaluación inicial
+          verificar();
+        });
+      }());
+
+      // ─── Importación Excel ────────────────────────────────────────────
+      function cargarExcel(input) {
+        var file = input.files[0];
+        if (!file) return;
+        document.getElementById('excelFileName').textContent = file.name;
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            var data = new Uint8Array(e.target.result);
+            var workbook = XLSX.read(data, { type: 'array' });
+            var sheetName = workbook.SheetNames[0];
+            var sheet = workbook.Sheets[sheetName];
+            var json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+            if (!json || json.length === 0) {
+              alert('El archivo no contiene datos.');
+              return;
+            }
+
+            // Encabezados (primera fila)
+            var headers = json[0];
+            var thead = document.getElementById('excelThead');
+            var tr = document.createElement('tr');
+            headers.forEach(function (h) {
+              var th = document.createElement('th');
+              th.className = 'px-3 py-2 text-left font-semibold whitespace-nowrap';
+              th.textContent = h || '';
+              tr.appendChild(th);
+            });
+            thead.innerHTML = '';
+            thead.appendChild(tr);
+
+            // Filas de datos
+            var tbody = document.getElementById('excelTbody');
+            tbody.innerHTML = '';
+            var count = 0;
+            for (var i = 1; i < json.length; i++) {
+              var row = json[i];
+              // Saltar filas completamente vacías
+              if (row.every(function (c) { return c === ''; })) continue;
+              count++;
+              var trRow = document.createElement('tr');
+              trRow.className = count % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+              row.forEach(function (cell) {
+                var td = document.createElement('td');
+                td.className = 'px-3 py-1.5 border-t border-gray-100 whitespace-nowrap';
+                td.textContent = cell;
+                trRow.appendChild(td);
+              });
+              tbody.appendChild(trRow);
+            }
+
+            document.getElementById('excelCount').textContent = count;
+            document.getElementById('excelPreview').classList.remove('hidden');
+            document.getElementById('limpiarExcel').classList.remove('hidden');
+          } catch (err) {
+            alert('Error al leer el archivo: ' + err.message);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      function limpiarTablaExcel() {
+        document.getElementById('excelThead').innerHTML = '';
+        document.getElementById('excelTbody').innerHTML = '';
+        document.getElementById('excelPreview').classList.add('hidden');
+        document.getElementById('limpiarExcel').classList.add('hidden');
+        document.getElementById('excelFileName').textContent = 'Ningún archivo seleccionado';
+        document.getElementById('excelInput').value = '';
+        document.getElementById('excelCount').textContent = '0';
+      }
     </script>
   </body>
 </html>

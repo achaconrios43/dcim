@@ -119,7 +119,7 @@ public class GestionAccesoController {
         gestion.setEstadoAprobacion("Pendiente");
         
         model.addAttribute("gestion", gestion);
-        model.addAttribute("titulo", "Nueva Gestión de Acceso");
+        model.addAttribute("titulo", "Gestión de Accesos");
         model.addAttribute("sitiosCatalogo", temperaturaService.listarSitiosActivos());
         return "gestion/gestion-create";
     }

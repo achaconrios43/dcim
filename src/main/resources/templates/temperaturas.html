@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/headers :: headers}"></head>
 <body class="min-h-screen flex flex-col" style="font-family:'Barlow',sans-serif; color:#172134;
   background:
@@ -14,10 +15,382 @@
   <div style="display:flex; align-items:center; gap:16px;">
     <a href="/dashboard" style="color:rgba(255,255,255,0.75); font-size:13px; text-decoration:none; font-weight:600;">← Dashboard</a>
     <span style="color:rgba(255,255,255,0.4);">/</span>
-    <span style="color:#ffffff; font-weight:800; font-size:15px;">🌡️ Sitios, Salas y Temperaturas</span>
+    <span style="color:#ffffff; font-weight:800; font-size:15px;">🌡️ Configuración de Temperaturas</span>
+  </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <a th:href="@{/temperaturas/registro(salaId=${salaIdSeleccionada})}"
+       style="background:rgba(255,255,255,0.15); color:#fff; font-size:13px; font-weight:700; padding:8px 16px; border-radius:7px; text-decoration:none; border:1px solid rgba(255,255,255,0.3);">📋 Registrar Temperaturas</a>
+    <a href="/salas" style="background:rgba(255,255,255,0.15); color:#fff; font-size:13px; font-weight:700; padding:8px 16px; border-radius:7px; text-decoration:none; border:1px solid rgba(255,255,255,0.3);">🏢 Gestionar Salas</a>
+    <a href="/dashboard" style="background:#fff; color:#134e4a; font-size:13px; font-weight:800; padding:8px 16px; border-radius:7px; text-decoration:none;">← Dashboard</a>
+  </div>
+</div>
+
+<main class="flex-1" style="padding:28px 24px; max-width:1200px; margin:0 auto; width:100%; box-sizing:border-box;">
+
+  <!-- Alertas -->
+  <div th:if="${success}" style="background:#d1fae5; border:1px solid #6ee7b7; border-radius:8px; padding:12px 16px; margin-bottom:16px; color:#065f46; font-weight:600; font-size:14px;">✓ <span th:text="${success}"></span></div>
+  <div th:if="${error}"   style="background:#fee2e2; border:1px solid #fca5a5; border-radius:8px; padding:12px 16px; margin-bottom:16px; color:#7f1d1d; font-weight:600; font-size:14px;">✗ <span th:text="${error}"></span></div>
+
+  <div style="display:grid; grid-template-columns:320px 1fr; gap:20px; align-items:start;">
+
+    <!-- ─── Columna izquierda ─── -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
+
+      <!-- Selector de Sala -->
+      <div style="background:#fff; border-radius:12px; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.07); overflow:hidden;">
+        <div style="height:5px; background:linear-gradient(90deg,#134e4a,#0d9488);"></div>
+        <div style="padding:18px 22px;">
+          <div style="font-weight:800; font-size:12px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px;">🏢 Seleccionar Sala</div>
+          <form method="get" action="/temperaturas" style="display:flex; flex-direction:column; gap:8px;">
+            <select name="sitioId" onchange="this.form.submit()"
+                    style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box; background:#fff;">
+              <option value="">Todos los sitios</option>
+              <option th:each="s : ${sitios}" th:value="${s.id}" th:text="${s.nombre}"
+                      th:selected="${sitioIdSeleccionado == s.id}"></option>
+            </select>
+            <select name="salaId" onchange="this.form.submit()"
+                    style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box; background:#fff;">
+              <option value="">Seleccione sala</option>
+              <option th:each="sa : ${salas}" th:value="${sa.id}"
+                      th:text="${sa.nombre + (sa.tipo != null ? ' (' + sa.tipo + ')' : '')}"
+                      th:selected="${salaIdSeleccionada == sa.id}"></option>
+            </select>
+          </form>
+          <div th:if="${salaSeleccionada != null}" style="margin-top:12px; padding:10px 12px; background:#f0fdf4; border-radius:8px; border:1px solid #bbf7d0;">
+            <div style="font-size:12px; font-weight:700; color:#065f46;" th:text="${salaSeleccionada.nombre}"></div>
+            <div style="font-size:11px; color:#6b7280; margin-top:2px;" th:text="${salaSeleccionada.sitio?.nombre}"></div>
+            <div style="font-size:11px; color:#6b7280;" th:text="${salaSeleccionada.tipo}"></div>
+            <a th:href="@{/temperaturas/registro(salaId=${salaIdSeleccionada})}"
+               style="display:inline-block; margin-top:8px; padding:6px 14px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; border-radius:6px; font-size:12px; font-weight:700; text-decoration:none;">
+              📋 Ir a Registrar Temperaturas
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agregar Punto (solo si hay sala seleccionada) -->
+      <div th:if="${salaIdSeleccionada != null}"
+           style="background:#fff; border-radius:12px; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.07); overflow:hidden;">
+        <div style="height:5px; background:linear-gradient(90deg,#0d9488,#134e4a);"></div>
+        <div style="padding:18px 22px;">
+          <div style="font-weight:800; font-size:12px; color:#0d9488; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">➕ Agregar Punto de Medición</div>
+          <form th:action="@{/temperaturas/puntos}" method="post" style="display:flex; flex-direction:column; gap:9px;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input type="hidden" name="salaId" th:value="${salaIdSeleccionada}">
+
+            <div>
+              <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:3px;">Código *</label>
+              <input name="codigo" placeholder="Ej: PT-01" required
+                     style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:3px;">Nombre / Ubicación *</label>
+              <input name="nombre" placeholder="Ej: Retorno HVAC Norte" required
+                     style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div>
+                <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:3px;">T° Mín (°C)</label>
+                <input type="number" step="0.01" name="temperaturaMinima" value="18.00" required
+                       style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+              </div>
+              <div>
+                <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:3px;">T° Máx (°C)</label>
+                <input type="number" step="0.01" name="temperaturaMaxima" value="27.00" required
+                       style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
+              </div>
+            </div>
+            <button type="submit"
+                    style="padding:10px 18px; border-radius:8px; background:linear-gradient(90deg,#0d9488,#134e4a); color:#fff; font-weight:700; font-size:13px; border:none; cursor:pointer;">
+              + Agregar Punto
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Reporte por sitio -->
+      <div style="background:#fff; border-radius:12px; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.07); overflow:hidden;">
+        <div style="height:5px; background:linear-gradient(90deg,#1e3a5f,#0b3c75);"></div>
+        <div style="padding:18px 22px;">
+          <div style="font-weight:800; font-size:12px; color:#0b3c75; text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px;">📊 Reporte por Sitio</div>
+          <form method="get" action="/temperaturas" style="display:flex; flex-direction:column; gap:8px;">
+            <input type="hidden" name="salaId" th:value="${salaIdSeleccionada}">
+            <select name="sitioReporte" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box; background:#fff;">
+              <option value="">Seleccione sitio</option>
+              <option th:each="s : ${sitios}" th:value="${s.nombre}" th:text="${s.nombre}" th:selected="${sitioReporte == s.nombre}"></option>
+            </select>
+            <button type="submit" style="padding:9px 14px; border-radius:8px; background:linear-gradient(90deg,#1e3a5f,#0b3c75); color:#fff; font-weight:700; font-size:13px; border:none; cursor:pointer;">Ver Reporte</button>
+          </form>
+        </div>
+      </div>
+
+    </div><!-- fin col izq -->
+
+    <!-- ─── Columna derecha ─── -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
+
+      <!-- Tabla CRUD de puntos -->
+      <div style="background:#fff; border-radius:12px; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.07); overflow:hidden;">
+        <div style="height:5px; background:linear-gradient(90deg,#134e4a,#0d9488);"></div>
+        <div style="padding:18px 22px 8px;">
+
+          <!-- Sin sala seleccionada -->
+          <div th:if="${salaIdSeleccionada == null}"
+               style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px;">
+            <div style="font-size:32px; margin-bottom:12px;">🌡️</div>
+            Seleccione una sala en el panel izquierdo para ver y configurar sus puntos de medición.
+          </div>
+
+          <!-- Con sala seleccionada -->
+          <div th:if="${salaIdSeleccionada != null}">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+              <div>
+                <span style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em;">Puntos de Medición</span>
+                <span th:text="'— ' + ${salaSeleccionada?.nombre}"
+                      style="font-size:13px; color:#0d9488; font-weight:700; margin-left:6px;"></span>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <span style="font-size:12px; background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:99px; font-weight:700;"
+                      th:text="${#lists.size(puntos)} + ' puntos'"></span>
+                <a th:href="@{/temperaturas/registro(salaId=${salaIdSeleccionada})}"
+                   style="font-size:12px; padding:6px 14px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; border-radius:6px; font-weight:700; text-decoration:none;">
+                  📋 Registrar ahora
+                </a>
+              </div>
+            </div>
+
+            <!-- Sin puntos -->
+            <div th:if="${#lists.isEmpty(puntos)}"
+                 style="text-align:center; padding:30px; color:#9ca3af; font-size:13px; background:#f8fafc; border-radius:8px; border:1px dashed #d1d5db;">
+              No hay puntos de medición. Agrega el primero usando el formulario de la izquierda.
+            </div>
+
+            <!-- Tabla puntos -->
+            <div th:unless="${#lists.isEmpty(puntos)}" style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                <thead>
+                  <tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0;">
+                    <th style="padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em;">#</th>
+                    <th style="padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em;">Código</th>
+                    <th style="padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em;">Nombre / Ubicación</th>
+                    <th style="padding:10px 12px; text-align:center; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em;">T° Min</th>
+                    <th style="padding:10px 12px; text-align:center; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em;">T° Máx</th>
+                    <th style="padding:10px 12px; text-align:center; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em;">Estado</th>
+                    <th style="padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="p,iter : ${puntos}"
+                      th:id="'fila-' + ${p.id}"
+                      style="border-bottom:1px solid #f1f5f9;"
+                      onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+
+                    <td style="padding:10px 12px; font-size:12px; color:#9ca3af; font-weight:600;"
+                        th:text="${iter.index + 1}">1</td>
+
+                    <!-- Vista normal -->
+                    <td style="padding:10px 12px;" th:id="'view-codigo-' + ${p.id}">
+                      <span style="font-family:monospace; font-weight:700; color:#0d9488; font-size:13px;"
+                            th:text="${p.codigo}"></span>
+                    </td>
+                    <td style="padding:10px 12px;" th:id="'view-nombre-' + ${p.id}">
+                      <span style="font-weight:600; color:#172134;" th:text="${p.nombre}"></span>
+                    </td>
+                    <td style="padding:10px 12px; text-align:center;" th:id="'view-min-' + ${p.id}">
+                      <span style="font-size:12px; color:#0369a1;" th:text="${p.temperaturaMinima + ' °C'}"></span>
+                    </td>
+                    <td style="padding:10px 12px; text-align:center;" th:id="'view-max-' + ${p.id}">
+                      <span style="font-size:12px; color:#dc2626;" th:text="${p.temperaturaMaxima + ' °C'}"></span>
+                    </td>
+
+                    <td style="padding:10px 12px; text-align:center;">
+                      <span th:if="${p.activo}"
+                            style="background:#d1fae5; color:#065f46; font-size:11px; font-weight:700; padding:3px 9px; border-radius:99px;">Activo</span>
+                      <span th:unless="${p.activo}"
+                            style="background:#fee2e2; color:#7f1d1d; font-size:11px; font-weight:700; padding:3px 9px; border-radius:99px;">Inactivo</span>
+                    </td>
+
+                    <td style="padding:10px 12px;">
+                      <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                        <!-- Botón editar -->
+                        <button th:if="${p.activo}"
+                                th:onclick="'toggleEditForm(' + ${p.id} + ')'"
+                                style="font-size:11px; padding:5px 10px; border-radius:5px; background:#eff6ff; color:#1d4ed8; font-weight:700; border:1px solid #bfdbfe; cursor:pointer;">✏️</button>
+                        <!-- Eliminar -->
+                        <form th:if="${p.activo}"
+                              th:action="@{/temperaturas/puntos/{id}/eliminar(id=${p.id})}" method="post"
+                              style="display:inline;"
+                              th:onsubmit="'return confirm(\'¿Eliminar punto ' + ${p.codigo} + '?\''  )">
+                          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                          <input type="hidden" name="salaId" th:value="${salaIdSeleccionada}">
+                          <button type="submit"
+                                  style="font-size:11px; padding:5px 10px; border-radius:5px; background:#fff1f2; color:#be123c; font-weight:700; border:1px solid #fecdd3; cursor:pointer;">🗑️</button>
+                        </form>
+                      </div>
+
+                      <!-- Formulario de edición inline -->
+                      <div th:if="${p.activo}"
+                           th:id="'edit-form-' + ${p.id}"
+                           style="display:none; margin-top:8px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0; min-width:280px;">
+                        <form th:action="@{/temperaturas/puntos/{id}/editar(id=${p.id})}" method="post"
+                              style="display:flex; flex-direction:column; gap:7px;">
+                          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                          <input type="hidden" name="salaId" th:value="${salaIdSeleccionada}">
+                          <div style="display:grid; grid-template-columns:1fr 1fr; gap:7px;">
+                            <input name="codigo" th:value="${p.codigo}" placeholder="Código"
+                                   style="padding:7px 10px; border:1.5px solid #d1d5db; border-radius:6px; font-size:12px; box-sizing:border-box;">
+                            <input name="nombre" th:value="${p.nombre}" placeholder="Nombre"
+                                   style="padding:7px 10px; border:1.5px solid #d1d5db; border-radius:6px; font-size:12px; box-sizing:border-box;">
+                            <input type="number" step="0.01" name="temperaturaMinima" th:value="${p.temperaturaMinima}" placeholder="Mín"
+                                   style="padding:7px 10px; border:1.5px solid #d1d5db; border-radius:6px; font-size:12px; box-sizing:border-box;">
+                            <input type="number" step="0.01" name="temperaturaMaxima" th:value="${p.temperaturaMaxima}" placeholder="Máx"
+                                   style="padding:7px 10px; border:1.5px solid #d1d5db; border-radius:6px; font-size:12px; box-sizing:border-box;">
+                          </div>
+                          <div style="display:flex; gap:6px;">
+                            <button type="submit"
+                                    style="flex:1; padding:7px; border-radius:6px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; font-weight:700; font-size:12px; border:none; cursor:pointer;">Guardar</button>
+                            <button type="button" th:onclick="'toggleEditForm(' + ${p.id} + ')'"
+                                    style="padding:7px 12px; border-radius:6px; background:#f1f5f9; color:#64748b; font-weight:700; font-size:12px; border:1px solid #e2e8f0; cursor:pointer;">Cancelar</button>
+                          </div>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div><!-- fin tabla -->
+          </div><!-- fin con sala -->
+        </div>
+      </div><!-- fin card puntos -->
+
+      <!-- Resumen diario -->
+      <div th:if="${resumenSalas != null and !#lists.isEmpty(resumenSalas)}"
+           style="background:#fff; border-radius:12px; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.07); overflow:hidden;">
+        <div style="height:5px; background:linear-gradient(90deg,#134e4a,#0d9488);"></div>
+        <div style="padding:18px 22px;">
+          <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">Resumen Diario por Sala</div>
+          <p style="font-size:12px; color:#5b667a; margin:0 0 14px;" th:text="'Fecha: ' + ${#temporals.format(fechaResumenSalas, 'dd/MM/yyyy')}"></p>
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+              <thead>
+                <tr style="background:linear-gradient(90deg,#134e4a,#0d9488);">
+                  <th style="padding:10px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; text-align:left;">Sala</th>
+                  <th style="padding:10px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; text-align:center;">Puntos Config.</th>
+                  <th style="padding:10px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; text-align:center;">Medidos Hoy</th>
+                  <th style="padding:10px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; text-align:center;">Promedio</th>
+                  <th style="padding:10px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; text-align:center;">Alertas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="r : ${resumenSalas}" style="border-bottom:1px solid #e5e7eb;"
+                    onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+                  <td style="padding:10px 14px; font-weight:700;">
+                    <a th:href="@{/temperaturas/registro(salaId=${r.salaId})}"
+                       th:text="${r.salaNombre}" style="color:#0d9488; text-decoration:none; font-weight:700;"></a>
+                  </td>
+                  <td style="padding:10px 14px; text-align:center;" th:text="${r.totalPuntos}"></td>
+                  <td style="padding:10px 14px; text-align:center;" th:text="${r.puntosMedidos}"></td>
+                  <td style="padding:10px 14px; text-align:center; font-weight:600;" th:text="${r.promedio + ' °C'}"></td>
+                  <td style="padding:10px 14px; text-align:center;">
+                    <span th:text="${r.alertas}"
+                          th:style="${r.alertas > 0} ? 'background:#fee2e2;color:#7f1d1d;' : 'background:#d1fae5;color:#065f46;'"
+                          style="padding:2px 10px; border-radius:99px; font-size:11px; font-weight:700;"></span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reporte Diario/Mensual -->
+      <div th:if="${sitioReporte != null}"
+           style="background:#fff; border-radius:12px; border:1px solid rgba(11,60,117,0.09); box-shadow:0 2px 8px rgba(0,0,0,0.07); overflow:hidden;">
+        <div style="height:5px; background:linear-gradient(90deg,#1e3a5f,#0b3c75);"></div>
+        <div style="padding:18px 22px;">
+          <div style="font-weight:800; font-size:13px; color:#0b3c75; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;"
+               th:text="'Reporte: ' + ${sitioReporte}"></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px;">
+            <div style="border:1px solid #e5e7eb; border-radius:8px; padding:14px; text-align:center;">
+              <div style="font-size:10px; font-weight:700; color:#5b667a; text-transform:uppercase; margin-bottom:4px;">Promedio Diario</div>
+              <div style="font-size:22px; font-weight:800; color:#134e4a;" th:text="${resumenDiarioTemp.promedio + ' °C'}"></div>
+            </div>
+            <div style="border:1px solid #e5e7eb; border-radius:8px; padding:14px; text-align:center;">
+              <div style="font-size:10px; font-weight:700; color:#5b667a; text-transform:uppercase; margin-bottom:4px;">Promedio Mensual</div>
+              <div style="font-size:22px; font-weight:800; color:#134e4a;" th:text="${resumenMensualTemp.promedio + ' °C'}"></div>
+            </div>
+            <div style="border:1px solid #e5e7eb; border-radius:8px; padding:14px; text-align:center;">
+              <div style="font-size:10px; font-weight:700; color:#5b667a; text-transform:uppercase; margin-bottom:4px;">Estado</div>
+              <div style="font-size:22px; font-weight:800;"
+                   th:text="${resumenDiarioTemp.estadoGeneral}"
+                   th:style="${resumenDiarioTemp.estadoGeneral == 'ALERTA'} ? 'color:#dc2626;' : 'color:#059669;'"></div>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+              <thead>
+                <tr style="background:linear-gradient(90deg,#1e3a5f,#0b3c75);">
+                  <th style="padding:10px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; text-align:left;">Fecha/Hora</th>
+                  <th style="padding:10px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; text-align:left;">Punto</th>
+                  <th style="padding:10px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; text-align:left;">Temperatura</th>
+                  <th style="padding:10px 14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; text-align:left;">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${#lists.isEmpty(ultimasMediciones)}">
+                  <td colspan="4" style="padding:16px; text-align:center; color:#5b667a;">Sin mediciones del día.</td>
+                </tr>
+                <tr th:each="m : ${ultimasMediciones}" style="border-bottom:1px solid #e5e7eb;"
+                    onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+                  <td style="padding:10px 14px;" th:text="${#temporals.format(m.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></td>
+                  <td style="padding:10px 14px;" th:text="${m.punto.codigo + ' - ' + m.punto.nombre}"></td>
+                  <td style="padding:10px 14px; font-weight:600;" th:text="${m.temperaturaCelsius + ' °C'}"></td>
+                  <td style="padding:10px 14px;">
+                    <span th:text="${m.estado}"
+                          th:style="${m.estado == 'OK'} ? 'background:#d1fae5;color:#065f46;' : 'background:#fee2e2;color:#7f1d1d;'"
+                          style="padding:2px 10px; border-radius:99px; font-size:11px; font-weight:700;"></span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- fin col derecha -->
+  </div><!-- fin grid -->
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script>
+function toggleEditForm(puntoId) {
+  var form = document.getElementById('edit-form-' + puntoId);
+  if (form) {
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  }
+}
+</script>
+</body>
+</html>
+
+  background:
+    radial-gradient(circle at 8% 12%, rgba(11,60,117,0.08), transparent 32%),
+    radial-gradient(circle at 94% 5%, rgba(0,164,200,0.12), transparent 28%),
+    linear-gradient(180deg,#edf3f9 0%,#e6edf5 55%,#dfe9f3 100%);">
+
+<nav th:replace="~{fragments/navdar :: nav}"></nav>
+
+<!-- Page Header -->
+<div style="background:linear-gradient(90deg,#134e4a,#0d9488); padding:22px 32px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+  <div style="display:flex; align-items:center; gap:16px;">
+    <a href="/dashboard" style="color:rgba(255,255,255,0.75); font-size:13px; text-decoration:none; font-weight:600;">← Dashboard</a>
+    <span style="color:rgba(255,255,255,0.4);">/</span>
+    <span style="color:#ffffff; font-weight:800; font-size:15px;">🌡️ Sitios y Temperaturas</span>
   </div>
   <div style="display:flex; gap:10px;">
     <a href="/temperaturas/registro" style="background:rgba(255,255,255,0.15); color:#fff; font-size:13px; font-weight:700; padding:8px 16px; border-radius:7px; text-decoration:none; border:1px solid rgba(255,255,255,0.3);">Ingresar Temperaturas</a>
+    <a href="/salas" style="background:rgba(255,255,255,0.15); color:#fff; font-size:13px; font-weight:700; padding:8px 16px; border-radius:7px; text-decoration:none; border:1px solid rgba(255,255,255,0.3);">🏢 Gestionar Salas</a>
     <a href="/plano-sala" style="background:rgba(255,255,255,0.15); color:#fff; font-size:13px; font-weight:700; padding:8px 16px; border-radius:7px; text-decoration:none; border:1px solid rgba(255,255,255,0.3);">🗺️ Planos de Sala</a>
     <a href="/dashboard" style="background:#fff; color:#134e4a; font-size:13px; font-weight:800; padding:8px 16px; border-radius:7px; text-decoration:none;">← Dashboard</a>
   </div>
@@ -47,29 +420,12 @@
       </div>
     </div>
 
-    <!-- 2) Crear Sala -->
-    <div class="dcim-card" style="overflow:hidden;">
-      <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
-      <div style="padding:20px 24px;">
-        <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">2) Crear Sala</div>
-        <form method="post" action="/temperaturas/salas" style="display:flex; flex-direction:column; gap:10px;">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-          <select name="sitioId" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
-            <option value="">Seleccione sitio</option>
-            <option th:each="s : ${sitios}" th:value="${s.id}" th:text="${s.nombre}" th:selected="${sitioIdSeleccionado == s.id}"></option>
-          </select>
-          <input name="nombre" placeholder="Ej: Sala A1" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
-          <input name="descripcion" placeholder="Descripción" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13px; box-sizing:border-box;">
-          <button style="padding:9px 18px; border-radius:8px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; font-weight:700; font-size:13px; border:none; cursor:pointer; width:fit-content;">Guardar Sala</button>
-        </form>
-      </div>
-    </div>
 
-    <!-- 3) Crear Punto de Medición -->
+    <!-- 2) Crear Punto de Medición -->
     <div class="dcim-card" style="overflow:hidden;">
       <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
       <div style="padding:20px 24px;">
-        <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">3) Crear Punto de Medición</div>
+        <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">2) Crear Punto de Medición</div>
         <form method="post" action="/temperaturas/puntos" style="display:flex; flex-direction:column; gap:10px;">
           <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
           <select id="sitioPunto" name="sitioId" required onchange="window.location='/temperaturas?sitioId='+this.value"
@@ -96,7 +452,7 @@
     <div class="dcim-card" style="overflow:hidden;">
       <div class="card-band" style="background:linear-gradient(90deg,#134e4a,#0d9488)"></div>
       <div style="padding:20px 24px;">
-        <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">4) Registro de Temperaturas</div>
+        <div style="font-weight:800; font-size:13px; color:#134e4a; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">3) Registro de Temperaturas</div>
         <p style="font-size:13px; color:#5b667a; margin:0 0 16px;">El ingreso de temperaturas se realiza en la página dedicada de registro.</p>
         <a href="/temperaturas/registro" style="display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:8px; background:linear-gradient(90deg,#134e4a,#0d9488); color:#fff; font-weight:700; font-size:13px; text-decoration:none; box-shadow:0 3px 10px rgba(13,148,136,0.25);">
           → Ir a Registro de Temperaturas

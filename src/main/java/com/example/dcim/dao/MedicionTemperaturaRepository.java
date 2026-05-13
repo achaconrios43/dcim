@@ -42,5 +42,11 @@ public interface MedicionTemperaturaRepository extends JpaRepository<MedicionTem
         @Query("SELECT DISTINCT m.punto.id FROM MedicionTemperatura m WHERE m.punto.sala.id = :salaId AND m.fechaMedicion = :fecha")
         List<Long> findPuntoIdsRegistradosEnFecha(@Param("salaId") Long salaId, @Param("fecha") LocalDate fecha);
 
+        @Query("SELECT DISTINCT m.punto.id FROM MedicionTemperatura m WHERE m.punto.sala.id = :salaId AND m.fechaMedicion = :fecha AND m.horario = :horario")
+        List<Long> findPuntoIdsRegistradosEnFechaYHorario(@Param("salaId") Long salaId, @Param("fecha") LocalDate fecha, @Param("horario") String horario);
+
         boolean existsByPuntoIdAndFechaMedicion(Long puntoId, LocalDate fecha);
+
+        @Query("SELECT m FROM MedicionTemperatura m WHERE m.punto.sala.sitio.id = :sitioId AND m.fechaMedicion BETWEEN :inicio AND :fin ORDER BY m.punto.sala.nombre ASC, m.punto.id ASC, m.fechaMedicion ASC, m.horario ASC")
+        List<MedicionTemperatura> findBySitioIdAndFechaRange(@Param("sitioId") Long sitioId, @Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
     }

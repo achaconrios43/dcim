@@ -66,6 +66,7 @@ public class IngresoAPServiceImpl implements IngresoAPService {
         }
         
         ingresoAP.setActivo(true);
+        calcularSupervisionMedia(ingresoAP);
         temperaturaService.vincularIngresoAPConUbicacion(ingresoAP);
         
         return ingresoAPRepository.save(ingresoAP);
@@ -106,9 +107,36 @@ public class IngresoAPServiceImpl implements IngresoAPService {
             throw new Exception("El registro de ingreso no existe");
         }
         
+        // Si se registró fecha/hora de salida → técnico inactivo; si no → sigue activo
+        boolean tieneSalida = ingresoAP.getFechaTermino() != null || ingresoAP.getHoraTermino() != null;
+        ingresoAP.setActivo(!tieneSalida);
+
+        calcularSupervisionMedia(ingresoAP);
         validarDatosIngreso(ingresoAP);
         temperaturaService.vincularIngresoAPConUbicacion(ingresoAP);
         return ingresoAPRepository.save(ingresoAP);
+    }
+
+    /**
+     * Calcula el punto medio entre horaInicio y horaFinFicticia y lo guarda en
+     * horaSupervisionMedia / fechaSupervisionMedia si aún no está fijado.
+     */
+    private void calcularSupervisionMedia(IngresoAP ingresoAP) {
+        if (ingresoAP.getHoraInicio() == null || ingresoAP.getHoraFinFicticia() == null) return;
+        if (ingresoAP.getHoraSupervisionMedia() != null) return; // ya calculado, respetar
+
+        LocalDate fechaInicio = ingresoAP.getFechaInicio() != null ? ingresoAP.getFechaInicio() : LocalDate.now();
+        LocalDate fechaFin    = ingresoAP.getFechaFinFicticia() != null ? ingresoAP.getFechaFinFicticia() : fechaInicio;
+
+        long inicioSeg = fechaInicio.toEpochDay() * 86400L + ingresoAP.getHoraInicio().toSecondOfDay();
+        long finSeg    = fechaFin.toEpochDay()    * 86400L + ingresoAP.getHoraFinFicticia().toSecondOfDay();
+
+        long medioSeg  = (inicioSeg + finSeg) / 2;
+        LocalDate fechaMedio = LocalDate.ofEpochDay(medioSeg / 86400);
+        LocalTime horaMedio  = LocalTime.ofSecondOfDay(medioSeg % 86400);
+
+        ingresoAP.setFechaSupervisionMedia(fechaMedio);
+        ingresoAP.setHoraSupervisionMedia(horaMedio);
     }
     
     @Override
@@ -414,6 +442,11 @@ public class IngresoAPServiceImpl implements IngresoAPService {
     public Long contarTicketsUnicos(LocalDate fechaInicio, LocalDate fechaFin) {
         return ingresoAPRepository.countDistinctNumeroTicketByFechaInicioBetween(fechaInicio, fechaFin);
     }
+
+    @Override
+    public Long contarIngresosPorRango(LocalDate fechaInicio, LocalDate fechaFin) {
+        return ingresoAPRepository.countByFechaInicioBetween(fechaInicio, fechaFin);
+    }
     
     /**
      * Cuenta ingresos por tipo de ticket en un rango de fechas
@@ -476,6 +509,11 @@ public class IngresoAPServiceImpl implements IngresoAPService {
             return todos.subList(0, limite);
         }
         return todos;
+    }
+
+    @Override
+    public List<String> listarSitiosIngresoAP() {
+        return ingresoAPRepository.findDistinctSitioIngreso();
     }
 }
 

@@ -59,53 +59,60 @@ public class DashboardClienteDiarioController {
         
         model.addAttribute("usuarioLogueado", usuarioLogueado);
         LocalDate hoy = LocalDate.now();
-        model.addAttribute("sitiosDisponibles", temperaturaService.listarSitiosActivos());
+
+        // Dropdown pobla desde los sitios reales de IngresoAP
+        model.addAttribute("sitiosDisponibles", ingresoAPService.listarSitiosIngresoAP());
         
         model.addAttribute("sitioSeleccionado", sitio);
         model.addAttribute("fechaActual", hoy);
         model.addAttribute("diaSemana", hoy.getDayOfWeek().toString());
         
-        if (sitio == null || sitio.trim().isEmpty()) {
-            model.addAttribute("ingresosHoy", 0L);
-            model.addAttribute("ticketsUnicosHoy", 0L);
-            model.addAttribute("cantidadCRQHoy", 0L);
-            model.addAttribute("cantidadINCHoy", 0L);
-            model.addAttribute("cantidadInspeccionHoy", 0L);
-            model.addAttribute("salasTIHoy", 0L);
-            model.addAttribute("salasREDHoy", 0L);
-            model.addAttribute("gestionesDelDia", 0L);
-            model.addAttribute("ticketsAprobadosHoy", 0L);
-            model.addAttribute("ticketsPendientesAprobacion", 0L);
-            model.addAttribute("ticketsRechazadosHoy", 0L);
-            model.addAttribute("ticketsDevueltosHoy", 0L);
-            model.addAttribute("ticketsPendientesCierre", 0L);
-            model.addAttribute("registrosActivosHoy", List.of());
-            return "dashboard-cliente-diario";
-        }
-        
+        boolean filtrarPorSitio = sitio != null && !sitio.trim().isEmpty() && !sitio.equals("TODOS");
+
         // === ESTADÍSTICAS DE INGRESOS TÉCNICOS DEL DÍA ===
-        Long ingresosHoy = ingresoAPService.contarIngresosPorSitio(sitio, hoy, hoy);
-        Long ticketsUnicosHoy = ingresoAPService.contarTicketsUnicosPorSitio(sitio, hoy, hoy);
-        
+        Long ingresosHoy = filtrarPorSitio
+                ? ingresoAPService.contarIngresosPorSitio(sitio, hoy, hoy)
+                : ingresoAPService.contarIngresosPorFecha(hoy);
+
+        Long ticketsUnicosHoy = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorSitio(sitio, hoy, hoy)
+                : ingresoAPService.contarTicketsUnicos(hoy, hoy);
+
         // Tipos de tickets del día
-        Long cantidadCRQHoy = ingresoAPService.contarTicketsUnicosPorTipoYSitio("CRQ", sitio, hoy, hoy);
-        Long cantidadINCHoy = ingresoAPService.contarTicketsUnicosPorTipoYSitio("INC", sitio, hoy, hoy);
-        
-        Long cantidadVisitaInspectivaHoy = ingresoAPService.contarTicketsUnicosPorTipoYSitio("Visita Inspectiva", sitio, hoy, hoy);
-        Long cantidadRondaRutinariaHoy = ingresoAPService.contarTicketsUnicosPorTipoYSitio("Ronda Rutinaria", sitio, hoy, hoy);
-        Long cantidadInspeccionHoy = (cantidadVisitaInspectivaHoy != null ? cantidadVisitaInspectivaHoy : 0L) + 
+        Long cantidadCRQHoy = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorTipoYSitio("CRQ", sitio, hoy, hoy)
+                : ingresoAPService.contarTicketsUnicosPorTipo("CRQ", hoy, hoy);
+        Long cantidadINCHoy = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorTipoYSitio("INC", sitio, hoy, hoy)
+                : ingresoAPService.contarTicketsUnicosPorTipo("INC", hoy, hoy);
+
+        Long cantidadVisitaInspectivaHoy = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorTipoYSitio("Visita Inspectiva", sitio, hoy, hoy)
+                : ingresoAPService.contarTicketsUnicosPorTipo("Visita Inspectiva", hoy, hoy);
+        Long cantidadRondaRutinariaHoy = filtrarPorSitio
+                ? ingresoAPService.contarTicketsUnicosPorTipoYSitio("Ronda Rutinaria", sitio, hoy, hoy)
+                : ingresoAPService.contarTicketsUnicosPorTipo("Ronda Rutinaria", hoy, hoy);
+        Long cantidadInspeccionHoy = (cantidadVisitaInspectivaHoy != null ? cantidadVisitaInspectivaHoy : 0L) +
                                       (cantidadRondaRutinariaHoy != null ? cantidadRondaRutinariaHoy : 0L);
-        
+
         // Salas del día
-        Long salasTIHoy = ingresoAPService.contarPorSalaRemedyYSitio("Salas TI", sitio, hoy, hoy);
-        Long salasREDHoy = ingresoAPService.contarPorSalaRemedyYSitio("Salas de RED", sitio, hoy, hoy);
-        Long salasTIyREDHoy = ingresoAPService.contarPorSalaRemedyYSitio("Salas TI & RED", sitio, hoy, hoy);
-        
+        Long salasTIHoy = filtrarPorSitio
+                ? ingresoAPService.contarPorSalaRemedyYSitio("Salas TI", sitio, hoy, hoy)
+                : ingresoAPService.contarPorSalaRemedy("Salas TI", hoy, hoy);
+        Long salasREDHoy = filtrarPorSitio
+                ? ingresoAPService.contarPorSalaRemedyYSitio("Salas de RED", sitio, hoy, hoy)
+                : ingresoAPService.contarPorSalaRemedy("Salas de RED", hoy, hoy);
+        Long salasTIyREDHoy = filtrarPorSitio
+                ? ingresoAPService.contarPorSalaRemedyYSitio("Salas TI & RED", sitio, hoy, hoy)
+                : ingresoAPService.contarPorSalaRemedy("Salas TI & RED", hoy, hoy);
+
         Long salasTITotalHoy = (salasTIHoy != null ? salasTIHoy : 0L) + (salasTIyREDHoy != null ? salasTIyREDHoy : 0L);
         Long salasREDTotalHoy = (salasREDHoy != null ? salasREDHoy : 0L) + (salasTIyREDHoy != null ? salasTIyREDHoy : 0L);
-        
+
         // Registros activos del día
-        List<IngresoAP> registrosActivosHoy = ingresoAPService.obtenerRegistrosActivosRecientesPorSitio(sitio, 10);
+        List<IngresoAP> registrosActivosHoy = filtrarPorSitio
+                ? ingresoAPService.obtenerRegistrosActivosRecientesPorSitio(sitio, 10)
+                : ingresoAPService.obtenerRegistrosActivosRecientes(10);
         
         model.addAttribute("ingresosHoy", ingresosHoy != null ? ingresosHoy : 0L);
         model.addAttribute("ticketsUnicosHoy", ticketsUnicosHoy != null ? ticketsUnicosHoy : 0L);

@@ -52,13 +52,13 @@
             <form method="get" action="/dashboard/cliente/diario" class="flex flex-wrap gap-4 items-end">
                 <div class="flex-1 min-w-[300px]">
                     <label for="sitio" class="block text-sm font-medium text-gray-700 mb-2">Sitio de Ingreso</label>
-                    <select id="sitio" name="sitio" required
+                    <select id="sitio" name="sitio"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="">Seleccione un sitio</option>
+                        <option value="">Todos los sitios</option>
                         <option th:each="sitioItem : ${sitiosDisponibles}"
-                                th:value="${sitioItem.nombre}"
-                                th:text="${sitioItem.nombre}"
-                                th:selected="${sitioSeleccionado == sitioItem.nombre}"></option>
+                                th:value="${sitioItem}"
+                                th:text="${sitioItem}"
+                                th:selected="${sitioSeleccionado == sitioItem}"></option>
                     </select>
                 </div>
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
@@ -66,16 +66,20 @@
                     Ver Estadísticas
                 </button>
             </form>
-            <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}" class="mt-4">
-                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+            <div class="mt-4">
+                <span th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}" class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                     <i class="fas fa-check-circle mr-2"></i>
                     Mostrando estadísticas para: <strong class="ml-1" th:text="${sitioSeleccionado}">Sitio</strong>
+                </span>
+                <span th:if="${sitioSeleccionado == null or sitioSeleccionado == ''}" class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                    <i class="fas fa-globe mr-2"></i>
+                    Mostrando todos los sitios
                 </span>
             </div>
         </div>
 
         <!-- Contenedor de estadísticas -->
-        <div th:if="${sitioSeleccionado != null and sitioSeleccionado != ''}">
+        <div>
 
         <!-- Sección: INGRESOS DE TÉCNICOS -->
         <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 mb-6 text-white">

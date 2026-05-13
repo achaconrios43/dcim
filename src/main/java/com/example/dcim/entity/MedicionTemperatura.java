@@ -39,6 +39,9 @@ public class MedicionTemperatura {
     @Column(name = "fecha_registro", nullable = false, updatable = false)
     private LocalDateTime fechaRegistro;
 
+    @Column(name = "horario", length = 10)
+    private String horario;
+
     @PrePersist
     protected void onCreate() {
         fechaRegistro = LocalDateTime.now();
@@ -93,5 +96,13 @@ public class MedicionTemperatura {
 
     public void setFechaRegistro(LocalDateTime fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
+    }
+
+    public String getHorario() {
+        return horario;
+    }
+
+    public void setHorario(String horario) {
+        this.horario = horario;
     }
 }

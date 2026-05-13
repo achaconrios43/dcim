@@ -132,10 +132,6 @@
             <span>📦 Inventario de Racks</span>
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
-          <a href="/temperaturas/registro" class="module-link text-blue-700">
-            <span>🌡️ Monitoreo de Temperatura</span>
-            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-          </a>
           <a href="/plano-sala" class="module-link text-blue-700">
             <span>🗺️ Layout de Salas</span>
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -194,8 +190,30 @@
             <span>➕ Registrar Gestión</span>
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
-          <a th:href="@{/dashboard/cliente}" class="module-link text-violet-700">
-            <span>📊 Ver Estadísticas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Salas (solo ADMIN) -->
+    <div class="dcim-card" th:if="${usuario != null and usuario.rol == 'ADMIN'}">
+      <div class="card-band" style="background: linear-gradient(90deg,#1e3a5f,#0b3c75)"></div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+               style="background:rgba(11,60,117,0.10)">🏢</div>
+          <div>
+            <h3 class="font-bold text-slate-800">Creación de Salas</h3>
+            <p class="text-xs text-slate-500">Crear y administrar salas por sitio</p>
+          </div>
+          <span class="ml-auto tag-pill bg-blue-100 text-blue-700">ADMIN</span>
+        </div>
+        <div class="space-y-1 mt-3">
+          <a href="/salas" class="module-link text-blue-700">
+            <span>🏢 Ver todas las salas</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a href="/salas" class="module-link text-blue-700">
+            <span>➕ Crear nueva sala</span>
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
         </div>
@@ -221,7 +239,7 @@
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
           <a href="/temperaturas/registro" class="module-link text-teal-700">
-            <span>➕ Registrar Medición</span>
+            <span>➕ Registro de Temperaturas</span>
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
         </div>
@@ -248,6 +266,43 @@
           </a>
           <a th:href="@{/user/create}" class="module-link text-emerald-700">
             <span>➕ Crear Usuario</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas (ADMIN + USER) -->
+    <div class="dcim-card" th:if="${usuario != null and usuario.rol != 'VIEWER'}">
+      <div class="card-band" style="background: linear-gradient(90deg,#b45309,#f59e0b)"></div>
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+               style="background:rgba(180,83,9,0.10)">📊</div>
+          <div>
+            <h3 class="font-bold text-slate-800">Estadísticas</h3>
+            <p class="text-xs text-slate-500">Reportes e indicadores del Data Center</p>
+          </div>
+        </div>
+        <div class="space-y-1 mt-3">
+          <a th:href="@{/dashboard/cliente/diario}" class="module-link text-amber-700">
+            <span>📅 Ingresos Diarios</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a th:href="@{/dashboard/cliente/mensual}" class="module-link text-amber-700">
+            <span>📆 Ingresos Mensuales</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a href="/temperaturas" class="module-link text-amber-700">
+            <span>🌡️ Temperatura Diaria / Mensual</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a th:href="@{/dashboard/cliente}" class="module-link text-amber-700">
+            <span>🎫 Gestión de Acceso</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a th:href="@{/inventario}" class="module-link text-amber-700">
+            <span>🗄️ Racks, Servidores y Equipos</span>
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
         </div>

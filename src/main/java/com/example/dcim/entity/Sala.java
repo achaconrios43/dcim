@@ -30,6 +30,9 @@ public class Sala {
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Column(length = 50)
+    private String tipo;
+
     @Column(length = 255)
     private String descripcion;
 
@@ -78,6 +81,14 @@ public class Sala {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public String getDescripcion() {

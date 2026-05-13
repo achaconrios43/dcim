@@ -9,7 +9,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 /**
  * Configuración de Spring Security
@@ -22,6 +23,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
  */
 @Configuration
 @EnableWebSecurity
+@org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 public class SecurityConfig {
 
     /**
@@ -81,14 +83,18 @@ public class SecurityConfig {
                 .requestMatchers("/temperaturas/**").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/plano-sala/plantillas", "/plano-sala/plantillas/**").hasAnyRole("ADMIN", "USER", "VIEWER")
                 .requestMatchers("/plano-sala/**", "/plano-sala").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/salas", "/salas/**").hasRole("ADMIN")
 
                 // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
                 )
 
             // Configuración de CSRF para aplicación web
+            // CsrfTokenRequestAttributeHandler (no-deferred) evita "Cannot create session
+            // after response committed" al renderizar login.html en Spring Security 6.5+
             .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRepository(new HttpSessionCsrfTokenRepository())
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
 
             // Configuración del formulario de login
