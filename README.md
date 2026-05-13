@@ -6,7 +6,7 @@ Sistema web desarrollado en Spring Boot para gestionar usuarios e ingresos en in
 
 | Capa | Tecnología |
 |------|-----------|
-| Runtime | Java 21 LTS |
+| Runtime | Java 25 LTS |
 | Framework | Spring Boot 3.5.9 |
 | ORM | Spring Data JPA / Hibernate |
 | Seguridad | Spring Security |
@@ -17,19 +17,19 @@ Sistema web desarrollado en Spring Boot para gestionar usuarios e ingresos en in
 
 ## Stack y herramientas usadas
 
-- Lenguaje principal: Java 21
+- Lenguaje principal: Java 25
 - Framework backend: Spring Boot 3.5.9
 - Plantillas UI: Thymeleaf + HTML + JavaScript + TailwindCSS
 - Persistencia: Spring Data JPA con Hibernate
 - Seguridad: Spring Security + BCrypt + CSRF para web
 - IDE/Extensión: VS Code con Java (Red Hat Language Support)
 - Contenedores: Docker multi-stage
-- Runtime de contenedor: Red Hat UBI 9 con OpenJDK 21
+- Runtime de contenedor: Red Hat UBI 9 con OpenJDK 25
 - Despliegue cloud (opcional): Koyeb
 
 ## Requisitos previos
 
-- Java 21 LTS
+- Java 25 LTS
 - MySQL 8.4 corriendo en `localhost:3307`
 - Base de datos `dcimdb` creada
 

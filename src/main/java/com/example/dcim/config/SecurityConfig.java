@@ -9,8 +9,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 /**
  * Configuración de Spring Security
@@ -89,11 +89,10 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 )
 
-            // Configuración de CSRF para aplicación web
-            // CsrfTokenRequestAttributeHandler (no-deferred) evita "Cannot create session
-            // after response committed" al renderizar login.html en Spring Security 6.5+
+            // CookieCsrfTokenRepository evita "Cannot create session after response
+            // committed" porque almacena el token en cookie, no en sesión HTTP
             .csrf(csrf -> csrf
-                .csrfTokenRepository(new HttpSessionCsrfTokenRepository())
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
 
