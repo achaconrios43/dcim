@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: achaconrios43/dcim-app
+  DOCKER_IMAGE: achaconrios43ipss/dcim-app
 
 jobs:
   docker:
