@@ -11,7 +11,7 @@ COPY mvnw mvnw
 COPY .mvn .mvn
 COPY src ./src
 
-RUN chmod +x mvnw && ./mvnw clean package -DskipTests -B
+RUN sed -i 's/\r//' mvnw && chmod +x mvnw && ./mvnw clean package -DskipTests -B
 
 # ========================================
 # ETAPA 2: RUNTIME - JRE 25 ligero

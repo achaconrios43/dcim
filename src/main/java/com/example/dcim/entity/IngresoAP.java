@@ -171,7 +171,7 @@ public class IngresoAP {
     private Boolean activo = true;
 
     @JsonProperty("foto_tecnico")
-    @Column(name = "foto_tecnico", columnDefinition = "LONGTEXT")
+    @Column(name = "foto_tecnico", columnDefinition = "TEXT")
     private String fotoTecnico;
 
     @JsonProperty("coordenadas_gps")
