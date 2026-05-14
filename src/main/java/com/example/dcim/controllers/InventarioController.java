@@ -178,13 +178,27 @@ public class InventarioController {
                 return "redirect:/inventario/importar";
             }
 
-            // Importar datos del Excel
-            List<Inventario> items = ExcelImportUtil.importarExcel(file);
-            
+            // Importar datos del Excel con diagnóstico
+            ExcelImportUtil.ImportResult result = ExcelImportUtil.importarExcelConDiagnostico(file);
+            List<Inventario> items = result.items;
+
+            if (items.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error",
+                    "No se encontraron filas con datos. "
+                    + "Filas en hoja: " + result.totalFilasHoja
+                    + " | Encabezados detectados: " + result.encabezadosDetectados
+                    + " | Columnas mapeadas: " + result.columnasMapeadas);
+                return "redirect:/inventario/importar";
+            }
+
             // Importar sin duplicados
             inventarioService.importarLote(items);
 
-            redirectAttributes.addFlashAttribute("success", "Importados " + items.size() + " registros correctamente (duplicados actualizados)");
+            redirectAttributes.addFlashAttribute("success",
+                "✓ Guardados " + items.size() + " registros. "
+                + "(Hoja tenía " + result.totalFilasHoja + " filas, "
+                + result.filasConDatos + " con datos. "
+                + "Encabezados: " + (result.encabezadosDetectados ? "detectados automáticamente" : "índices fijos") + ")");
             return "redirect:/inventario";
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("error", "Error al procesar el archivo: " + e.getMessage());

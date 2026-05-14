@@ -83,6 +83,31 @@ public class SalaController {
         return "salas";
     }
 
+    @PostMapping("/sitio/crear")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String crearSitio(
+            @RequestParam String nombre,
+            @RequestParam(required = false) String descripcion,
+            RedirectAttributes ra) {
+
+        String nombreTrimmed = nombre.trim();
+        if (nombreTrimmed.isEmpty()) {
+            ra.addFlashAttribute("error", "El nombre del sitio no puede estar vacío");
+            return "redirect:/salas";
+        }
+        if (sitioRepository.findByNombreIgnoreCase(nombreTrimmed).isPresent()) {
+            ra.addFlashAttribute("error", "Ya existe un sitio con ese nombre");
+            return "redirect:/salas";
+        }
+        Sitio sitio = new Sitio();
+        sitio.setNombre(nombreTrimmed);
+        sitio.setDescripcion(descripcion != null ? descripcion.trim() : null);
+        sitio.setActivo(true);
+        sitioRepository.save(sitio);
+        ra.addFlashAttribute("success", "Sitio \"" + sitio.getNombre() + "\" creado correctamente");
+        return "redirect:/salas";
+    }
+
     @PostMapping("/crear")
     @PreAuthorize("hasRole('ADMIN')")
     public String crear(

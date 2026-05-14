@@ -57,6 +57,7 @@ public class GestionAccesoController {
 
         List<GestionAcceso> gestiones = gestionAccesoService.listarTodas();
         model.addAttribute("gestiones", gestiones);
+        model.addAttribute("sitiosCatalogo", temperaturaService.listarSitiosActivos());
         model.addAttribute("titulo", "Gestión de Accesos - Listado Completo");
         return "gestion/gestion-list";
     }
@@ -85,6 +86,7 @@ public class GestionAccesoController {
         List<GestionAcceso> gestiones = gestionAccesoService.listarPorSitio(sitio);
         model.addAttribute("gestiones", gestiones);
         model.addAttribute("sitio", sitio);
+        model.addAttribute("sitiosCatalogo", temperaturaService.listarSitiosActivos());
         model.addAttribute("titulo", "Gestión de Accesos - " + sitio);
         return "gestion/gestion-list";
     }

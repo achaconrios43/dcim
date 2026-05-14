@@ -1,16 +1,18 @@
 package com.example.dcim.controllers;
 
-import com.example.dcim.service.IngresoAPService;
-import com.example.dcim.service.GestionAccesoService;
-import com.example.dcim.entity.IngresoAP;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDate;
-import java.util.List;
+import com.example.dcim.dao.SitioRepository;
+import com.example.dcim.entity.IngresoAP;
+import com.example.dcim.service.GestionAccesoService;
+import com.example.dcim.service.IngresoAPService;
 
 /**
  * Controlador para el Dashboard de Cliente
@@ -25,6 +27,9 @@ public class ClienteDashboardController {
     
     @Autowired
     private GestionAccesoService gestionAccesoService;
+
+    @Autowired
+    private SitioRepository sitioRepository;
     
     @GetMapping
     public String mostrarDashboard(@org.springframework.web.bind.annotation.RequestParam(required = false) String sitio, Model model) {
@@ -37,17 +42,10 @@ public class ClienteDashboardController {
         model.addAttribute("sitioSeleccionado", sitio);
         model.addAttribute("mesActual", now.getMonth().toString());
         model.addAttribute("anioActual", now.getYear());
+        model.addAttribute("sitiosDisponibles", sitioRepository.findByActivoTrueOrderByNombreAsc());
         
         // Si no hay sitio seleccionado, solo mostrar el formulario
         if (sitio == null || sitio.trim().isEmpty()) {
-            model.addAttribute("ingresosTotalesMes", 0L);
-            model.addAttribute("ticketsUnicos", 0L);
-            model.addAttribute("cantidadCRQ", 0L);
-            model.addAttribute("cantidadINC", 0L);
-            model.addAttribute("cantidadInspeccionRonda", 0L);
-            model.addAttribute("salasTI", 0L);
-            model.addAttribute("salasRED", 0L);
-            model.addAttribute("registrosRecientes", List.of());
             return "dashboard-cliente";
         }
         

@@ -2,6 +2,7 @@ package com.example.dcim.controllers;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.dcim.dao.IUsuarioDao;
+import com.example.dcim.dao.SitioRepository;
+import com.example.dcim.dto.RegistroActivoDto;
+import com.example.dcim.entity.GestionAcceso;
 import com.example.dcim.entity.IngresoAP;
 import com.example.dcim.entity.MedicionTemperatura;
 import com.example.dcim.entity.Usuario;
@@ -39,6 +43,9 @@ public class DashboardClienteDiarioController {
 
     @Autowired
     private TemperaturaService temperaturaService;
+
+    @Autowired
+    private SitioRepository sitioRepository;
     
     @GetMapping
     public String mostrarDashboardDiario(@RequestParam(required = false) String sitio, Authentication authentication, Model model) {
@@ -54,14 +61,14 @@ public class DashboardClienteDiarioController {
             return "redirect:/login";
         }
         
-        // Permitir acceso a USER y ADMIN
-        // Ambos roles pueden ver el dashboard diario
+        // Permitir acceso a USER, ADMIN, VIEWER y CLIENTE
+        // Todos los roles pueden ver el dashboard diario
         
         model.addAttribute("usuarioLogueado", usuarioLogueado);
         LocalDate hoy = LocalDate.now();
 
-        // Dropdown pobla desde los sitios reales de IngresoAP
-        model.addAttribute("sitiosDisponibles", ingresoAPService.listarSitiosIngresoAP());
+        // Dropdown pobla desde la tabla Sitio (sitios activos)
+        model.addAttribute("sitiosDisponibles", sitioRepository.findByActivoTrueOrderByNombreAsc());
         
         model.addAttribute("sitioSeleccionado", sitio);
         model.addAttribute("fechaActual", hoy);
@@ -109,10 +116,16 @@ public class DashboardClienteDiarioController {
         Long salasTITotalHoy = (salasTIHoy != null ? salasTIHoy : 0L) + (salasTIyREDHoy != null ? salasTIyREDHoy : 0L);
         Long salasREDTotalHoy = (salasREDHoy != null ? salasREDHoy : 0L) + (salasTIyREDHoy != null ? salasTIyREDHoy : 0L);
 
-        // Registros activos del día
-        List<IngresoAP> registrosActivosHoy = filtrarPorSitio
-                ? ingresoAPService.obtenerRegistrosActivosRecientesPorSitio(sitio, 10)
-                : ingresoAPService.obtenerRegistrosActivosRecientes(10);
+        // Registros activos del día con alertas de horario
+        List<IngresoAP> registrosRaw = filtrarPorSitio
+                ? ingresoAPService.obtenerRegistrosActivosRecientesPorSitio(sitio, 50)
+                : ingresoAPService.obtenerRegistrosActivosRecientes(50);
+
+        List<RegistroActivoDto> registrosActivosHoy = registrosRaw.stream().map(ingreso -> {
+            List<GestionAcceso> gestiones = gestionAccesoService.listarPorNumeroTicket(ingreso.getNumeroTicket());
+            GestionAcceso gestion = (gestiones != null && !gestiones.isEmpty()) ? gestiones.get(0) : null;
+            return RegistroActivoDto.of(ingreso, gestion);
+        }).collect(Collectors.toList());
         
         model.addAttribute("ingresosHoy", ingresosHoy != null ? ingresosHoy : 0L);
         model.addAttribute("ticketsUnicosHoy", ticketsUnicosHoy != null ? ticketsUnicosHoy : 0L);

@@ -35,10 +35,21 @@
           <span style="font-weight:800; font-size:13px; color:#0f4c75; text-transform:uppercase; letter-spacing:.06em;">Ubicación</span>
           <div style="flex:1; height:1px; background:#e5e7eb;"></div>
         </div>
+        <!-- Tipo va primero -->
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Tipo</label>
+          <input type="text" name="tipo" id="campoTipo" th:value="${inventario?.tipo}" oninput="toggleCapacidadUr()" placeholder="Ej: Rack, Servidor, Switch…" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+        </div>
+        <!-- Capacidad UR del Rack (solo visible si tipo == rack) -->
+        <div id="campoCapacidadUr" style="margin-bottom:14px; display:none;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#0f4c75; margin-bottom:5px;">🗄️ Capacidad Total UR del Rack</label>
+          <input type="number" name="capacidadUrRack" id="inputCapacidadUr" min="1" max="999" th:value="${inventario?.capacidadUrRack}" placeholder="Ej: 42" style="width:100%; padding:9px 12px; border:1.5px solid #1b6ca8; border-radius:8px; background:#f0f7ff; font-size:13px; box-sizing:border-box;">
+          <small style="color:#5b667a; font-size:11px;">Número total de unidades de rack (UL) disponibles en este rack físico.</small>
+        </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
           <div>
             <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Sitio</label>
-            <select name="sitio" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+            <select name="sitio" id="selectSitio" onchange="filtrarSalas()" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
               <option value="">Seleccione sitio</option>
               <option th:each="sitioItem : ${sitiosCatalogo}"
                       th:value="${sitioItem.nombre}"
@@ -48,11 +59,12 @@
           </div>
           <div>
             <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Sala</label>
-            <select name="sala" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+            <select name="sala" id="selectSala" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
               <option value="">Seleccione sala</option>
               <option th:each="salaItem : ${salasCatalogo}"
                       th:value="${salaItem.nombre}"
-                      th:text="${salaItem.sitio.nombre + ' - ' + salaItem.nombre}"
+                      th:text="${salaItem.nombre}"
+                      th:attr="data-sitio=${salaItem.sitio != null ? salaItem.sitio.nombre : ''}"
                       th:selected="${inventario?.sala == salaItem.nombre}"></option>
             </select>
           </div>
@@ -84,6 +96,14 @@
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
           <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Marca</label>
+            <input type="text" name="marca" th:value="${inventario?.marca}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Modelo</label>
+            <input type="text" name="modelo" th:value="${inventario?.modelo}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
+          </div> 
+          <div>
             <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Número de Serie <span style="color:#dc2626;">*</span></label>
             <input type="text" name="numeroSerie" th:value="${inventario?.numeroSerie}" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; font-family:monospace; box-sizing:border-box;">
           </div>
@@ -91,18 +111,8 @@
             <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">TAG <span style="color:#dc2626;">*</span></label>
             <input type="text" name="tag" th:value="${inventario?.tag}" required style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; font-family:monospace; box-sizing:border-box;">
           </div>
-          <div>
-            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Tipo</label>
-            <input type="text" name="tipo" th:value="${inventario?.tipo}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Marca</label>
-            <input type="text" name="marca" th:value="${inventario?.marca}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
-          </div>
-          <div>
-            <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Modelo</label>
-            <input type="text" name="modelo" th:value="${inventario?.modelo}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
-          </div>
+          
+          
           <div>
             <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:5px;">Cliente</label>
             <input type="text" name="cliente" th:value="${inventario?.cliente}" style="width:100%; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:8px; background:#fff; font-size:13px; box-sizing:border-box;">
@@ -128,6 +138,7 @@
               <option value="STAND BY"  th:selected="${inventario?.estado == 'STAND BY'}">STAND BY</option>
               <option value="Retirado"  th:selected="${inventario?.estado == 'Retirado'}">Retirado</option>
               <option value="Alarmado"  th:selected="${inventario?.estado == 'Alarmado'}">Alarmado</option>
+               <option value="UR Ocupada"  th:selected="${inventario?.estado == 'Alarmado'}">UR Ocupada</option>  
             </select>
           </div>
         </div>
@@ -223,5 +234,48 @@
 </main>
 
 <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script>
+  function filtrarSalas() {
+    var sitioSel = document.getElementById('selectSitio').value;
+    var salaSelect = document.getElementById('selectSala');
+    var opciones = salaSelect.querySelectorAll('option');
+    var primeraVisible = null;
+    opciones.forEach(function(opt) {
+      if (opt.value === '') { opt.style.display = ''; return; }
+      var pertenece = opt.getAttribute('data-sitio') === sitioSel;
+      opt.style.display = (!sitioSel || pertenece) ? '' : 'none';
+      if (pertenece && !primeraVisible) primeraVisible = opt;
+    });
+    // Si la sala actualmente seleccionada no pertenece al nuevo sitio, limpiar
+    var salaActual = salaSelect.options[salaSelect.selectedIndex];
+    if (salaActual && salaActual.value !== '' && salaActual.getAttribute('data-sitio') !== sitioSel) {
+      salaSelect.value = '';
+    }
+  }
+
+  // Al cargar la página, aplicar el filtro con el sitio pre-seleccionado (modo edición)
+  document.addEventListener('DOMContentLoaded', function() {
+    var sitioSel = document.getElementById('selectSitio').value;
+    if (sitioSel) {
+      var salaSelect = document.getElementById('selectSala');
+      var salaPresel = salaSelect.value;
+      filtrarSalas();
+      // Restaurar la sala pre-seleccionada si pertenece al sitio
+      if (salaPresel) salaSelect.value = salaPresel;
+    }
+    // Inicializar visibilidad campo capacidad UR según tipo cargado (modo edición)
+    toggleCapacidadUr();
+  });
+
+  function toggleCapacidadUr() {
+    var tipo = (document.getElementById('campoTipo').value || '').trim().toLowerCase();
+    var div = document.getElementById('campoCapacidadUr');
+    var input = document.getElementById('inputCapacidadUr');
+    var esRack = tipo === 'rack' || tipo === 'racks';
+    div.style.display = esRack ? 'block' : 'none';
+    if (!esRack) input.value = '';
+  }
+</script>
 </body>
 </html>

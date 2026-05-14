@@ -55,39 +55,101 @@
   <div class="dcim-card" style="overflow:hidden;">
     <div class="card-band" style="background:linear-gradient(90deg,#0f4c75,#1b6ca8)"></div>
     <div style="overflow-x:auto;">
-      <table style="width:100%; border-collapse:collapse;">
+      <table style="width:100%; border-collapse:collapse; min-width:3200px;">
         <thead>
           <tr style="background:linear-gradient(90deg,#0f4c75,#1b6ca8);">
-            <th style="padding:11px 14px; text-align:left; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">ID</th>
-            <th style="padding:11px 14px; text-align:left; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">Número Serie</th>
-            <th style="padding:11px 14px; text-align:left; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">Tag</th>
-            <th style="padding:11px 14px; text-align:left; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">Sitio</th>
-            <th style="padding:11px 14px; text-align:left; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">Tipo</th>
-            <th style="padding:11px 14px; text-align:left; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">Marca</th>
-            <th style="padding:11px 14px; text-align:left; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">Modelo</th>
-            <th style="padding:11px 14px; text-align:left; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">Estado</th>
-            <th style="padding:11px 14px; text-align:left; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">IP</th>
-            <th style="padding:11px 14px; text-align:center; font-size:11px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap;">Acciones</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">ID</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Sala</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Sitio</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Tipo</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Marca</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Modelo</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Número Serie</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Tag</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Cliente</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Coordenadas</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Nombre Rack</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Ubic. UR</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">UR Utilizada</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Cap. UR Rack</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Nº Temporal</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Hotname</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Estado</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Fecha Alarma</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Alarma HW</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Alarma Vent.</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Alarma FP</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Alarma HDD</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Coment. Alarma</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Ticket</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Observaciones</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Flujo Aire</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Peso (kg)</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Fuentes Poder</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Tipos Enchufe</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Obs. Enchufe</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Potencia (W)</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Dirección IP</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Fecha Creación</th>
+            <th style="padding:11px 10px; text-align:left; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Fecha Modif.</th>
+            <th style="padding:11px 10px; text-align:center; font-size:10px; font-weight:800; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr th:each="inv : ${inventarios}"
               style="border-bottom:1px solid #f1f5f9; transition:background 0.15s;"
               onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
-            <td style="padding:10px 14px; font-size:13px; color:#5b667a;" th:text="${inv.id}">-</td>
-            <td style="padding:10px 14px; font-size:12px; font-family:monospace; color:#172134; font-weight:600;" th:text="${inv.numeroSerie}">-</td>
-            <td style="padding:10px 14px; font-size:13px;" th:text="${inv.tag}">-</td>
-            <td style="padding:10px 14px; font-size:13px;" th:text="${inv.sitio}">-</td>
-            <td style="padding:10px 14px; font-size:13px;" th:text="${inv.tipo}">-</td>
-            <td style="padding:10px 14px; font-size:13px;" th:text="${inv.marca}">-</td>
-            <td style="padding:10px 14px; font-size:13px;" th:text="${inv.modelo}">-</td>
-            <td style="padding:10px 14px;">
+            <td style="padding:8px 10px; font-size:12px; color:#5b667a; white-space:nowrap;" th:text="${inv.id}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.sala}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.sitio}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.tipo}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.marca}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.modelo}">-</td>
+            <td style="padding:8px 10px; font-size:12px; font-family:monospace; font-weight:600; white-space:nowrap;" th:text="${inv.numeroSerie}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.tag}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.cliente}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.coordenadas}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.nombreRack}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.ubicacionUr}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.urUtilizada}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.capacidadUrRack}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.numeroTemporal}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.hotname}">-</td>
+            <td style="padding:8px 10px; white-space:nowrap;">
               <span th:text="${inv.estado}"
-                    th:style="${inv.estado == 'Activo'} ? 'background:#d1fae5;color:#065f46;' : (${inv.estado == 'Inactivo'} ? 'background:#fee2e2;color:#7f1d1d;' : 'background:#fef3c7;color:#92400e;')"
-                    style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:700;">-</span>
+                    th:style="${inv.estado == 'Activo'} ? 'background:#d1fae5;color:#065f46;' : (${inv.estado == 'Inactivo'} ? 'background:#fee2e2;color:#7f1d1d;' : (${inv.estado == 'Operativo'} ? 'background:#d1fae5;color:#065f46;' : (${inv.estado == 'Alarmado'} ? 'background:#fee2e2;color:#7f1d1d;' : (${inv.estado == 'Apagado'} ? 'background:#e5e7eb;color:#374151;' : 'background:#fef3c7;color:#92400e;'))))"
+                    style="padding:3px 8px; border-radius:99px; font-size:11px; font-weight:700;">-</span>
             </td>
-            <td style="padding:10px 14px; font-size:12px; font-family:monospace; color:#5b667a;" th:text="${inv.direccionIp}">-</td>
-            <td style="padding:10px 14px; text-align:center;">
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.fechaAlarma}">-</td>
+            <td style="padding:8px 10px; font-size:12px; text-align:center; white-space:nowrap;">
+              <span th:if="${inv.alarmaHardware}" style="color:#ef4444; font-weight:700;">Sí</span>
+              <span th:unless="${inv.alarmaHardware}" style="color:#9ca3af;">No</span>
+            </td>
+            <td style="padding:8px 10px; font-size:12px; text-align:center; white-space:nowrap;">
+              <span th:if="${inv.alarmaVentilador}" style="color:#ef4444; font-weight:700;">Sí</span>
+              <span th:unless="${inv.alarmaVentilador}" style="color:#9ca3af;">No</span>
+            </td>
+            <td style="padding:8px 10px; font-size:12px; text-align:center; white-space:nowrap;">
+              <span th:if="${inv.alarmaFuentePoder}" style="color:#ef4444; font-weight:700;">Sí</span>
+              <span th:unless="${inv.alarmaFuentePoder}" style="color:#9ca3af;">No</span>
+            </td>
+            <td style="padding:8px 10px; font-size:12px; text-align:center; white-space:nowrap;">
+              <span th:if="${inv.alarmaHdd}" style="color:#ef4444; font-weight:700;">Sí</span>
+              <span th:unless="${inv.alarmaHdd}" style="color:#9ca3af;">No</span>
+            </td>
+            <td style="padding:8px 10px; font-size:12px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" th:text="${inv.comentariosAlarma}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.ticketRelacion}">-</td>
+            <td style="padding:8px 10px; font-size:12px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" th:text="${inv.observaciones}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.flujoAire}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.pesoEquipoKg}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.fuentesPoder}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.tiposEnchufe}">-</td>
+            <td style="padding:8px 10px; font-size:12px; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" th:text="${inv.observacionTipoEnchufe}">-</td>
+            <td style="padding:8px 10px; font-size:12px; white-space:nowrap;" th:text="${inv.potenciaConsumoWatts}">-</td>
+            <td style="padding:8px 10px; font-size:12px; font-family:monospace; white-space:nowrap;" th:text="${inv.direccionIp}">-</td>
+            <td style="padding:8px 10px; font-size:11px; color:#6b7280; white-space:nowrap;" th:text="${#temporals.format(inv.fechaCreacion, 'dd/MM/yyyy HH:mm')}">-</td>
+            <td style="padding:8px 10px; font-size:11px; color:#6b7280; white-space:nowrap;" th:text="${#temporals.format(inv.fechaModificacion, 'dd/MM/yyyy HH:mm')}">-</td>
+            <td style="padding:8px 10px; text-align:center; white-space:nowrap;">
               <div style="display:flex; justify-content:center; gap:8px;">
                 <a th:href="@{/inventario/{id}(id=${inv.id})}" style="font-size:12px; color:#1b6ca8; font-weight:700; text-decoration:none;" title="Ver">👁️</a>
                 <a th:href="@{/inventario/editar/{id}(id=${inv.id})}" style="font-size:12px; color:#d97706; font-weight:700; text-decoration:none;" title="Editar">✏️</a>
@@ -96,7 +158,7 @@
             </td>
           </tr>
           <tr th:if="${#lists.isEmpty(inventarios)}">
-            <td colspan="10" style="padding:36px; text-align:center; color:#9ca3af; font-size:14px;">Sin registros de inventario</td>
+            <td colspan="35" style="padding:36px; text-align:center; color:#9ca3af; font-size:14px;">Sin registros de inventario</td>
           </tr>
         </tbody>
       </table>

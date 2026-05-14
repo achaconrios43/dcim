@@ -29,6 +29,9 @@ public class Usuario {
     @Column(nullable = false, length = 20)
     private String rol = "USER";
 
+    @Column(name = "modulos_permitidos", columnDefinition = "TEXT")
+    private String modulosPermitidos = "";
+
     @Column(name = "creat_at")
     private LocalDateTime creatAt;
 
@@ -114,6 +117,14 @@ public class Usuario {
 
     public void setRol(String rol) {
         this.rol = rol;
+    }
+
+    public String getModulosPermitidos() {
+        return modulosPermitidos;
+    }
+
+    public void setModulosPermitidos(String modulosPermitidos) {
+        this.modulosPermitidos = modulosPermitidos != null ? modulosPermitidos : "";
     }
 
     public LocalDateTime getCreatAt() {

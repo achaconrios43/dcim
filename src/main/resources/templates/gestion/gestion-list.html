@@ -9,8 +9,6 @@
   <body class="bg-gray-100">
     <div th:replace="~{fragments/navdar :: nav}"></div>
 
-    <div th:replace="fragments/dashboard-button :: navigation-buttons"></div>
-
     <div class="container mx-auto px-4 py-8">
       <div class="bg-white rounded-lg shadow-lg p-6">
         <!-- Encabezado -->
@@ -19,9 +17,14 @@
             <i class="fas fa-clipboard-list mr-2 text-accent"></i>
             <span th:text="${titulo}">Gestión de Accesos</span>
           </h1>
-          <a href="/gestion/create" class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-300">
-            <i class="fas fa-plus mr-2"></i>Nueva Gestión
-          </a>
+          <div class="flex items-center gap-3">
+            <a th:href="@{/dashboard}" class="inline-flex items-center px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-300 hover:shadow-lg">
+              <i class="fas fa-home mr-2"></i>Dashboard
+            </a>
+            <a href="/gestion/create" class="inline-flex items-center px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all duration-300">
+              <i class="fas fa-plus mr-2"></i>Nueva Gestión
+            </a>
+          </div>
         </div>
 
         <!-- Mensajes de alerta -->
@@ -41,14 +44,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Sitio</label>
               <select id="filtroSitio" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent">
                 <option value="">Todos los sitios</option>
-                <option value="DC San Martin">DC San Martin</option>
-                <option value="DC Apoquindo">DC Apoquindo</option>
-                <option value="MC La Florida">MC La Florida</option>
-                <option value="MC Chiloé">MC Chiloé</option>
-                <option value="MC Independencia">MC Independencia</option>
-                <option value="MC Providencia">MC Providencia</option>
-                <option value="MC Pedro de Valdivia">MC Pedro de Valdivia</option>
-                <option value="MC Manuel Montt">MC Manuel Montt</option>
+                <option th:each="s : ${sitiosCatalogo}" th:value="${s.nombre}" th:text="${s.nombre}">Sitio</option>
               </select>
             </div>
             <div>

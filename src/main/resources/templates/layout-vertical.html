@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/headers :: headers}"></head>
+<body class="min-h-screen flex flex-col" style="font-family:'Barlow',sans-serif; color:#172134;
+  background: radial-gradient(circle at 8% 12%, rgba(11,60,117,0.08), transparent 32%),
+              radial-gradient(circle at 94% 5%, rgba(0,164,200,0.12), transparent 28%),
+              linear-gradient(180deg,#edf3f9 0%,#e6edf5 55%,#dfe9f3 100%);">
+
+<nav th:replace="~{fragments/navdar :: nav}"></nav>
+
+<style>
+/* ── Rack frame ── */
+.rack-frame {
+  background: #0d1117;
+  border-radius: 8px;
+  border: 3px solid #30363d;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+  min-width: 320px;
+  max-width: 420px;
+}
+.rack-top-cap {
+  background: linear-gradient(180deg, #21262d 0%, #161b22 100%);
+  padding: 10px 0 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding-left: 14px; padding-right: 14px;
+  border-bottom: 2px solid #30363d;
+}
+.rack-unit-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid #21262d;
+  transition: filter .1s;
+}
+.rack-unit-row:hover { filter: brightness(1.15); cursor: default; }
+.rack-unit-row.occupied { cursor: pointer; }
+.rack-unit-screw-col {
+  width: 14px; min-width: 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-around;
+  background: #161b22;
+  border-right: 1px solid #30363d;
+  padding: 2px 0;
+}
+.screw {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #6e7681, #30363d);
+  border: 1px solid #484f58;
+}
+.rack-unit-num {
+  width: 32px; min-width: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: #484f58;
+  background: #0d1117;
+  border-right: 1px solid #21262d;
+  font-family: monospace;
+  user-select: none;
+}
+.rack-unit-content {
+  flex: 1;
+  display: flex; align-items: center;
+  padding: 0 10px;
+  overflow: hidden;
+  gap: 8px;
+}
+.rack-unit-empty .rack-unit-content {
+  background: #0d1117;
+}
+.rack-unit-empty .rack-unit-num { color: #21262d; }
+.rack-panel-line {
+  width: 100%; height: 1px;
+  background: repeating-linear-gradient(90deg, #21262d 0, #21262d 4px, transparent 4px, transparent 8px);
+  opacity: .5;
+}
+.rack-bottom-cap {
+  background: #161b22;
+  padding: 8px 14px;
+  border-top: 2px solid #30363d;
+  display: flex; gap: 10px; align-items: center;
+}
+/* ── Tooltip ── */
+.rack-tooltip {
+  display: none; position: fixed; z-index: 9999;
+  background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+  padding: 12px 16px; min-width: 260px; max-width: 340px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.7); pointer-events: none;
+}
+/* ── Filtros ── */
+.filter-card {
+  background: #fff; border-radius: 10px;
+  border: 1px solid rgba(11,60,117,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 18px 22px; margin-bottom: 24px;
+}
+.filter-label {
+  display: block; font-size: 10px; font-weight: 700;
+  color: #5b667a; margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.filter-select {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid #d1d5db; border-radius: 8px;
+  background: #fff; font-size: 13px; box-sizing: border-box;
+}
+</style>
+
+<!-- Header -->
+<div style="background:linear-gradient(90deg,#0f4c75,#1b6ca8); padding:20px 32px; display:flex; align-items:center; gap:14px;">
+  <a href="/dashboard" style="color:rgba(255,255,255,0.7); font-size:13px; text-decoration:none; font-weight:600;">← Dashboard</a>
+  <span style="color:rgba(255,255,255,0.35);">/</span>
+  <span style="color:#fff; font-weight:800; font-size:15px;">🗄️ Layout Vertical de Racks</span>
+</div>
+
+<main class="flex-1" style="padding:28px 24px; max-width:1600px; margin:0 auto; width:100%;">
+
+  <!-- Filtros en cascada -->
+  <div class="filter-card">
+    <form method="GET" action="/layout-vertical">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:14px; align-items:end;">
+        <div>
+          <label class="filter-label">Sitio</label>
+          <select name="sitio" id="selSitio" class="filter-select" onchange="cargarSalas()">
+            <option value="">— Todos los sitios —</option>
+            <option th:each="s : ${sitios}" th:value="${s}" th:text="${s}" th:selected="${sitioSel == s}"></option>
+          </select>
+        </div>
+        <div>
+          <label class="filter-label">Sala</label>
+          <select name="sala" id="selSala" class="filter-select" onchange="cargarRacks()">
+            <option value="">— Todas las salas —</option>
+            <option th:each="sa : ${salas}" th:value="${sa}" th:text="${sa}" th:selected="${salaSel == sa}"></option>
+          </select>
+        </div>
+        <div>
+          <label class="filter-label">Rack específico</label>
+          <select name="rack" id="selRack" class="filter-select">
+            <option value="">— Todos los racks —</option>
+            <option th:each="r : ${racks}" th:value="${r}" th:text="${r}" th:selected="${rackSel == r}"></option>
+          </select>
+        </div>
+        <div>
+          <button type="submit" style="padding:9px 22px; background:linear-gradient(90deg,#0f4c75,#1b6ca8); color:#fff; border:none; border-radius:8px; font-weight:800; font-size:13px; cursor:pointer;">
+            🔍 Ver Racks
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Estado vacío -->
+  <div th:if="${racksData.isEmpty() and sitioSel == '' and salaSel == ''}"
+       style="text-align:center; padding:80px 20px;">
+    <div style="font-size:56px; margin-bottom:14px;">🗄️</div>
+    <div style="font-size:18px; font-weight:800; color:#374151; margin-bottom:8px;">Selecciona un Sitio o Sala</div>
+    <div style="font-size:13px; color:#9ca3af;">Filtra por sitio o sala para visualizar la ocupación de racks.</div>
+  </div>
+  <div th:if="${racksData.isEmpty() and (sitioSel != '' or salaSel != '')}"
+       style="text-align:center; padding:80px 20px;">
+    <div style="font-size:56px; margin-bottom:14px;">📭</div>
+    <div style="font-size:18px; font-weight:800; color:#374151; margin-bottom:8px;">Sin equipos registrados</div>
+    <div style="font-size:13px; color:#9ca3af;">No hay equipos con los filtros seleccionados.</div>
+  </div>
+
+  <!-- Grid de racks -->
+  <div th:if="${!racksData.isEmpty()}"
+       style="display:flex; flex-wrap:wrap; gap:32px; align-items:flex-start;">
+
+    <div th:each="entry : ${racksData}" style="flex:0 0 auto;">
+      <th:block th:with="rv = ${entry.value}">
+
+        <!-- Etiqueta encima del rack -->
+        <div style="margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; font-weight:700; color:#0f4c75; background:#e0eaf5; padding:3px 10px; border-radius:99px;"
+                th:text="${rv.nombre}"></span>
+          <span style="font-size:11px; font-weight:700; color:#6b7280;"
+                th:text="${rv.capacidadTotal + 'U'}"></span>
+        </div>
+
+        <!-- Marco físico del rack -->
+        <div class="rack-frame">
+
+          <!-- Cabecera del rack -->
+          <div class="rack-top-cap">
+            <div>
+              <div style="color:#e6edf3; font-weight:800; font-size:14px; letter-spacing:.02em;" th:text="${rv.nombre}"></div>
+           
+              <div th:if="${!rv.coordenadas.isEmpty()}" style="display:inline-flex; align-items:center; gap:5px; margin-top:3px;">
+                <span style="background:#f59e0b; color:#000; font-size:13px; font-weight:900; padding:1px 8px; border-radius:4px; letter-spacing:.06em;" th:text="${rv.coordenadas}"></span>
+              </div>
+              <div style="color:#79c0ff; font-size:11px; margin-top:2px; font-style:italic;"
+                   th:if="${!rv.marcaRack.isEmpty() or !rv.modeloRack.isEmpty()}"
+                   th:text="${rv.marcaRack + (rv.marcaRack.isEmpty() or rv.modeloRack.isEmpty() ? '' : ' ') + rv.modeloRack}"></div>
+              <div style="color:#8b949e; font-size:10px; margin-top:2px;"
+                   th:text="${rv.capacidadTotal + ' U  ·  ' + rv.equipos.size() + ' equipos'}"></div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+              <span style="font-size:9px; font-weight:800; padding:2px 8px; border-radius:99px; background:#1f6b3e; color:#aff4c6;"
+                    th:text="${rv.urLibres + ' U libres'}"></span>
+              <span style="font-size:9px; font-weight:800; padding:2px 8px; border-radius:99px; background:#6b1f1f; color:#fca5a5;"
+                    th:text="${rv.urUsadas + ' U usadas'}"></span>
+            </div>
+          </div>
+
+          <!-- Barra de ocupación -->
+          <div style="background:#161b22; padding:4px 8px;">
+            <div style="background:#21262d; border-radius:3px; height:5px; overflow:hidden;">
+              <div th:style="'width:' + ${rv.porcentaje} + '%; height:100%; background:' + ${rv.porcentajeColor} + '; border-radius:3px; transition:width .5s;'"></div>
+            </div>
+          </div>
+
+          <!-- Unidades del rack -->
+          <div>
+            <div th:each="slot : ${rv.slots}"
+                 th:class="${slot.isEmpty ? 'rack-unit-row rack-unit-empty' : 'rack-unit-row occupied'}"
+                 th:style="'height:' + ${slot.heightPx} + 'px; ' + (!${slot.isEmpty} ? 'background:' + ${slot.colorBg} + '; border-left:3px solid ' + ${slot.accentColor} + ';' : '')"
+                 th:attr="data-id=${slot.isEmpty ? '' : slot.equipo.id},
+                          data-tipo=${slot.isEmpty ? '' : slot.equipo.tipo},
+                          data-marca=${slot.isEmpty ? '' : slot.equipo.marca},
+                          data-modelo=${slot.isEmpty ? '' : slot.equipo.modelo},
+                          data-serie=${slot.isEmpty ? '' : slot.equipo.numeroSerie},
+                          data-tag=${slot.isEmpty ? '' : slot.equipo.tag},
+                          data-estado=${slot.isEmpty ? '' : slot.equipo.estado},
+                          data-hotname=${slot.isEmpty ? '' : slot.equipo.hotname},
+                          data-ip=${slot.isEmpty ? '' : slot.equipo.direccionIp},
+                          data-ur=${slot.unitNumber},
+                          data-span=${slot.spanUnits},
+                          data-cliente=${slot.isEmpty ? '' : slot.equipo.cliente}">
+
+              <!-- Columna de tornillos (estética de rack real) -->
+              <div class="rack-unit-screw-col">
+                <div class="screw"></div>
+                <div class="screw"></div>
+              </div>
+
+              <!-- Número de U -->
+              <div class="rack-unit-num" th:text="${slot.unitNumber}"></div>
+
+              <!-- Contenido -->
+              <div class="rack-unit-content">
+                <!-- Vacío -->
+                <div th:if="${slot.isEmpty}" style="width:100%;">
+                  <div class="rack-panel-line"></div>
+                </div>
+
+                <!-- Ocupado -->
+                <div th:unless="${slot.isEmpty}" style="display:flex; align-items:center; width:100%; gap:8px; overflow:hidden;">
+                  <!-- Indicador de estado -->
+                  <div th:style="'width:6px; height:6px; border-radius:50%; background:' + ${slot.estadoColor} + '; flex-shrink:0; box-shadow:0 0 4px ' + ${slot.estadoColor} + ';'"></div>
+                  <!-- Nombre del equipo -->
+                  <span style="flex:1; font-size:11px; font-weight:700; color:#e6edf3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+                        th:text="${slot.nombreDisplay}"></span>
+                  <!-- Badge de tipo -->
+                  <span th:style="'font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; background:' + ${slot.accentColor} + '30; color:' + ${slot.accentColor} + '; border:1px solid ' + ${slot.accentColor} + '50; white-space:nowrap; flex-shrink:0;'"
+                        th:text="${slot.tipoLabel}"></span>
+                  <!-- Indicador de span -->
+                  <span th:if="${slot.spanUnits > 1}"
+                        style="font-size:9px; color:#8b949e; flex-shrink:0;"
+                        th:text="${slot.spanUnits + 'U'}"></span>
+                </div>
+              </div>
+
+              <!-- Columna de tornillos derecha -->
+              <div class="rack-unit-screw-col" style="border-right:none; border-left:1px solid #30363d;">
+                <div class="screw"></div>
+                <div class="screw"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pie del rack -->
+          <div class="rack-bottom-cap">
+            <div style="flex:1; background:#21262d; border-radius:3px; height:4px; overflow:hidden;">
+              <div th:style="'width:' + ${rv.porcentaje} + '%; height:100%; background:' + ${rv.porcentajeColor} + ';'"></div>
+            </div>
+            <span style="font-size:10px; font-weight:700; color:#8b949e;" th:text="${rv.porcentaje + '%'}"></span>
+          </div>
+
+        </div><!-- /rack-frame -->
+      </th:block>
+    </div>
+
+  </div><!-- /grid -->
+</main>
+
+<!-- Tooltip de detalle -->
+<div class="rack-tooltip" id="rackTooltip">
+  <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+    <div style="width:8px; height:8px; border-radius:50%;" id="tt-estado-dot"></div>
+    <span style="font-size:10px; font-weight:800; color:#8b949e; text-transform:uppercase; letter-spacing:.05em;" id="tt-tipo"></span>
+    <span style="font-size:10px; color:#484f58;" id="tt-ur"></span>
+  </div>
+  <div style="font-size:14px; font-weight:800; color:#e6edf3; margin-bottom:10px;" id="tt-nombre"></div>
+  <div style="display:grid; grid-template-columns:auto 1fr; gap:4px 10px; font-size:11px; color:#8b949e;">
+    <span style="color:#484f58;">Serie</span>   <span style="color:#c9d1d9;" id="tt-serie"></span>
+    <span style="color:#484f58;">TAG</span>     <span style="color:#c9d1d9;" id="tt-tag"></span>
+    <span style="color:#484f58;">IP</span>      <span style="color:#58a6ff; font-family:monospace;" id="tt-ip"></span>
+    <span style="color:#484f58;">Cliente</span> <span style="color:#c9d1d9;" id="tt-cliente"></span>
+    <span style="color:#484f58;">Estado</span>  <span id="tt-estado"></span>
+  </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script>
+var tooltip = document.getElementById('rackTooltip');
+document.addEventListener('click', function(e) {
+  var row = e.target.closest('.occupied');
+  if (row) { mostrarTooltip(e, row); return; }
+  if (!e.target.closest('#rackTooltip')) tooltip.style.display = 'none';
+});
+
+function mostrarTooltip(e, el) {
+  e.stopPropagation();
+  var tipo   = el.dataset.tipo   || '-';
+  var marca  = el.dataset.marca  || '';
+  var modelo = el.dataset.modelo || '';
+  var hn     = el.dataset.hotname|| '';
+  var estado = el.dataset.estado || '-';
+  var estadoColors = {
+    'Operativo': '#22c55e', 'Alarmado': '#ef4444',
+    'Apagado': '#94a3b8',   'STAND BY': '#f59e0b', 'Retirado': '#6b7280'
+  };
+  var ec = estadoColors[estado] || '#60a5fa';
+
+  document.getElementById('tt-tipo').textContent   = tipo;
+  document.getElementById('tt-ur').textContent     = '· U' + el.dataset.ur + (el.dataset.span > 1 ? '–' + (parseInt(el.dataset.ur) + parseInt(el.dataset.span) - 1) : '');
+  document.getElementById('tt-nombre').textContent = [marca, modelo].filter(Boolean).join(' ') + (hn && hn !== 'N/A' ? '  ·  ' + hn : '');
+  document.getElementById('tt-serie').textContent  = el.dataset.serie   || '-';
+  document.getElementById('tt-tag').textContent    = el.dataset.tag     || '-';
+  document.getElementById('tt-ip').textContent     = el.dataset.ip      || '-';
+  document.getElementById('tt-cliente').textContent= el.dataset.cliente || '-';
+  document.getElementById('tt-estado').textContent = estado;
+  document.getElementById('tt-estado').style.color = ec;
+  document.getElementById('tt-estado-dot').style.background = ec;
+  document.getElementById('tt-estado-dot').style.boxShadow  = '0 0 5px ' + ec;
+
+  tooltip.style.display = 'block';
+  var r = el.getBoundingClientRect();
+  var x = r.right + 12, y = r.top;
+  if (x + 350 > window.innerWidth)  x = r.left - 360;
+  if (y + 220 > window.innerHeight) y = window.innerHeight - 225;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top  = Math.max(8, y) + 'px';
+}
+
+function cargarSalas() {
+  var sitio = document.getElementById('selSitio').value;
+  fetch('/layout-vertical/api/salas?sitio=' + encodeURIComponent(sitio))
+    .then(r => r.json()).then(list => {
+      var sel = document.getElementById('selSala');
+      sel.innerHTML = '<option value="">— Todas las salas —</option>';
+      list.forEach(s => { var o = new Option(s,s); sel.add(o); });
+      cargarRacks();
+    });
+}
+function cargarRacks() {
+  var sitio = document.getElementById('selSitio').value;
+  var sala  = document.getElementById('selSala').value;
+  fetch('/layout-vertical/api/racks?sitio=' + encodeURIComponent(sitio) + '&sala=' + encodeURIComponent(sala))
+    .then(r => r.json()).then(list => {
+      var sel = document.getElementById('selRack');
+      sel.innerHTML = '<option value="">— Todos los racks —</option>';
+      list.forEach(r => { var o = new Option(r,r); sel.add(o); });
+    });
+}
+</script>
+</body>
+</html>

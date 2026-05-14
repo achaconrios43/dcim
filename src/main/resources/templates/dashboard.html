@@ -65,8 +65,8 @@
 
 <nav th:replace="fragments/navdar :: nav"></nav>
 
-<main class="flex-1 py-8">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<main class="flex-1" style="padding:2rem 0 3rem;">
+<div style="max-width:min(3400px,92%); margin:0 auto; padding:0 1.5rem;">
 
   <!-- ── Alertas ── -->
   <div th:if="${error != null}"
@@ -113,7 +113,7 @@
     <div class="section-line" style="background: linear-gradient(90deg,#00a4c8,transparent)"></div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 reveal">
+  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1.25rem;" class="reveal">
 
     <!-- Data Center -->
     <div class="dcim-card" th:if="${usuario != null and usuario.rol != 'VIEWER'}">
@@ -138,6 +138,10 @@
           </a>
           <a href="/plano-sala/plantillas" class="module-link text-blue-700">
             <span>📐 Plantillas de Salas</span>
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          <a href="/layout-vertical" class="module-link text-blue-700">
+            <span>🗄️ Layout Vertical de Racks</span>
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
         </div>
@@ -228,7 +232,7 @@
           <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
                style="background:rgba(19,78,74,0.10)">🌡️</div>
           <div>
-            <h3 class="font-bold text-slate-800">Sitios, Salas y Temperatura</h3>
+            <h3 class="font-bold text-slate-800">Registro de Temperatura</h3>
             <p class="text-xs text-slate-500">Mediciones y reportes ambientales</p>
           </div>
           <span class="ml-auto tag-pill bg-emerald-100 text-emerald-700">nuevo</span>
@@ -286,11 +290,11 @@
         </div>
         <div class="space-y-1 mt-3">
           <a th:href="@{/dashboard/cliente/diario}" class="module-link text-amber-700">
-            <span>📅 Ingresos Diarios</span>
+            <span>📅 Registros Diarios</span>
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
           <a th:href="@{/dashboard/cliente/mensual}" class="module-link text-amber-700">
-            <span>📆 Ingresos Mensuales</span>
+            <span>📆 Registros Mensuales</span>
             <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
           <a href="/temperaturas" class="module-link text-amber-700">
@@ -368,7 +372,7 @@
     <div class="section-line" style="background: linear-gradient(90deg,#7c3aed,transparent)"></div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 reveal">
+  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(420px,1fr)); gap:1.25rem;" class="reveal">
 
     <!-- Accesos rápidos -->
     <div class="dcim-card">

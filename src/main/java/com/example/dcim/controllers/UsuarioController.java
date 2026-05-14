@@ -54,8 +54,11 @@ public class UsuarioController {
 
     // Procesar la creación de usuario
     @PostMapping("/create")
-    public String crearUsuario(@ModelAttribute Usuario usuario, RedirectAttributes redirectAttributes) {
+    public String crearUsuario(@ModelAttribute Usuario usuario,
+                               @RequestParam(value = "modulos", required = false) String[] modulos,
+                               RedirectAttributes redirectAttributes) {
         try {
+            usuario.setModulosPermitidos(modulos != null ? String.join(",", modulos) : "");
             usuarioService.crearUsuario(usuario);
             redirectAttributes.addAttribute("success", "created");
             return "redirect:/user/list";
@@ -103,9 +106,12 @@ public class UsuarioController {
 
     // Procesar la actualización de usuario
     @PostMapping("/update/{id}")
-    public String actualizarUsuario(@PathVariable Long id, @ModelAttribute Usuario usuario, RedirectAttributes redirectAttributes) {
+    public String actualizarUsuario(@PathVariable Long id, @ModelAttribute Usuario usuario,
+                                    @RequestParam(value = "modulos", required = false) String[] modulos,
+                                    RedirectAttributes redirectAttributes) {
         try {
             usuario.setId(id);
+            usuario.setModulosPermitidos(modulos != null ? String.join(",", modulos) : "");
             usuarioService.actualizarUsuario(usuario);
             redirectAttributes.addAttribute("success", "updated");
             return "redirect:/user/list";

@@ -47,10 +47,10 @@ public class Inventario {
     @Column(length = 100)
     private String modelo;
 
-    @Column(length = 100, unique = true)
+    @Column(length = 100)
     private String numeroSerie;
 
-    @Column(length = 100, unique = true)
+    @Column(length = 100)
     private String tag;
 
     @Column(length = 100)
@@ -67,6 +67,9 @@ public class Inventario {
 
     @Column(length = 50)
     private String urUtilizada;
+
+    @Column(name = "capacidad_ur_rack")
+    private Integer capacidadUrRack;
 
     @Column(length = 50)
     private String numeroTemporal;
@@ -270,6 +273,14 @@ public class Inventario {
 
     public void setUrUtilizada(String urUtilizada) {
         this.urUtilizada = urUtilizada;
+    }
+
+    public Integer getCapacidadUrRack() {
+        return capacidadUrRack;
+    }
+
+    public void setCapacidadUrRack(Integer capacidadUrRack) {
+        this.capacidadUrRack = capacidadUrRack;
     }
 
     public String getNumeroTemporal() {

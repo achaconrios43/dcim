@@ -57,15 +57,11 @@
                     <label for="sitio" class="block text-sm font-medium text-gray-700 mb-2">Sitio de Ingreso</label>
                     <select id="sitio" name="sitio" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="" th:selected="${sitioSeleccionado == null or sitioSeleccionado == ''}">Seleccione un sitio</option>
-                        <option value="DC San Martin" th:selected="${sitioSeleccionado == 'DC San Martin'}">DC San Martin</option>
-                        <option value="DC Apoquindo" th:selected="${sitioSeleccionado == 'DC Apoquindo'}">DC Apoquindo</option>
-                        <option value="MC Chiloé" th:selected="${sitioSeleccionado == 'MC Chiloé'}">MC Chiloé</option>
-                        <option value="MC Independencia" th:selected="${sitioSeleccionado == 'MC Independencia'}">MC Independencia</option>
-                        <option value="MC la Florida" th:selected="${sitioSeleccionado == 'MC la Florida'}">MC la Florida</option>
-                        <option value="MC Manuel Montt" th:selected="${sitioSeleccionado == 'MC Manuel Montt'}">MC Manuel Montt</option>
-                        <option value="MC Pedro de Valdivia" th:selected="${sitioSeleccionado == 'MC Pedro de Valdivia'}">MC Pedro de Valdivia</option>
-                        <option value="MC Providencia" th:selected="${sitioSeleccionado == 'MC Providencia'}">MC Providencia</option>
+                        <option value="">Selecciona un sitio</option>
+                        <option th:each="sitioItem : ${sitiosDisponibles}"
+                                th:value="${sitioItem.nombre}"
+                                th:text="${sitioItem.nombre}"
+                                th:selected="${sitioSeleccionado == sitioItem.nombre}"></option>
                     </select>
                 </div>
                 <button type="submit" 
@@ -84,6 +80,16 @@
                     Mostrando estadísticas para: <strong class="ml-1" th:text="${sitioSeleccionado}">Sitio</strong>
                 </span>
             </div>
+        </div>
+
+        <!-- Mensaje cuando no hay sitio seleccionado -->
+        <div th:if="${sitioSeleccionado == null or sitioSeleccionado == ''}" class="bg-white rounded-xl shadow-lg p-12 mb-8 text-center">
+            <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-500 mb-2">Selecciona un sitio</h3>
+            <p class="text-gray-400">Elige un sitio del listado superior para ver las estadísticas.</p>
         </div>
 
         <!-- Contenedor de estadísticas (solo visible si hay sitio seleccionado) -->

@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,11 +17,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.dcim.dao.IUsuarioDao;
+import com.example.dcim.entity.GestionAcceso;
 import com.example.dcim.entity.IngresoAP;
 import com.example.dcim.entity.Usuario;
+import com.example.dcim.service.GestionAccesoService;
 import com.example.dcim.service.IngresoAPService;
 import com.example.dcim.service.TemperaturaService;
 import com.example.dcim.service.UsuarioService;
@@ -42,6 +43,9 @@ public class IngresoController {
 
     @Autowired
     private IUsuarioDao usuarioDao;
+
+    @Autowired
+    private GestionAccesoService gestionAccesoService;
 
     @GetMapping("/ingresoap")
     public String ingresoForm(Model model){
@@ -78,7 +82,7 @@ public class IngresoController {
             @RequestParam(name="aprobador") String aprobador,
             @RequestParam(name="escolta") String escolta,
             @RequestParam(name="guiaDespacho", required=false) String guiaDespacho,
-            @RequestParam(name="sitioIngreso", required=false) String sitioIngreso,
+            @RequestParam(name="sitioIngreso") String sitioIngreso,
             @RequestParam(name="salaIngresa") String salaIngresa,
             @RequestParam(name="rackIngresa", required=false) String rackIngresa,
             @RequestParam(name="motivoIngreso") String motivoIngreso,
@@ -137,9 +141,7 @@ public class IngresoController {
             if (guiaDespacho != null && !guiaDespacho.trim().isEmpty()) {
                 ingresoAP.setGuiaDespacho(guiaDespacho);
             }
-            if (sitioIngreso != null && !sitioIngreso.trim().isEmpty()) {
-                ingresoAP.setSitioIngreso(sitioIngreso);
-            }
+            ingresoAP.setSitioIngreso(sitioIngreso.trim());
             if (rackIngresa != null && !rackIngresa.trim().isEmpty()) {
                 ingresoAP.setRackIngresa(rackIngresa);
             }
@@ -196,12 +198,101 @@ public class IngresoController {
         return "redirect:/user/ingresoap-list";
     }
 
-    // Listar todos los ingresos
+    // Listar todos los ingresos con filtros
     @GetMapping("/user/ingresoap-list")
-    public String listarIngresos(Model model) {
+    public String listarIngresos(
+            @RequestParam(required = false) String fechaInicio,
+            @RequestParam(required = false) String fechaFin,
+            @RequestParam(required = false) Boolean soloActivos,
+            @RequestParam(required = false) String sitio,
+            Model model) {
         try {
-            List<IngresoAP> ingresos = ingresoAPService.obtenerTodosLosIngresos();
+            List<IngresoAP> ingresos;
+            LocalDate dInicio = null;
+            LocalDate dFin = null;
+
+            // Parsear fechas
+            if (fechaInicio != null && !fechaInicio.isBlank()) {
+                dInicio = LocalDate.parse(fechaInicio);
+            }
+            if (fechaFin != null && !fechaFin.isBlank()) {
+                dFin = LocalDate.parse(fechaFin);
+            }
+
+            // Validar rango
+            if (dInicio != null && dFin != null && dInicio.isAfter(dFin)) {
+                model.addAttribute("errorFechas", "La fecha inicio no puede ser posterior a la fecha fin.");
+                dInicio = null;
+                dFin = null;
+            }
+
+            final String sitioFiltro = (sitio != null && !sitio.isBlank()) ? sitio.trim() : null;
+            boolean hayFiltro = dInicio != null || sitioFiltro != null || Boolean.TRUE.equals(soloActivos);
+
+            // Sin filtros: no mostrar nada
+            if (!hayFiltro) {
+                model.addAttribute("ingresos", java.util.Collections.emptyList());
+                model.addAttribute("sinFiltro", true);
+                model.addAttribute("fechaInicio", fechaInicio);
+                model.addAttribute("fechaFin", fechaFin);
+                model.addAttribute("soloActivos", soloActivos);
+                model.addAttribute("sitioSeleccionado", sitio);
+                model.addAttribute("sitios", ingresoAPService.listarSitiosIngresoAP());
+                return "user/ingresoap-list";
+            }
+
+            // Consulta base
+            if (dInicio != null && dFin != null) {
+                ingresos = ingresoAPService.obtenerIngresosPorRangoOrdenados(dInicio, dFin);
+            } else if (dInicio != null) {
+                ingresos = ingresoAPService.obtenerIngresosPorRangoOrdenados(dInicio, dInicio.plusYears(1));
+            } else {
+                ingresos = ingresoAPService.obtenerIngresosOrdenadosPorFecha();
+            }
+
+            // Filtro de sitio (Java-side)
+            if (sitioFiltro != null) {
+                ingresos = ingresos.stream()
+                        .filter(i -> sitioFiltro.equalsIgnoreCase(i.getSitioIngreso()))
+                        .collect(java.util.stream.Collectors.toList());
+            }
+
+            // Filtro solo activos
+            if (Boolean.TRUE.equals(soloActivos)) {
+                ingresos = ingresos.stream()
+                        .filter(i -> Boolean.TRUE.equals(i.getActivo()))
+                        .collect(java.util.stream.Collectors.toList());
+            }
+
+            // Mensaje resumen del filtro aplicado
+            if (hayFiltro) {
+                StringBuilder msg = new StringBuilder("Filtro: ");
+                if (dInicio != null) msg.append("Fecha ").append(dInicio).append(dFin != null ? " a " + dFin : "").append("  ");
+                if (sitioFiltro != null) msg.append("Sitio: ").append(sitioFiltro).append("  ");
+                if (Boolean.TRUE.equals(soloActivos)) msg.append("Solo activos");
+                model.addAttribute("filtroAplicado", msg.toString().trim());
+            }
+
             model.addAttribute("ingresos", ingresos);
+            model.addAttribute("sinFiltro", false);
+            model.addAttribute("fechaInicio", fechaInicio);
+            model.addAttribute("fechaFin", fechaFin);
+            model.addAttribute("soloActivos", soloActivos);
+            model.addAttribute("sitioSeleccionado", sitio);
+            model.addAttribute("sitios", ingresoAPService.listarSitiosIngresoAP());
+
+            // Mapa ticket -> primera GestionAcceso (para alertas de horario)
+            Map<String, GestionAcceso> gestionPorTicket = new HashMap<>();
+            for (IngresoAP ing : ingresos) {
+                if (ing.getNumeroTicket() != null && !gestionPorTicket.containsKey(ing.getNumeroTicket())) {
+                    List<GestionAcceso> gs = gestionAccesoService.listarPorNumeroTicket(ing.getNumeroTicket());
+                    if (gs != null && !gs.isEmpty()) {
+                        gestionPorTicket.put(ing.getNumeroTicket(), gs.get(0));
+                    }
+                }
+            }
+            model.addAttribute("gestionPorTicket", gestionPorTicket);
+
             return "user/ingresoap-list";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Error al cargar la lista de ingresos: " + e.getMessage());
@@ -216,6 +307,16 @@ public class IngresoController {
             Optional<IngresoAP> ingreso = ingresoAPService.obtenerIngresoPorId(id);
             if (ingreso.isPresent()) {
                 model.addAttribute("ingreso", ingreso.get());
+                // Buscar GestionAcceso asociada al ticket
+                String ticket = ingreso.get().getNumeroTicket();
+                GestionAcceso gestion = null;
+                if (ticket != null) {
+                    List<GestionAcceso> gs = gestionAccesoService.listarPorNumeroTicket(ticket);
+                    if (gs != null && !gs.isEmpty()) {
+                        gestion = gs.get(0);
+                    }
+                }
+                model.addAttribute("gestion", gestion);
                 return "user/ingresoap-read";
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Ingreso no encontrado");

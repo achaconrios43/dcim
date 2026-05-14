@@ -1,5 +1,6 @@
 package com.example.dcim.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -9,8 +10,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Configuración de Spring Security
@@ -25,6 +26,9 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 @EnableWebSecurity
 @org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private CustomAuthSuccessHandler customAuthSuccessHandler;
 
     /**
      * Configuración de seguridad para API REST (aplicaciones móviles)
@@ -71,8 +75,8 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health/**", "/actuator/health").permitAll()
 
                 // TODAS LAS DEMÁS RUTAS: Requieren autenticación
-                // Dashboard de estadísticas: accesible por ADMIN, USER y VIEWER
-                .requestMatchers("/dashboard/**").hasAnyRole("ADMIN", "USER", "VIEWER")
+                // Dashboard de estadísticas: accesible por ADMIN, USER, VIEWER y CLIENTE
+                .requestMatchers("/dashboard/**").hasAnyRole("ADMIN", "USER", "VIEWER", "CLIENTE")
 
                 // Módulos operativos: solo ADMIN y USER (VIEWER no tiene acceso)
                 .requestMatchers("/user/**").hasAnyRole("ADMIN", "USER")
@@ -81,7 +85,7 @@ public class SecurityConfig {
                 .requestMatchers("/gestion/**").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/inventario/**", "/inventario").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/temperaturas/**").hasAnyRole("ADMIN", "USER")
-                .requestMatchers("/plano-sala/plantillas", "/plano-sala/plantillas/**").hasAnyRole("ADMIN", "USER", "VIEWER")
+                .requestMatchers("/plano-sala/plantillas", "/plano-sala/plantillas/**").hasAnyRole("ADMIN", "USER", "VIEWER", "CLIENTE")
                 .requestMatchers("/plano-sala/**", "/plano-sala").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/salas", "/salas/**").hasRole("ADMIN")
 
@@ -89,18 +93,17 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 )
 
-            // CookieCsrfTokenRepository evita "Cannot create session after response
-            // committed" porque almacena el token en cookie, no en sesión HTTP
+            // HttpSessionCsrfTokenRepository: repositorio por defecto, compatible 100% con Thymeleaf.
             .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                .csrfTokenRepository(new HttpSessionCsrfTokenRepository())
             )
 
             // Configuración del formulario de login
             .formLogin(form -> form
                 .loginPage("/login")  // URL de la página de login personalizada
                 .loginProcessingUrl("/login")  // URL donde se procesa el login
-                .defaultSuccessUrl("/dashboard", true)  // Redirige al dashboard tras login exitoso
+                .defaultSuccessUrl("/dashboard", true)  // fallback si no se usa successHandler
+                .successHandler(customAuthSuccessHandler)  // handler personalizado (VIEWER=sesión infinita)
                 .failureUrl("/login?error=true")  // Redirige al login con error si falla
                 .usernameParameter("email")  // Campo del formulario para username (usamos email)
                 .passwordParameter("password")  // Campo del formulario para password
@@ -114,10 +117,10 @@ public class SecurityConfig {
 
             // Configuración del logout
             .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")
-                .invalidateHttpSession(true)  // Invalida la sesión HTTP
-                .deleteCookies("JSESSIONID")  // Elimina la cookie de sesión
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                 .permitAll()
             );
 

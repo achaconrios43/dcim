@@ -191,7 +191,15 @@ public class TemperaturaController {
 
         model.addAttribute("sitios", sitios);
         var salas = salaRepository.findByActivoTrueAndSitioIdOrderByNombreAsc(sitioId);
-        // Auto-seleccionar primera sala si no se proporcionó
+        // Validar que salaId pertenece al sitioId seleccionado; si no, resetear
+        if (salaId != null) {
+            final Long salaIdFinal = salaId;
+            boolean perteneceAlSitio = salas.stream().anyMatch(s -> s.getId().equals(salaIdFinal));
+            if (!perteneceAlSitio) {
+                salaId = null;
+            }
+        }
+        // Auto-seleccionar primera sala si no se proporcionó o fue reseteada
         if (salaId == null && !salas.isEmpty()) {
             salaId = salas.get(0).getId();
         }

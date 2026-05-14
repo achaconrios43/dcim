@@ -446,6 +446,22 @@ public class TemperaturaService {
                 .toList();
     }
 
+    /**
+     * Retorna un mapa ordenado con el promedio diario de temperatura para cada día
+     * del mes indicado (primerDia → ultimoDia). Los días sin mediciones quedan como null.
+     */
+    public Map<String, Double> promediosDiariosDelMes(String sitio, LocalDate primerDia, LocalDate ultimoDia) {
+        Map<String, Double> resultado = new LinkedHashMap<>();
+        if (sitio == null || sitio.trim().isEmpty()) return resultado;
+        LocalDate fecha = primerDia;
+        while (!fecha.isAfter(ultimoDia)) {
+            Double avg = medicionTemperaturaRepository.promedioDiarioPorSitio(sitio, fecha);
+            resultado.put(String.valueOf(fecha.getDayOfMonth()), avg);
+            fecha = fecha.plusDays(1);
+        }
+        return resultado;
+    }
+
     public void vincularIngresoAPConUbicacion(IngresoAP ingresoAP) {
         if (ingresoAP == null) {
             return;

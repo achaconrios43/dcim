@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.dcim.dao.InventarioRepository;
@@ -59,7 +60,7 @@ public class InventarioService {
     }
 
     public List<Inventario> obtenerTodos() {
-        return inventarioRepository.findAll();
+        return inventarioRepository.findAllByOrderByIdAsc();
     }
 
     // Búsquedas específicas
@@ -88,28 +89,64 @@ public class InventarioService {
         return inventarioRepository.buscar(search);
     }
 
-    // Importar múltiples sin duplicados
+    // Importar múltiples sin duplicados — cada ítem en su propia transacción
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void importarLote(List<Inventario> items) throws Exception {
         for (Inventario item : items) {
             try {
-                // Si existe, actualizar; si no, crear
-                Optional<Inventario> existente = inventarioRepository.findByNumeroSerie(item.getNumeroSerie());
+                Optional<Inventario> existente = Optional.empty();
+
+                // Solo buscar duplicado si numeroSerie tiene valor real y no es "0" (placeholder sin datos)
+                String ns = item.getNumeroSerie();
+                if (ns != null && !ns.trim().isEmpty() && !ns.trim().equals("0")) {
+                    existente = inventarioRepository.findByNumeroSerie(ns.trim());
+                }
+
+                // Si no encontró por serie, intentar por tag (también ignorar "0")
+                if (!existente.isPresent()) {
+                    String tg = item.getTag();
+                    if (tg != null && !tg.trim().isEmpty() && !tg.trim().equals("0")) {
+                        existente = inventarioRepository.findByTag(tg.trim());
+                    }
+                }
+
                 if (existente.isPresent()) {
-                    // Actualizar solo campos específicos
+                    // Actualizar todos los campos del registro existente
                     Inventario inv = existente.get();
-                    inv.setEstado(item.getEstado());
+                    inv.setSala(item.getSala());
+                    inv.setTipo(item.getTipo());
+                    inv.setMarca(item.getMarca());
+                    inv.setModelo(item.getModelo());
                     inv.setCliente(item.getCliente());
+                    inv.setCoordenadas(item.getCoordenadas());
+                    inv.setNombreRack(item.getNombreRack());
+                    inv.setUbicacionUr(item.getUbicacionUr());
+                    inv.setUrUtilizada(item.getUrUtilizada());
+                    inv.setNumeroTemporal(item.getNumeroTemporal());
                     inv.setHotname(item.getHotname());
+                    inv.setEstado(item.getEstado());
+                    inv.setFechaAlarma(item.getFechaAlarma());
+                    inv.setAlarmaHardware(item.getAlarmaHardware());
+                    inv.setAlarmaVentilador(item.getAlarmaVentilador());
+                    inv.setAlarmaFuentePoder(item.getAlarmaFuentePoder());
+                    inv.setAlarmaHdd(item.getAlarmaHdd());
+                    inv.setComentariosAlarma(item.getComentariosAlarma());
+                    inv.setTicketRelacion(item.getTicketRelacion());
+                    inv.setObservaciones(item.getObservaciones());
+                    inv.setFlujoAire(item.getFlujoAire());
+                    inv.setPesoEquipoKg(item.getPesoEquipoKg());
+                    inv.setFuentesPoder(item.getFuentesPoder());
+                    inv.setTiposEnchufe(item.getTiposEnchufe());
+                    inv.setObservacionTipoEnchufe(item.getObservacionTipoEnchufe());
+                    inv.setPotenciaConsumoWatts(item.getPotenciaConsumoWatts());
                     inv.setDireccionIp(item.getDireccionIp());
                     inv.setSitio(item.getSitio());
-                    inv.setObservaciones(item.getObservaciones());
                     inventarioRepository.save(inv);
                 } else {
                     inventarioRepository.save(item);
                 }
             } catch (Exception e) {
-                // Continuar con el siguiente, registrar el error
-                System.err.println("Error importando item: " + item.getNumeroSerie() + " - " + e.getMessage());
+                System.err.println("Error importando fila (serie=" + item.getNumeroSerie() + ", tag=" + item.getTag() + "): " + e.getMessage());
             }
         }
     }

@@ -46,7 +46,8 @@
       </div>
 
       <!-- Formulario de carga -->
-      <form method="POST" enctype="multipart/form-data">
+      <form method="POST" enctype="multipart/form-data" th:action="@{/inventario/importar}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <div style="margin-bottom:20px;">
           <label style="display:block; font-size:12px; font-weight:700; color:#5b667a; margin-bottom:8px;">Seleccionar archivo Excel</label>
           <input type="file" name="file" accept=".xlsx,.xls" required

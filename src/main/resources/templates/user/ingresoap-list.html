@@ -14,7 +14,7 @@
                         <p class="text-gray-600 mt-1">Registro completo de ingresos técnicos al Data Center</p>
                     </div>
                     <div class="flex space-x-3">
-                        <a th:href="@{/ingreso/ap}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+                        <a th:href="@{/ingresoap}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
@@ -26,14 +26,7 @@
                             </svg>
                             Dashboard
                         </a>
-                        <form th:action="@{/logout}" method="post" class="inline">
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                </svg>
-                                Cerrar Sesión
-                            </button>
-                        </form>
+
                     </div>
                 </div>
             </div>
@@ -43,7 +36,20 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Filtros de Búsqueda</h3>
                 
                 <form th:action="@{/user/ingresoap-list}" method="get" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Sitio -->
+                        <div>
+                            <label for="sitio" class="block text-sm font-medium text-gray-700 mb-1">Sitio</label>
+                            <select id="sitio" name="sitio"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Todos los sitios</option>
+                                <option th:each="s : ${sitios}"
+                                        th:value="${s}"
+                                        th:text="${s}"
+                                        th:selected="${s == sitioSeleccionado}">Sitio</option>
+                            </select>
+                        </div>
+
                         <!-- Fecha Inicio -->
                         <div>
                             <label for="fechaInicio" class="block text-sm font-medium text-gray-700 mb-1">Fecha Inicio</label>
@@ -113,7 +119,8 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="p-6 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900">Registros de Ingresos</h2>
-                    <p class="text-sm text-gray-600">Total de registros: <span th:text="${#lists.size(ingresos)}">0</span></p>
+                    <p th:if="${sinFiltro != true}" class="text-sm text-gray-600">Total de registros: <span th:text="${#lists.size(ingresos)}">0</span></p>
+                    <p th:if="${sinFiltro}" class="text-sm text-gray-500 italic">Use el formulario de filtros para buscar registros.</p>
                 </div>
                 
                 <div class="overflow-x-auto">
@@ -136,14 +143,27 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr th:if="${#lists.isEmpty(ingresos)}">
+                            <!-- Sin búsqueda aplicada -->
+                            <tr th:if="${sinFiltro}">
+                                <td colspan="13" class="px-6 py-12 text-center text-gray-500">
+                                    <div class="text-center">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                        <h3 class="mt-2 text-sm font-semibold text-gray-700">Realice una búsqueda</h3>
+                                        <p class="mt-1 text-sm text-gray-500">Seleccione un sitio o ingrese un rango de fechas para buscar registros.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Búsqueda sin resultados -->
+                            <tr th:if="${sinFiltro != true and #lists.isEmpty(ingresos)}">
                                 <td colspan="13" class="px-6 py-8 text-center text-gray-500">
                                     <div class="text-center">
                                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay registros</h3>
-                                        <p class="mt-1 text-sm text-gray-500">No se encontraron registros de acceso al Data Center.</p>
+                                        <h3 class="mt-2 text-sm font-medium text-gray-900">Sin resultados</h3>
+                                        <p class="mt-1 text-sm text-gray-500">No se encontraron registros para los filtros aplicados.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -177,6 +197,31 @@
                                     </span>
                                     <span th:unless="${ingreso.activo}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
                                         Inactivo
+                                    </span>
+                                    <!-- Indicador alerta si activo y vencido -->
+                                    <span th:if="${ingreso.activo}"
+                                          th:with="gestion=${gestionPorTicket != null ? gestionPorTicket[ingreso.numeroTicket] : null}">
+                                      <!-- Vencido por actividad -->
+                                      <th:block th:if="${gestion != null and gestion.fechaTerminoActividad != null and gestion.horaTerminoActividad != null}"
+                                                th:with="limiteAct=${T(java.time.LocalDateTime).of(gestion.fechaTerminoActividad, gestion.horaTerminoActividad)}">
+                                        <span th:if="${T(java.time.LocalDateTime).now().isAfter(limiteAct)}"
+                                              class="ml-1 inline-flex px-1 py-0.5 text-xs font-bold rounded bg-red-600 text-white"
+                                              title="Término actividad vencido">⚠️</span>
+                                      </th:block>
+                                      <!-- Vencido por Remedy -->
+                                      <th:block th:if="${gestion != null and gestion.fechaFinRemedy != null and gestion.horaFinRemedy != null}"
+                                                th:with="limiteRem=${T(java.time.LocalDateTime).of(gestion.fechaFinRemedy, gestion.horaFinRemedy)}">
+                                        <span th:if="${T(java.time.LocalDateTime).now().isAfter(limiteRem)}"
+                                              class="ml-1 inline-flex px-1 py-0.5 text-xs font-bold rounded bg-purple-600 text-white"
+                                              title="Salida Remedy vencida">⚠️</span>
+                                      </th:block>
+                                      <!-- Sin gestión y ficticia vencida -->
+                                      <th:block th:if="${gestion == null and ingreso.fechaFinFicticia != null and ingreso.horaFinFicticia != null}"
+                                                th:with="limiteFic=${T(java.time.LocalDateTime).of(ingreso.fechaFinFicticia, ingreso.horaFinFicticia)}">
+                                        <span th:if="${T(java.time.LocalDateTime).now().isAfter(limiteFic)}"
+                                              class="ml-1 inline-flex px-1 py-0.5 text-xs font-bold rounded bg-orange-500 text-white"
+                                              title="Salida ficticia vencida">⚠️</span>
+                                      </th:block>
                                     </span>
                                 </td>
                                 <!-- Columna de Acciones CRUD -->
@@ -264,6 +309,126 @@
                                 <div th:if="${ingreso.actividadRemedy}">
                                     <span class="text-gray-500">Actividad REMEDY:</span>
                                     <p class="text-sm text-gray-700 mt-1" th:text="${ingreso.actividadRemedy}">Descripción de actividad</p>
+                                </div>
+
+                                <!-- SECCIÓN DE ALERTAS DE HORARIO -->
+                                <div th:with="gestion=${gestionPorTicket != null ? gestionPorTicket[ingreso.numeroTicket] : null}"
+                                     class="mt-3 pt-3 border-t border-gray-200">
+
+                                  <div class="text-xs font-semibold text-gray-700 mb-2 flex items-center">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-1"></i>
+                                    Horarios Autorizados
+                                  </div>
+
+                                  <!-- Sin GestionAcceso: solo horario ficticio -->
+                                  <div th:if="${gestion == null}">
+                                    <!-- Alerta ficticia vencida -->
+                                    <div th:if="${ingreso.activo and ingreso.fechaFinFicticia != null and ingreso.horaFinFicticia != null}"
+                                         th:with="ahora=${T(java.time.LocalDateTime).now()},
+                                                  limite=${T(java.time.LocalDateTime).of(ingreso.fechaFinFicticia, ingreso.horaFinFicticia)}"
+                                         class="mb-2">
+                                      <div th:if="${ahora.isAfter(limite)}"
+                                           class="flex items-center bg-red-100 border border-red-400 rounded-md p-2">
+                                        <i class="fas fa-alarm-exclamation text-red-600 mr-2"></i>
+                                        <div>
+                                          <div class="text-xs font-bold text-red-800">⚠️ HORA DE SALIDA VENCIDA</div>
+                                          <div class="text-xs text-red-700">
+                                            Salida ficticia programada:
+                                            <span th:text="${#temporals.format(ingreso.fechaFinFicticia, 'dd/MM/yyyy')}">-</span>
+                                            <span th:text="${#temporals.format(ingreso.horaFinFicticia, 'HH:mm')}">-</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div th:unless="${ahora.isAfter(limite)}"
+                                           class="flex items-center bg-gray-100 border border-gray-300 rounded-md p-2">
+                                        <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                        <div class="text-xs text-gray-700">
+                                          Salida ficticia:
+                                          <span class="font-medium"
+                                                th:text="${#temporals.format(ingreso.fechaFinFicticia, 'dd/MM/yyyy') + ' ' + #temporals.format(ingreso.horaFinFicticia, 'HH:mm')}">-</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <!-- Sin fechas de ficticia -->
+                                    <div th:if="${ingreso.fechaFinFicticia == null or ingreso.horaFinFicticia == null}"
+                                         class="flex items-center bg-gray-50 border border-gray-200 rounded-md p-2 mb-2">
+                                      <i class="fas fa-clock text-gray-400 mr-2"></i>
+                                      <span class="text-xs text-gray-500 italic">Sin salida ficticia registrada</span>
+                                    </div>
+                                    <!-- Mensaje sin gestión -->
+                                    <div class="flex items-center bg-orange-50 border border-orange-300 rounded-md p-2">
+                                      <i class="fas fa-unlink text-orange-500 mr-2"></i>
+                                      <span class="text-xs text-orange-800 font-medium">Registro no tiene solicitud de acceso</span>
+                                    </div>
+                                  </div>
+
+                                  <!-- Con GestionAcceso: mostrar los 3 datos -->
+                                  <div th:if="${gestion != null}" class="space-y-2">
+
+                                    <!-- 1. Salida ficticia (siempre base) -->
+                                    <div th:if="${ingreso.activo and ingreso.fechaFinFicticia != null and ingreso.horaFinFicticia != null}"
+                                         th:with="ahora=${T(java.time.LocalDateTime).now()},
+                                                  limite=${T(java.time.LocalDateTime).of(ingreso.fechaFinFicticia, ingreso.horaFinFicticia)}">
+                                      <div th:if="${ahora.isAfter(limite)}"
+                                           class="flex items-center bg-red-50 border border-red-300 rounded-md p-2">
+                                        <i class="fas fa-clock text-red-500 mr-2"></i>
+                                        <div class="text-xs">
+                                          <span class="font-semibold text-red-700">⚠️ Salida ficticia VENCIDA:</span>
+                                          <span class="text-red-700 ml-1"
+                                                th:text="${#temporals.format(ingreso.fechaFinFicticia, 'dd/MM/yyyy') + ' ' + #temporals.format(ingreso.horaFinFicticia, 'HH:mm')}">-</span>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <!-- 2. Salida de actividad programada -->
+                                    <div th:if="${gestion.fechaTerminoActividad != null and gestion.horaTerminoActividad != null}"
+                                         th:with="ahora=${T(java.time.LocalDateTime).now()},
+                                                  limiteAct=${T(java.time.LocalDateTime).of(gestion.fechaTerminoActividad, gestion.horaTerminoActividad)}">
+                                      <div class="flex items-center rounded-md p-2"
+                                           th:classappend="${ingreso.activo and ahora.isAfter(limiteAct)} ? 'bg-red-50 border border-red-300' : 'bg-blue-50 border border-blue-200'">
+                                        <i class="fas fa-calendar-check mr-2"
+                                           th:classappend="${ingreso.activo and ahora.isAfter(limiteAct)} ? 'text-red-500' : 'text-blue-500'"></i>
+                                        <div class="text-xs">
+                                          <span class="font-semibold"
+                                                th:classappend="${ingreso.activo and ahora.isAfter(limiteAct)} ? 'text-red-700' : 'text-blue-700'"
+                                                th:text="${ingreso.activo and ahora.isAfter(limiteAct)} ? '⚠️ Término actividad VENCIDO:' : 'Término actividad:'">-</span>
+                                          <span class="ml-1"
+                                                th:classappend="${ingreso.activo and ahora.isAfter(limiteAct)} ? 'text-red-700' : 'text-blue-700'"
+                                                th:text="${#temporals.format(gestion.fechaTerminoActividad, 'dd/MM/yyyy') + ' ' + #temporals.format(gestion.horaTerminoActividad, 'HH:mm')}">-</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div th:if="${gestion.fechaTerminoActividad == null or gestion.horaTerminoActividad == null}"
+                                         class="flex items-center bg-gray-50 border border-gray-200 rounded-md p-2">
+                                      <i class="fas fa-calendar-times text-gray-400 mr-2"></i>
+                                      <span class="text-xs text-gray-500 italic">Sin fecha de término de actividad</span>
+                                    </div>
+
+                                    <!-- 3. Salida Remedy -->
+                                    <div th:if="${gestion.fechaFinRemedy != null and gestion.horaFinRemedy != null}"
+                                         th:with="ahora=${T(java.time.LocalDateTime).now()},
+                                                  limiteRem=${T(java.time.LocalDateTime).of(gestion.fechaFinRemedy, gestion.horaFinRemedy)}">
+                                      <div class="flex items-center rounded-md p-2"
+                                           th:classappend="${ingreso.activo and ahora.isAfter(limiteRem)} ? 'bg-red-50 border border-red-300' : 'bg-purple-50 border border-purple-200'">
+                                        <i class="fas fa-ticket-alt mr-2"
+                                           th:classappend="${ingreso.activo and ahora.isAfter(limiteRem)} ? 'text-red-500' : 'text-purple-500'"></i>
+                                        <div class="text-xs">
+                                          <span class="font-semibold"
+                                                th:classappend="${ingreso.activo and ahora.isAfter(limiteRem)} ? 'text-red-700' : 'text-purple-700'"
+                                                th:text="${ingreso.activo and ahora.isAfter(limiteRem)} ? '⚠️ Salida Remedy VENCIDA:' : 'Salida Remedy:'">-</span>
+                                          <span class="ml-1"
+                                                th:classappend="${ingreso.activo and ahora.isAfter(limiteRem)} ? 'text-red-700' : 'text-purple-700'"
+                                                th:text="${#temporals.format(gestion.fechaFinRemedy, 'dd/MM/yyyy') + ' ' + #temporals.format(gestion.horaFinRemedy, 'HH:mm')}">-</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div th:if="${gestion.fechaFinRemedy == null or gestion.horaFinRemedy == null}"
+                                         class="flex items-center bg-gray-50 border border-gray-200 rounded-md p-2">
+                                      <i class="fas fa-ticket-alt text-gray-400 mr-2"></i>
+                                      <span class="text-xs text-gray-500 italic">Sin fecha de fin Remedy</span>
+                                    </div>
+
+                                  </div>
                                 </div>
 
                                 <!-- SECCIÓN DE RONDA DE SUPERVISIÓN -->
@@ -417,13 +582,18 @@
                                                 if (alertaTxt) alertaTxt.textContent = 'Faltan ' + m + ' min ' + String(s).padStart(2,'0') + ' seg';
                                             }
                                         } else {
-                                            // Tiempo vencido — mantener alerta hasta que se marque
+                                            // Tiempo vencido — mostrar cuántas horas lleva de atraso
+                                            var atraso = Math.abs(diff);
+                                            var hAtras = Math.floor(atraso / 3600000);
+                                            var mAtras = Math.floor((atraso % 3600000) / 60000);
                                             if (contador) {
-                                                contador.textContent = '¡VENCIDO!';
+                                                contador.textContent = '¡VENCIDA! +' + hAtras + 'h ' + mAtras + 'min';
                                                 contador.classList.add('text-red-600');
                                             }
                                             if (alerta)    alerta.classList.remove('hidden');
-                                            if (alertaTxt) alertaTxt.textContent = 'Ronda NO realizada — requiere acción inmediata';
+                                            if (alertaTxt) alertaTxt.textContent =
+                                                'Ronda NO realizada — ' + hAtras + ' hora' + (hAtras !== 1 ? 's' : '') +
+                                                ' ' + mAtras + ' min de retraso';
                                         }
                                     }
 

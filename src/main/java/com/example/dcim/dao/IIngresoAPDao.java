@@ -1,14 +1,15 @@
 package com.example.dcim.dao;
 
-import com.example.dcim.entity.IngresoAP;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import com.example.dcim.entity.IngresoAP;
 
 /**
  * Repositorio de datos para IngresoAP usando Spring Data JPA
@@ -65,19 +66,19 @@ public interface IIngresoAPDao extends JpaRepository<IngresoAP, Long> {
     List<IngresoAP> findTop10ByActivoTrueOrderByFechaInicioDescHoraInicioDesc();
     
     // Métodos específicos del Dashboard Cliente por sitio
-    @Query("SELECT COUNT(i) FROM IngresoAP i WHERE i.sitioIngreso = :sitio AND i.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
+    @Query("SELECT COUNT(i) FROM IngresoAP i WHERE LOWER(i.sitioIngreso) = LOWER(:sitio) AND i.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
     Long countBySitioIngresoAndFechaInicioBetween(@Param("sitio") String sitio, @Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFin") LocalDate fechaFin);
     
-    @Query("SELECT COUNT(DISTINCT i.numeroTicket) FROM IngresoAP i WHERE i.sitioIngreso = :sitio AND i.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
+    @Query("SELECT COUNT(DISTINCT i.numeroTicket) FROM IngresoAP i WHERE LOWER(i.sitioIngreso) = LOWER(:sitio) AND i.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
     Long countDistinctNumeroTicketBySitioIngresoAndFechaInicioBetween(@Param("sitio") String sitio, @Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFin") LocalDate fechaFin);
     
-    @Query("SELECT COUNT(DISTINCT i.numeroTicket) FROM IngresoAP i WHERE i.tipoTicket = :tipoTicket AND i.sitioIngreso = :sitio AND i.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
+    @Query("SELECT COUNT(DISTINCT i.numeroTicket) FROM IngresoAP i WHERE i.tipoTicket = :tipoTicket AND LOWER(i.sitioIngreso) = LOWER(:sitio) AND i.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
     Long countDistinctNumeroTicketByTipoTicketAndSitioIngresoAndFechaInicioBetween(@Param("tipoTicket") String tipoTicket, @Param("sitio") String sitio, @Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFin") LocalDate fechaFin);
     
-    @Query("SELECT COUNT(i) FROM IngresoAP i WHERE i.salaRemedy = :salaRemedy AND i.sitioIngreso = :sitio AND i.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
+    @Query("SELECT COUNT(i) FROM IngresoAP i WHERE i.salaRemedy = :salaRemedy AND LOWER(i.sitioIngreso) = LOWER(:sitio) AND i.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
     Long countBySalaRemedyAndSitioIngresoAndFechaInicioBetween(@Param("salaRemedy") String salaRemedy, @Param("sitio") String sitio, @Param("fechaInicio") LocalDate fechaInicio, @Param("fechaFin") LocalDate fechaFin);
     
-    @Query("SELECT i FROM IngresoAP i WHERE i.activo = true AND i.sitioIngreso = :sitio ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
+    @Query("SELECT i FROM IngresoAP i WHERE i.activo = true AND LOWER(i.sitioIngreso) = LOWER(:sitio) ORDER BY i.fechaInicio DESC, i.horaInicio DESC")
     List<IngresoAP> findByActivoTrueAndSitioIngresoOrderByFechaInicioDescHoraInicioDesc(@Param("sitio") String sitio);
     
     @Query("SELECT COUNT(DISTINCT i.numeroTicket) FROM IngresoAP i WHERE i.tipoTicket = :tipoTicket AND i.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
